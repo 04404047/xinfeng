@@ -1,0 +1,13 @@
+{
+  "name": "recycleflow-sync-server",
+  "version": "1.0.0",
+  "description": "RecycleFlow 塑料回收收发货管理 — 一体化部署服务器（前端 + 多厂区同步 API，零依赖）",
+  "main": "app-server.js",
+  "scripts": {
+    "start": "node app-server.js"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "license": "MIT"
+}
