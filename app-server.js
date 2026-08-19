@@ -78,9 +78,12 @@ function readBody(req) {
 }
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.ico': 'image/x-icon', '.png': 'image/png', '.svg': 'image/svg+xml' };
 
-/* ---------- 合并逻辑（LWW：ts 大者胜；相同则 rev 大者胜） ---------- */
+/* ---------- 合并逻辑（LWW：ts 大者胜；相同则 rev 大者胜） ----------
+   墓碑优先：一旦 id 进入 deleted（含老板/开发管理员删除），任何后续推送都
+   不得将其复活——这是修复「老板删除后被同步复原」的关键。 */
 function mergeRecord(rec) {
   if (!rec || rec.id == null) return;
+  if (deleted.indexOf(rec.id) >= 0) return; // 墓碑中的记录永不复活
   const cur = ledger[rec.id];
   const ts = rec.ts || 0, rev = rec.rev || 0;
   const cts = cur ? (cur.ts || 0) : -1, crev = cur ? (cur.rev || 0) : -1;

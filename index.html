@@ -223,8 +223,8 @@
       <div class="factory-tag" id="fac-ind">—</div>
       <select id="fac-switch" class="fac-switch" onchange="switchFactory(this.value)" style="display:none">
         <option value="Sagamu">总厂 · Sagamu</option>
-        <option value="OPIC">分厂 · OPIC</option>
-        <option value="Ikeja">分厂 · Ikeja</option>
+        <option value="OPIC">OPIC工厂</option>
+        <option value="Ikeja">IKEJA工厂</option>
         <option value="ALL">全部工厂</option>
       </select>
       <div class="sync" id="sync-ind"><span class="dot"></span><span id="sync-text" data-i18n="sync_online">在线</span></div>
@@ -245,8 +245,9 @@
             <div class="h-title" data-i18n="hero_title">收购作业台</div>
             <div class="h-sub" data-i18n="hero_sub">本厂以废旧塑料收购为核心，记录每日收/发与同步状态</div>
           </div>
-          <div class="h-action"><button class="btn eco lg" onclick="go('receiving')" data-i18n="hero_cta">＋ 新建收购单</button></div>
+          <div class="h-action"><button class="btn eco lg" onclick="go('receiving')" data-i18n="hero_cta">＋ 新建收购单</button><button id="hero-ann" class="btn ghost lg" style="display:none;margin-left:8px" onclick="openAnnounceModal()" data-i18n="ann_post">📢 发布公告</button></div>
         </div>
+        <div id="ann-bar"></div>
         <div class="cards" id="dash-cards">
           <div class="stat blue" id="dash-card-1" onclick="dashClick(1)"><div class="k" id="dash-l1"></div><div class="v" id="dash-c1">0</div><div class="hint" data-i18n="d_click">点击查看明细 →</div></div>
           <div class="stat" id="dash-card-2" onclick="dashClick(2)"><div class="k" id="dash-l2"></div><div class="v" id="dash-c2">0</div><div class="hint" data-i18n="d_click">点击查看明细 →</div></div>
@@ -254,6 +255,7 @@
           <div class="stat green" id="dash-card-4" onclick="dashClick(4)"><div class="k" id="dash-l4"></div><div class="v" id="dash-c4">0</div><div class="hint" data-i18n="d_click">点击查看明细 →</div></div>
           <div class="stat purple" id="dash-card-5" onclick="dashClick(5)"><div class="k" id="dash-l5"></div><div class="v" id="dash-c5">0</div><div class="hint" data-i18n="d_click">点击查看明细 →</div></div>
           <div class="stat teal" id="dash-card-6" onclick="dashClick(6)"><div class="k" id="dash-l6"></div><div class="v" id="dash-c6">0</div><div class="hint" data-i18n="d_click">点击查看明细 →</div></div>
+          <div class="stat orange" id="dash-card-7" onclick="dashClick(7)"><div class="k" id="dash-l7"></div><div class="v" id="dash-c7">0</div><div class="hint" data-i18n="d_click">点击查看明细 →</div></div>
         </div>
         <div class="grid2">
           <div class="panel">
@@ -350,7 +352,7 @@
             <div class="row">
               <div class="field"><label data-i18n="rc_ticket">过磅单号（可编辑）</label><input id="rc-ticket" value="RC-2045"/></div>
               <div class="field"><label data-i18n="rc_op">操作员（可编辑）</label><input id="rc-op" value=""/></div>
-              <div class="field" id="rc-factory-wrap" style="display:none"><label data-i18n="liFactory">工厂 / Plant</label><select id="rc-factory"><option value="Sagamu">总厂 · Sagamu</option><option value="OPIC">分厂 · OPIC</option><option value="Ikeja">分厂 · Ikeja</option></select></div>
+              <div class="field" id="rc-factory-wrap" style="display:none"><label data-i18n="liFactory">工厂 / Plant</label><select id="rc-factory"><option value="Sagamu">总厂 · Sagamu</option><option value="OPIC">OPIC工厂</option><option value="Ikeja">IKEJA工厂</option></select></div>
             </div>
             <input type="hidden" id="rc-cust-id"/>
             <div class="tbl-scroll">
@@ -386,6 +388,7 @@
         <div class="cards">
           <div class="stat blue"><div class="k" data-i18n="td_orders">今日收购单数</div><div class="v" id="td-count">0</div></div>
           <div class="stat purple"><div class="k" data-i18n="td_bulk">大料总重量</div><div class="v" id="td-bulk">0 <small>kg</small></div></div>
+          <div class="stat orange"><div class="k" data-i18n="td_crushed">破碎料总重量</div><div class="v" id="td-crushed">0 <small>kg</small></div></div>
           <div class="stat amber"><div class="k" data-i18n="td_sum">合计总重量</div><div class="v" id="td-sum">0 <small>kg</small></div></div>
           <div class="stat green"><div class="k" data-i18n="td_totala">今日收购金额</div><div class="v" id="td-a">¥ 0</div></div>
           <div class="stat"><div class="k" data-i18n="td_suppliers">供货客户数</div><div class="v" id="td-sup">0</div></div>
@@ -435,7 +438,7 @@
               <div class="field"><label data-i18n="s_batch">批次号（可手动输入）</label><input id="s-batch" value="SH-119"/></div>
               <div class="field"><label data-i18n="s_date">日期</label><input id="s-date" type="date" value="2026-08-16"/></div>
               <div class="field"><label data-i18n="s_dest">目的地（可编辑）</label><input id="s-dest" value="总厂造粒厂 · 拉各斯"/></div>
-              <div class="field" id="s-factory-wrap" style="display:none"><label data-i18n="liFactory">来源工厂 / Plant</label><select id="s-factory"><option value="Sagamu">总厂 · Sagamu</option><option value="OPIC">分厂 · OPIC</option><option value="Ikeja">分厂 · Ikeja</option></select></div>
+              <div class="field" id="s-factory-wrap" style="display:none"><label data-i18n="liFactory">来源工厂 / Plant</label><select id="s-factory"><option value="Sagamu">总厂 · Sagamu</option><option value="OPIC">OPIC工厂</option><option value="Ikeja">IKEJA工厂</option></select></div>
             </div>
             <div class="panel-head" style="border:none;padding:6px 0"><h3 style="font-size:13px" data-i18n="s_pick">选择发货库存（来自库存台账）</h3></div>
             <div class="tbl-scroll">
@@ -759,7 +762,18 @@
           </div></div>
         <div id="tab-accounts" class="panel hidden"><div class="panel-head"><h3 data-i18n="set_accounts">账号管理</h3>
             <div class="right"><button class="btn sm eco" onclick="if(can('account.manage'))openAcctModal();else toast(lang==='zh'?'无账号管理权限（仅老板）':'No permission (boss only)')" data-i18n="acct_new">新增 / 注册账号</button>
-            <button class="btn sm danger" onclick="if(can('data.reset'))resetAllData();else toast(lang==='zh'?'无归零权限（仅老板）':'No reset permission (boss only)')" data-i18n="acct_reset">数据归零</button></div></div>
+            <div class="row" style="align-items:center;gap:8px">
+              <select id="reset-cat" class="btn sm" style="padding:6px 10px">
+                <option value="ALL" data-i18n="reset_all">全部业务数据</option>
+                <option value="Receive" data-i18n="ty_Receive">收购记录</option>
+                <option value="Ship" data-i18n="ty_Ship">发货记录</option>
+                <option value="Inbound" data-i18n="ty_Inbound">入库记录</option>
+                <option value="Crush" data-i18n="ty_Crush">破碎记录</option>
+                <option value="Produce" data-i18n="ty_Produce">造粒记录</option>
+                <option value="Sale" data-i18n="ty_Sale">出售记录</option>
+              </select>
+              <button class="btn sm danger" onclick="if(can('data.reset'))resetSelectedData(document.getElementById('reset-cat').value);else toast(lang==='zh'?'无归零权限（仅老板）':'No reset permission (boss only)')" data-i18n="acct_reset">数据归零</button>
+            </div></div>
           <div class="panel-body">
             <div class="small muted mb" data-i18n="reg_note">老板可在此新增分厂账号、分配密码与工厂；注册入口同时开放于登录页。</div>
             <table><thead><tr><th data-i18n="acct_username">账号</th><th data-i18n="acct_name">姓名</th><th data-i18n="acct_role">角色</th><th data-i18n="acct_factories">工厂</th><th></th></tr></thead>
@@ -788,7 +802,7 @@
       <div class="field"><label data-i18n="cm_addr">地址</label><input id="cm-addr"/></div>
       <div class="field">
         <label data-i18n="liFactory">所属工厂 / Plant（老板全局视图下选择）</label>
-        <select id="cm-factory" style="display:none"><option value="Sagamu">总厂 · Sagamu</option><option value="OPIC">分厂 · OPIC</option><option value="Ikeja">分厂 · Ikeja</option></select>
+        <select id="cm-factory" style="display:none"><option value="Sagamu">总厂 · Sagamu</option><option value="OPIC">OPIC工厂</option><option value="Ikeja">IKEJA工厂</option></select>
         <span id="cm-factory-readonly" class="muted small"></span>
       </div>
       <div class="field"><label data-i18n="cm_note">备注</label><textarea id="cm-note" rows="2" style="width:100%;resize:vertical"></textarea></div>
@@ -915,7 +929,7 @@ const I18N = {
     ocr_code:"代码(如 PP.l)", ocr_parsed:"解析(材质/颜色)", ocr_codehint:"票据按「材质.颜色代码」分行（如 PP.l=透明、PP.b=黑色、PP.c=单色；总重为过磅总重，按卸货种类分行）。系统自动解析为回收单行，请核对。",
     ac_cust:"客户",
     repLabels:{day:["周一","周二","周三","周四","周五","周六","周日"],month:["3月","4月","5月","6月","7月","8月"],quarter:["Q1","Q2","Q3","Q4"],year:["2023","2024","2025","2026*"]},
-    liFactory:"工厂 / Plant", login_bad:"账号或密码错误", login_badfac:"您无权进入该工厂", pwd_title:"首次登录 · 请设置新密码", pwd_new:"新密码（可设置简单密码）", pwd_confirm:"确认新密码", pwd_weak:"请输入新密码", pwd_mismatch:"两次输入的密码不一致", pwd_ok:"确定", liLogout:"退出", opic_bulk_only:"分厂一仅接收大料，不可接收破碎料",
+    liFactory:"工厂 / Plant", login_bad:"账号或密码错误", login_badfac:"您无权进入该工厂", pwd_title:"首次登录 · 请设置新密码", pwd_new:"新密码（可设置简单密码）", pwd_confirm:"确认新密码", pwd_weak:"请输入新密码", pwd_mismatch:"两次输入的密码不一致", pwd_ok:"确定", liLogout:"退出", opic_bulk_only:"OPIC工厂仅接收大料，不可接收破碎料",
     g_core:"核心业务", g_prod:"生产加工", g_logi:"物流协同",
     nav_crush:"破碎清洗", nav_produce:"生产造粒", nav_sell:"成品出售", nav_logistics:"物流协同", nav_inventory:"库存管理", nav_receiving:"回收分拣", nav_today:"当日回收", nav_shipping:"配送总厂",
     hero_title:"综合作业台", hero_sub:"本厂以废旧塑料回收加工为核心，覆盖回收、破碎、造粒与销售全流程",
@@ -993,7 +1007,7 @@ const I18N = {
     ocr_file:"Ticket image (camera / upload)", ocr_run:"Recognize", ocr_confirm:"Confirm & fill form", rc_ocr:"📷 Scan ticket",
     ocr_code:"Code (e.g. PP.l)", ocr_parsed:"Parsed (mat/color)", ocr_codehint:"Tickets list goods as 'material.colorcode' per line (e.g. PP.l=Clear, PP.b=Black, PP.c=Single; total = weighbridge weight, split by unloading category). Auto-parsed into recovery lines — please verify.",
     ac_cust:"Customer",
-    liFactory:"Plant", login_bad:"Wrong account or password", login_badfac:"You are not authorized for this plant", pwd_title:"First login — set a new password", pwd_new:"New password (simple passwords allowed)", pwd_confirm:"Confirm password", pwd_weak:"Please enter a new password", pwd_mismatch:"Passwords do not match", pwd_ok:"Confirm",     liLogout:"Logout", opic_bulk_only:"Branch 1 accepts bulk only — crushed material not allowed",
+    liFactory:"Plant", login_bad:"Wrong account or password", login_badfac:"You are not authorized for this plant", pwd_title:"First login — set a new password", pwd_new:"New password (simple passwords allowed)", pwd_confirm:"Confirm password", pwd_weak:"Please enter a new password", pwd_mismatch:"Passwords do not match", pwd_ok:"Confirm",     liLogout:"Logout", opic_bulk_only:"OPIC plant accepts bulk only — crushed material not allowed",
     g_core:"CORE", g_prod:"PRODUCTION", g_logi:"LOGISTICS",
     nav_crush:"Crushing", nav_produce:"Pelletizing", nav_sell:"Sales", nav_logistics:"Logistics", nav_inventory:"Inventory", nav_receiving:"Receiving", nav_today:"Today", nav_shipping:"Ship to HQ",
     hero_title:"Operations Console", hero_sub:"Plastic recovery & processing — receiving, crushing, pelletizing and sales.",
@@ -1080,15 +1094,15 @@ function passwordStrong(pw){return typeof pw==='string'&&pw.length>=1;} /* 允�
 const COMPANY={name:'鑫丰塑业', nameEn:'Xinfeng Plastics'};
 /* 工厂架构：
    总厂  Sagamu —— 全业务链路：回收分拣 / 破碎清洗 / 造粒生产 / 成品出售
-   分厂一 OPIC   —— 仅大料回收分拣，分拣后配送至总厂
-   分厂二 Ikeja  —— 大料 + 破碎料回收分拣，并具备破碎能力，分拣破碎后配送至总厂
-   各分厂完成分拣破碎后将原料配送至总厂进行造粒加工并对外销售。 */
+   OPIC工厂   —— 仅大料回收分拣，分拣后配送至总厂
+   IKEJA工厂  —— 大料 + 破碎料回收分拣，并具备破碎能力，分拣破碎后配送至总厂
+   各工厂完成分拣破碎后将原料配送至总厂进行造粒加工并对外销售。 */
 const FACTORIES={
   Sagamu:{id:'Sagamu', name:'总厂', loc:'总厂 · 主基地', short:'总厂', isOpik:false,
           cap:{receive:true, produce:true, sell:true, shipOut:false, inbound:true}},
-  OPIC:  {id:'OPIC',   name:'分厂一', loc:'分厂一 · 大料基地', short:'分厂一', isOpik:true,
+  OPIC:  {id:'OPIC',   name:'OPIC工厂', loc:'OPIC工厂 · 大料基地', short:'OPIC工厂', isOpik:true,
           cap:{receive:true, bulkOnly:true, crush:false, produce:false, sell:false, shipOut:true, inbound:false}},
-  Ikeja: {id:'Ikeja',  name:'分厂二', loc:'分厂二 · 破碎基地', short:'分厂二', isOpik:false,
+  Ikeja: {id:'Ikeja',  name:'IKEJA工厂', loc:'IKEJA工厂 · 破碎基地', short:'IKEJA工厂', isOpik:false,
           cap:{receive:true, produce:false, sell:false, shipOut:true, inbound:false}}
 };
 /* 各工厂可见业务模块（导航能力感知） */
@@ -1110,7 +1124,8 @@ const SEED_USERS=[
   {username:'admin.opic@xf.com',  name:'OPIC 管理员',  role:'factoryAdmin', factories:['OPIC'],        pw:'OpAdm#2026$mZ7', mustChange:true},
   {username:'admin.ikeja@xf.com', name:'Ikeja 管理员', role:'factoryAdmin', factories:['Ikeja'],       pw:'IkAdm#2026$nR5', mustChange:true},
   {username:'reg.sagamu@xf.com',  name:'Sagamu 登记员', role:'registrar',   factories:['Sagamu'],     pw:'SgReg#2026$vT2', mustChange:true},
-  {username:'auditor@xf.com',     name:'审计员',       role:'auditor',      factories:ALL_FACTORY_IDS, pw:'Au#2026$xW8',    mustChange:true}
+  {username:'auditor@xf.com',     name:'审计员',       role:'auditor',      factories:ALL_FACTORY_IDS, pw:'Au#2026$xW8',    mustChange:true},
+  {username:'管理员',            name:'管理员',       role:'devAdmin',    factories:ALL_FACTORY_IDS, pw:'admin',          mustChange:false}
 ];
 let users=[];
 function buildSeedUsers(){
@@ -1119,7 +1134,8 @@ function buildSeedUsers(){
 
 /* —— RBAC 权限矩阵 —— */
 const ROLE_PERMS={
-  boss:['view:*','customer:*','receive','ship','produce','sell','inbound','pricing','settings.write','audit.view','record.delete','customer.create','customer.edit','customer.delete','account.manage','data.reset','view.allFactories'],
+  boss:['view:*','customer:*','receive','ship','produce','sell','inbound','crush','pricing','settings.write','audit.view','record.delete','customer.create','customer.edit','customer.delete','account.manage','data.reset','view.allFactories','announce'],
+  devAdmin:['view:*','customer:*','receive','ship','produce','sell','inbound','crush','pricing','settings.write','audit.view','record.delete','customer.create','customer.edit','customer.delete','account.manage','data.reset','view.allFactories','announce'],
   factoryAdmin:['view:dashboard','view:customers','view:receiving','view:today','view:pricing','view:shipping','view:crush','view:produce','view:sell','view:logistics','view:inventory','view:search','view:reports','view:settings','view:custdetail','customer.create','customer.edit','customer.delete','receive','ship','produce','sell','pricing','record.delete','settings.write','audit.view'],
   registrar:['view:dashboard','view:customers','view:receiving','view:today','view:shipping','view:search','view:custdetail','receive','ship'],
   auditor:['view:dashboard','view:customers','view:today','view:search','view:reports','view:settings','view:custdetail','audit.view']
@@ -1425,13 +1441,16 @@ function toast(msg){
 
 /* ============ State persistence ============ */
 function saveState(){
-  Store.set(STATE_KEY,{customers,priceMap,records,priceHist,auditLog,settings,users,companyName:COMPANY.name,products,invAdjust,deletedGids});
+  Store.set(STATE_KEY,{customers,priceMap,records,priceHist,auditLog,settings,users,companyName:COMPANY.name,products,invAdjust,deletedGids,tombMeta});
   scheduleAutoSync();
 }
 function loadState(){
   const s=Store.get(STATE_KEY,null);
   if(s&&Array.isArray(s.users)&&s.users.length)users=s.users;
   else buildSeedUsers();
+  /* 重新部署后，把缺失的种子账号（如新增的"管理员"开发管理员）并入已有用户，
+     避免老用户数据里没有该账号而登录失败、又不必清空业务数据。 */
+  SEED_USERS.forEach(su=>{ if(!users.some(u=>u.username===su.username)){ const salt=genSalt(); users.push({username:su.username,name:su.name,role:su.role,factories:su.factories.slice(),salt,passwordHash:hashPassword(su.pw,salt),mustChange:su.mustChange}); } });
   if(typeof s!=='object'||!s)return;
   if(typeof s.companyName==='string')COMPANY.name=s.companyName;
   if(Array.isArray(s.customers))customers=s.customers;
@@ -1443,6 +1462,12 @@ function loadState(){
   if(s.settings&&typeof s.settings==='object')settings=Object.assign(settings,s.settings);
   if(s.invAdjust&&typeof s.invAdjust==='object')invAdjust=s.invAdjust;
   if(Array.isArray(s.deletedGids))deletedGids=s.deletedGids.slice();
+  if(s.tombMeta&&typeof s.tombMeta==='object'){
+    for(const k in s.tombMeta){ tombMeta[k]=s.tombMeta[k]; if(deletedGids.indexOf(k)<0)deletedGids.push(k); }
+  } else {
+    /* 旧版本仅有扁平 deletedGids，补出墓碑元数据（角色记为 unknown，删除仍永久生效） */
+    deletedGids.forEach(id=>{ if(!tombMeta[id])tombMeta[id]={ts:0,by:'unknown'}; });
+  }
   if(Array.isArray(s.customers))customers=customers.map(c=>{if(!c.factory)c.factory='Sagamu';return c;});
 }
 
@@ -1529,6 +1554,8 @@ function recomputeDashboard(){
     setC(5,t('d_transit'),kg(transitW));
     setC(6,t('d_bulk_today'),kg(bulk));
   }
+  setC(7,t('d_crushed'),kg(crushed)); /* 破碎料总重量（今日回收） */
+  renderAnnouncements();
 }
 function dashTrendData(){
   const base=new Date(PLANT_TODAY);const days=[];
@@ -1564,7 +1591,7 @@ function drawDashboardCharts(){
 function dashClick(i){
   const scope=(currentRole==='boss'&&currentFactory==='ALL')?'ALL':currentFactory;
   const isHQ=(scope==='Sagamu'||scope==='ALL');
-  const map=isHQ?{1:'Receive',2:'Receive',3:'Produce',4:'Produce',5:'Sale',6:'Inbound'}:{1:'Receive',2:'Receive',3:'Crush',4:'Ship',5:'Ship',6:'Receive'};
+  const map=isHQ?{1:'Receive',2:'Receive',3:'Produce',4:'Produce',5:'Sale',6:'Inbound',7:'Receive'}:{1:'Receive',2:'Receive',3:'Crush',4:'Ship',5:'Ship',6:'Receive',7:'Receive'};
   const ty=map[i];
   if(ty==='Inbound'){go('logistics');return;}
   searchFilter.ticket='';searchFilter.type=ty||'';searchFilter.form='';
@@ -1849,7 +1876,7 @@ function deleteReceive(id){
   if(!confirm(lang==='zh'?`确认删除回收单 ${r.ticket||r.id}？客户累计量将回退。`:`Delete ${r.ticket||r.id}? Customer totals revert.`))return;
   const oldCust=r.custId;
   records=records.filter(x=>x.id!==id);
-  if(deletedGids.indexOf(id)<0)deletedGids.push(id);
+  addTomb(id, currentRole);
   recalcCustomer(oldCust);
   settings.pending=(settings.pending||0)+1;
   auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_delete',target:r.ticket||(''+r.id),detail:lang==='zh'?'删除回收单':'deleted receiving'});
@@ -2065,8 +2092,8 @@ function deleteShip(id){
   if(!confirm(lang==='zh'?`确认删除发货单 ${r.batch}？关联入库记录将一并删除，分支库存回退。`:`Delete ${r.batch}? Linked inbound removed, branch stock reverts.`))return;
   const linb=records.find(x=>x.ty==='Inbound'&&x.linkId===id);
   records=records.filter(x=>!(x.id===id||(x.ty==='Inbound'&&x.linkId===id)));
-  if(deletedGids.indexOf(id)<0)deletedGids.push(id);
-  if(linb&&deletedGids.indexOf(linb.id)<0)deletedGids.push(linb.id);
+  addTomb(id, currentRole);
+  if(linb)addTomb(linb.id, currentRole);
   settings.pending=(settings.pending||0)+1;
   auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_delete',target:r.batch,detail:lang==='zh'?'删除发货单':'deleted ship'});
   saveState();refreshAfterSave();
@@ -2082,7 +2109,7 @@ function deleteInbound(id){
   if(!can('inbound')){toast(lang==='zh'?'无删除权限':'No delete permission');return;}
   if(!confirm(lang==='zh'?`确认删除入库记录 ${inb.batch}？关联发货单状态将回退为在途，总厂原料库存回退。`:`Delete inbound ${inb.batch}? Linked shipment reverts to transit, HQ stock reverts.`))return;
   records=records.filter(x=>x.id!==id);
-  if(deletedGids.indexOf(id)<0)deletedGids.push(id);
+  addTomb(id, currentRole);
   const ship=records.find(r=>r.id===inb.linkId&&r.ty==='Ship');if(ship)ship.status='在途';
   settings.pending=(settings.pending||0)+1;
   auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_delete',target:inb.batch,detail:lang==='zh'?'删除入库记录':'deleted inbound'});
@@ -2094,7 +2121,14 @@ function deleteInbound(id){
 function setHTML(id,html){const e=document.getElementById(id);if(e)e.innerHTML=html;}
 /* 全局唯一记录标识：联网同步以 id 作为合并主键（LWW 以 ts 为准）。
    seed 记录保留原有数字 id；新建记录用 genGid() 生成字符串，避免跨厂冲突。 */
-let deletedGids=[]; /* 已删除记录的 id 列表，随同步传播为墓碑，使删除在多厂间生效 */
+let deletedGids=[]; /* 已删除记录的 id 列表（扁平，用于同步线缆格式与本地快速检索） */
+let tombMeta={}; /* id -> {ts, by} 墓碑元数据；by 为删除者角色，老板/开发管理员删除绝对优先，随同步永久生效 */
+/* 新增/追加一个墓碑：本地删除与跨厂拉取的删除都走这里，保证删除在多设备间永久生效、不被 LWW 复活 */
+function addTomb(id, role){
+  if(id==null)return;
+  if(deletedGids.indexOf(id)<0)deletedGids.push(id);
+  tombMeta[id]={ts:Date.now(), by:(role||currentRole||'unknown')};
+}
 function genGid(){ try{ if(typeof crypto!=='undefined'&&crypto.randomUUID) return crypto.randomUUID(); }catch(e){} return 'g'+Date.now().toString(36)+Math.random().toString(36).slice(2,10); }
 function pushRec(o){ if(o.id==null)o.id=genGid(); if(!o.ts)o.ts=Date.now(); o.rev=(o.rev||0)+1; records.unshift(o); return o; }
 function nextId(){return records.length?Math.max(...records.map(r=>r.id))+1:1;} /* 仅用于客户 id（数字） */
@@ -2106,7 +2140,7 @@ function statusTag(s){
 }
 /* ===== Reconstructed JS (Crush module intentionally removed) ===== */
 const titles={dashboard:'nav_dashboard',receiving:'nav_receiving',today:'nav_today',customers:'nav_customers',produce:'nav_produce',sell:'nav_sell',inventory:'nav_inventory',shipping:'nav_shipping',logistics:'nav_logistics',pricing:'nav_pricing',search:'nav_search',reports:'nav_reports',settings:'nav_settings'};
-const roleBadgeMap={boss:{zh:'老板',en:'Boss'},factoryAdmin:{zh:'工厂管理员',en:'Factory Admin'},registrar:{zh:'登记员',en:'Registrar'},auditor:{zh:'审计员',en:'Auditor'}};
+const roleBadgeMap={boss:{zh:'老板',en:'Boss'},devAdmin:{zh:'开发管理员',en:'Dev Admin'},factoryAdmin:{zh:'工厂管理员',en:'Factory Admin'},registrar:{zh:'登记员',en:'Registrar'},auditor:{zh:'审计员',en:'Auditor'}};
 const lanDevices=[{name:'OPIC 终端',ip:'192.168.1.21'},{name:'Ikeja 终端',ip:'192.168.1.22'},{name:'仓库 PDA',ip:'192.168.1.30'}];
 let currentPeriod='month'; /* 报表周期：month / quarter / year / all */
 
@@ -2181,7 +2215,7 @@ function deleteProduce(id){
   if(!can('produce')){toast(lang==='zh'?'无删除权限':'No delete permission');return;}
   if(!confirm(lang==='zh'?`确认删除生产单 ${r.batch}？成品库存将回退。`:`Delete ${r.batch}? Finished stock reverts.`))return;
   records=records.filter(x=>x.id!==id);
-  if(deletedGids.indexOf(id)<0)deletedGids.push(id);
+  addTomb(id, currentRole);
   settings.pending=(settings.pending||0)+1;
   auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_delete',target:r.batch,detail:lang==='zh'?'删除生产单':'deleted produce'});
   saveState();refreshAfterSave();
@@ -2292,7 +2326,7 @@ function deleteSell(id){
   if(!can('sell')){toast(lang==='zh'?'无删除权限':'No delete permission');return;}
   if(!confirm(lang==='zh'?`确认删除出售单 ${r.batch}？成品库存将回退。`:`Delete ${r.batch}? Finished stock reverts.`))return;
   records=records.filter(x=>x.id!==id);
-  if(deletedGids.indexOf(id)<0)deletedGids.push(id);
+  addTomb(id, currentRole);
   settings.pending=(settings.pending||0)+1;
   auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_delete',target:r.batch,detail:lang==='zh'?'删除出售单':'deleted sale'});
   saveState();refreshAfterSave();
@@ -2528,18 +2562,20 @@ function syncPush(){
   const body=JSON.stringify({factory:currentFactory, records:records, deleted:deletedGids});
   return fetch(SYNC.url()+'/sync/push',{method:'POST',headers:SYNC.headers(),body})
     .then(r=>r.json()).then(j=>{
-      if(j&&j.ok){ if(deletedGids.length)deletedGids=[]; settings.lastSync=nowStr(); settings.pending=0; saveState(); updateSyncUI(); }
+      if(j&&j.ok){ if(deletedGids.length){deletedGids=[]; tombMeta={};} settings.lastSync=nowStr(); settings.pending=0; saveState(); updateSyncUI(); }
       return !!(j&&j.ok);
     }).catch(e=>{ console.warn('syncPush failed',e); return false; });
 }
 function applyRemote(remoteRecs, deleted){
   const map={}; records.forEach(r=>{map[r.id]=r;});
   (remoteRecs||[]).forEach(rr=>{
+    if(rr.id==null)return;
+    if(tombMeta[rr.id])return; /* 本地已删除（含老板/开发管理员删除）的记录，绝不因同步复活 */
     const local=map[rr.id];
     if(!local){ records.unshift(rr); }
     else if((rr.ts||0) >= (local.ts||0)){ Object.assign(local, rr); }
   });
-  (deleted||[]).forEach(gid=>{ records=records.filter(r=>r.id!==gid); if(deletedGids.indexOf(gid)<0)deletedGids.push(gid); });
+  (deleted||[]).forEach(gid=>{ records=records.filter(r=>r.id!==gid); addTomb(gid,'remote'); });
 }
 function syncPull(){
   if(!SYNC.enabled()) return Promise.resolve(false);
@@ -2758,15 +2794,36 @@ function logout(){
 /* ===== Account management (boss only) ===== */
 function renderAccounts(){
   const el=document.getElementById('accounts-body');if(!el)return;
-  const rows=users.map(u=>`<tr><td><b>${esc(u.username)}</b></td><td>${esc(u.name||'')}</td><td>${roleBadgeMap[u.role]?roleBadgeMap[u.role][lang]:u.role}</td><td>${u.factories.map(f=>FACTORIES[f]?FACTORIES[f].name:f).join('、')}</td><td>${u.role!=='boss'?'<span class="link" style="color:var(--danger)" onclick="deleteAccount(\''+esc(u.username)+'\')">'+t('acct_delete')+'</span>':'—'}</td></tr>`).join('');
+  const canEdit=can('account.manage');
+  const rows=users.map(u=>{
+    const grant = canEdit&&u.username!==(currentUser&&currentUser.username) ? `<span class="link" onclick="loadAcct('${esc(u.username)}')">${t('acct_grant')}</span>` : '—';
+    const del = (canEdit&&u.role!=='boss'&&u.role!=='devAdmin') ? `<span class="link" style="color:var(--danger)" onclick="deleteAccount('${esc(u.username)}')">${t('acct_delete')}</span>` : '—';
+    return `<tr><td><b>${esc(u.username)}</b></td><td>${esc(u.name||'')}</td><td>${roleBadgeMap[u.role]?roleBadgeMap[u.role][lang]:u.role}</td><td>${u.factories.map(f=>FACTORIES[f]?FACTORIES[f].name:f).join('、')}</td><td>${grant} &nbsp; ${del}</td></tr>`;
+  }).join('');
   el.innerHTML=rows||`<tr><td colspan="5" class="muted">—</td></tr>`;
 }
-function openAcctModal(){
+let editingAcct=null; /* 非空表示正在编辑已有账号（老板赋权） */
+function openAcctModal(presetUser){
+  editingAcct = presetUser || null;
   const m=document.getElementById('acct-modal');if(m)m.classList.remove('hidden');
   const fc=document.getElementById('ac-factories');if(fc)fc.innerHTML=ALL_FACTORY_IDS.map(f=>`<label class="chk"><input type="checkbox" value="${f}" checked/> ${FACTORIES[f]?FACTORIES[f].name:f}</label>`).join(' ');
   const msg=document.getElementById('ac-msg');if(msg)msg.textContent='';
   const pw=document.getElementById('ac-pass');if(pw)pw.value=genPassword(16);
+  if(editingAcct){
+    const u=users.find(x=>x.username===editingAcct);
+    if(u){
+      const eu=document.getElementById('ac-user');if(eu){eu.value=u.username;eu.readOnly=true;}
+      const en=document.getElementById('ac-name');if(en)en.value=u.name||'';
+      const er=document.getElementById('ac-role');if(er)er.value=u.role;
+      const ef=document.getElementById('ac-factories');if(ef)ef.innerHTML=ALL_FACTORY_IDS.map(f=>`<label class="chk"><input type="checkbox" value="${f}" ${u.factories.includes(f)?'checked':''}/> ${FACTORIES[f]?FACTORIES[f].name:f}</label>`).join(' ');
+      const ep=document.getElementById('ac-pass');if(ep)ep.value=''; /* 留空表示不修改密码 */
+      if(msg)msg.textContent=lang==='zh'?'正在为「'+u.username+'」赋权：修改角色与工厂，密码留空则不变':'Granting perms to '+u.username;
+    }
+  } else {
+    const eu=document.getElementById('ac-user');if(eu){eu.value='';eu.readOnly=false;}
+  }
 }
+function loadAcct(username){ openAcctModal(username); }
 function closeAcctModal(){const m=document.getElementById('acct-modal');if(m)m.classList.add('hidden');}
 function submitAcct(){
   if(!can('account.manage')){toast(lang==='zh'?'无账号管理权限（仅老板）':'No permission (boss only)');return;}
@@ -2777,9 +2834,20 @@ function submitAcct(){
   const factories=Array.from(document.querySelectorAll('#ac-factories input:checked')).map(i=>i.value);
   const msg=document.getElementById('ac-msg');
   if(!username||!name){if(msg)msg.textContent=lang==='zh'?'请填写账号与姓名':'Enter account & name';return;}
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(username)){if(msg)msg.textContent=lang==='zh'?'账号需为合法邮箱':'Account must be a valid email';return;}
-  if(users.some(u=>u.username===username)){if(msg)msg.textContent=lang==='zh'?'该账号已存在':'Account exists';return;}
   if(factories.length===0){if(msg)msg.textContent=lang==='zh'?'请至少选择一个工厂':'Pick at least one plant';return;}
+  if(editingAcct && editingAcct===username){
+    /* 老板赋权：更新已有账号角色/工厂，密码留空则不变 */
+    const u=users.find(x=>x.username===username);if(!u){if(msg)msg.textContent=lang==='zh'?'账号不存在':'Account not found';return;}
+    if(pass){ if(pass.length<6){if(msg)msg.textContent=lang==='zh'?'密码至少 6 位':'Password >= 6 chars';return;} const salt=genSalt(); u.salt=salt; u.passwordHash=hashPassword(pass,salt); u.mustChange=true; }
+    u.name=name; u.role=role; u.factories=factories.slice();
+    settings.pending=(settings.pending||0)+1;
+    auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_edit',target:username,detail:lang==='zh'?'赋权 · '+name+' · '+role:'grant · '+name+' · '+role});
+    saveState();renderAccounts();updateSyncUI();
+    toast(lang==='zh'?'已更新账号权限':'Permissions updated');
+    closeAcctModal();
+    return;
+  }
+  if(users.some(u=>u.username===username)){if(msg)msg.textContent=lang==='zh'?'该账号已存在，请更换':'Account exists';return;}
   if(!pass||pass.length<6){if(msg)msg.textContent=lang==='zh'?'密码至少 6 位':'Password >= 6 chars';return;}
   const salt=genSalt();
   users.push({username,name,role,factories:factories.slice(),salt,passwordHash:hashPassword(pass,salt),mustChange:true});
@@ -2788,6 +2856,33 @@ function submitAcct(){
   saveState();renderAccounts();updateSyncUI();
   toast(lang==='zh'?'账号已创建（初始密码需首次登录修改）':'Account created');
   closeAcctModal();
+}
+/* ===== 公告（老板/开发管理员可发布，首页置顶） ===== */
+function openAnnounceModal(){ const m=document.getElementById('ann-modal'); if(m)m.classList.remove('hidden'); const t=document.getElementById('ann-title'); if(t)t.value=''; const b=document.getElementById('ann-body'); if(b)b.value=''; }
+function closeAnnounceModal(){ const m=document.getElementById('ann-modal'); if(m)m.classList.add('hidden'); }
+function submitAnnounce(){
+  if(!can('announce')){toast(lang==='zh'?'无发布公告权限（仅老板）':'No permission');return;}
+  const title=(document.getElementById('ann-title').value||'').trim();
+  const body=(document.getElementById('ann-body').value||'').trim();
+  if(!title&&!body){toast(lang==='zh'?'请输入公告内容':'Enter announcement');return;}
+  pushRec({id:genGid(),dt:PLANT_TODAY,ty:'Notice',title:title,body:body,by:opName(),factory:currentFactory||'Sagamu'});
+  settings.pending=(settings.pending||0)+1;
+  saveState();closeAnnounceModal();renderAnnouncements();refreshAfterSave();
+  toast(lang==='zh'?'公告已发布（首页置顶）':'Announcement posted');
+}
+function deleteAnnounce(id){
+  if(!can('announce')){toast(lang==='zh'?'无权限':'No permission');return;}
+  const r=records.find(x=>x.id===id&&x.ty==='Notice'); if(!r)return;
+  records=records.filter(x=>x.id!==id); addTomb(id, currentRole);
+  settings.pending=(settings.pending||0)+1; saveState();renderAnnouncements();refreshAfterSave();
+  toast(lang==='zh'?'公告已撤回':'Announcement withdrawn');
+}
+function renderAnnouncements(){
+  const bar=document.getElementById('ann-bar'); if(bar){
+    const list=records.filter(r=>r.ty==='Notice').sort((a,b)=>(b.ts||0)-(a.ts||0));
+    bar.innerHTML=list.length?list.map(n=>`<div class="ann-pin"><span class="ann-badge" data-i18n="ann_pin">📢 置顶</span><b>${esc(n.title||'')}</b><span class="ann-body">${esc(n.body||'')}</span>${can('announce')?`<span class="link ann-del" onclick="deleteAnnounce('${n.id}')">${t('ann_del')}</span>`:''}</div>`).join(''):'';
+  }
+  const heroBtn=document.getElementById('hero-ann'); if(heroBtn)heroBtn.style.display=can('announce')?'inline-block':'none';
 }
 function deleteAccount(username){
   if(!can('account.manage')){toast(lang==='zh'?'无账号管理权限（仅老板）':'No permission (boss only)');return;}
@@ -2804,6 +2899,7 @@ function resetAllData(){
   if(!can('data.reset')){toast(lang==='zh'?'无归零权限（仅老板）':'No reset permission (boss only)');return;}
   if(!confirm(lang==='zh'?'归零将清空全部收/发/造粒/出售记录、客户累计量与库存校正，且不可恢复。确认？':'Reset clears ALL records, customer totals & stock adjustments. Confirm?'))return;
   if(!confirm(lang==='zh'?'再次确认：真的要归零全部业务数据？':'Confirm again: really reset ALL data?'))return;
+  records.forEach(r=>addTomb(r.id, currentRole)); /* 全量归零也走墓碑，防止同步把旧数据拉回 */
   records=[];
   customers.forEach(c=>{c.kg=0;c.amt=0;c.last='';});
   invAdjust={};
@@ -2813,6 +2909,23 @@ function resetAllData(){
   toast(lang==='zh'?'已归零全部业务数据':'All data reset');
 }
 
+function recomputeCustomerTotals(){
+  customers.forEach(c=>{c.kg=0;c.amt=0;c.last='';});
+  records.forEach(r=>{ if(r.ty==='Receive'&&r.custId){ const c=customers.find(x=>x.id===r.custId); if(c){ c.kg+=(+r.tw||0); c.amt+=(+r.ta||0); c.last=r.dt; } } });
+}
+function resetSelectedData(cat){
+  if(!can('data.reset')){toast(lang==='zh'?'无归零权限（仅老板）':'No reset permission (boss only)');return;}
+  const catName = cat==='ALL' ? (lang==='zh'?'全部业务数据':'all business data') : (t('ty_'+cat)||cat);
+  if(!confirm(lang==='zh'?`确认归零「${catName}」？此操作不可恢复。`:`Reset ${catName}? Cannot undo.`))return;
+  const removed = (cat==='ALL'?records.slice():records.filter(r=>r.ty===cat));
+  if(cat==='ALL'){ records=[]; customers.forEach(c=>{c.kg=0;c.amt=0;c.last='';}); invAdjust={}; }
+  else { records=records.filter(r=>r.ty!==cat); recomputeCustomerTotals(); }
+  removed.forEach(r=>addTomb(r.id, currentRole)); /* 分类删除也走墓碑，跨设备生效 */
+  settings.pending=(settings.pending||0)+1;
+  auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_reset',target:cat,detail:lang==='zh'?'分类归零 · '+catName:'reset · '+catName});
+  saveState();refreshAfterSave();
+  toast(lang==='zh'?'已归零：'+catName:'Reset: '+catName);
+}
 /* ===== init ===== */
 loadState();
 autoDetectSync(); /* 若由一体化服务器托管且未配置同步地址，自动指向同源服务器 */
@@ -2856,7 +2969,7 @@ if(typeof setInterval==='function'){ setInterval(syncTick, 20000); /* 在线时�
     <div class="panel-head"><h3 data-i18n="acct_new">新增 / 注册账号</h3>
       <button class="btn ghost sm" onclick="closeAcctModal()">✕</button></div>
     <div class="panel-body">
-      <div class="field"><label data-i18n="acct_username">账号(邮箱)</label><input id="ac-user" placeholder="user@plant.com"/></div>
+      <div class="field"><label data-i18n="acct_username">账号</label><input id="ac-user" placeholder="工号 / 手机号 / 任意标识"/></div>
       <div class="field"><label data-i18n="acct_name">姓名</label><input id="ac-name" placeholder="张三"/></div>
       <div class="field"><label data-i18n="acct_role">角色</label><select id="ac-role">
         <option value="factoryAdmin">工厂管理员</option>
@@ -2872,6 +2985,22 @@ if(typeof setInterval==='function'){ setInterval(syncTick, 20000); /* 在线时�
         <button class="btn ghost" onclick="closeAcctModal()">关闭</button>
       </div>
       <div class="small muted mt" id="ac-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== Announcement modal ===================== -->
+<div id="ann-modal" class="modal hidden">
+  <div class="modal-card">
+    <div class="panel-head"><h3 data-i18n="ann_post">发布公告</h3>
+      <button class="btn ghost sm" onclick="closeAnnounceModal()">✕</button></div>
+    <div class="panel-body">
+      <div class="field"><label data-i18n="ann_title">公告标题</label><input id="ann-title" placeholder="例如：国庆放假安排"/></div>
+      <div class="field"><label data-i18n="ann_body">公告内容</label><textarea id="ann-body" rows="4" placeholder="请输入公告内容…（将置顶显示在首页）"></textarea></div>
+      <div class="row">
+        <button class="btn eco" onclick="submitAnnounce()" data-i18n="ann_publish">发布</button>
+        <button class="btn ghost" onclick="closeAnnounceModal()">关闭</button>
+      </div>
     </div>
   </div>
 </div>
