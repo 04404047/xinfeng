@@ -93,6 +93,13 @@
   .btn.sm{padding:5px 10px;font-size:11.5px;}
   .btn.lg{padding:12px 20px;font-size:14px;}
   .btn:disabled{opacity:.5;cursor:not-allowed;background:#94a3b8;}
+  /* 按压即时反馈：点击瞬间有下沉/高亮效果，确保「点下去就有反应、无延迟感」 */
+  .btn:active{transform:translateY(1px) scale(.98);filter:brightness(.95);transition:transform .04s, filter .04s;}
+  .btn{transition:background .15s, transform .04s, filter .04s;}
+  .link{cursor:pointer;color:var(--primary);font-weight:600;}
+  .link:active{transform:translateY(1px);transition:transform .04s;}
+  .link:hover{text-decoration:underline;}
+  button{font-family:inherit;}
   input,select,textarea{font-family:inherit;font-size:12.5px;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);}
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
   .field{margin-bottom:12px;}
@@ -639,8 +646,8 @@
               <div class="field"><label data-i18n="se_name">客户姓名</label><input id="s-name" placeholder="e.g. Alhaji" style="width:160px" oninput="runSearch()"/></div>
               <div class="field"><label data-i18n="se_phone">电话</label><input id="s-phone" placeholder="080..." style="width:140px" oninput="runSearch()"/></div>
               <div class="field"><label data-i18n="se_acct">银行卡号</label><input id="s-acct" placeholder="0123..." style="width:150px" oninput="runSearch()"/></div>
-              <div class="field"><label data-i18n="se_from">起始</label><input id="s-from" type="date" value="2026-08-01" onchange="runSearch()"/></div>
-              <div class="field"><label data-i18n="se_to">结束</label><input id="s-to" type="date" value="2026-08-16" onchange="runSearch()"/></div>
+              <div class="field"><label data-i18n="se_from">起始</label><input id="s-from" type="date" value="" placeholder="不限" onchange="runSearch()"/></div>
+              <div class="field"><label data-i18n="se_to">结束</label><input id="s-to" type="date" value="" placeholder="不限" onchange="runSearch()"/></div>
               <div class="field"><label data-i18n="se_note">备注含</label><input id="s-note" placeholder="keyword" style="width:140px" oninput="runSearch()"/></div>
               <div class="field" style="align-self:flex-end"><button class="btn ghost sm" onclick="resetSearch()" data-i18n="se_reset">重置</button></div>
             </div>
@@ -655,7 +662,7 @@
               <th data-i18n="h_date">日期</th><th data-i18n="se_type">类型</th><th data-i18n="c_th_name">客户</th>
               <th data-i18n="c_th_phone">电话</th><th data-i18n="c_th_bank">开户行</th><th data-i18n="c_th_acct">账号</th>
               <th data-i18n="c_th_addr">地址</th><th data-i18n="se_note2">备注</th>
-              <th data-i18n="h_mat">材质</th><th data-i18n="h_w">重量</th><th data-i18n="h_amt">金额</th>
+              <th data-i18n="h_mat">材质</th><th data-i18n="h_w">重量</th><th data-i18n="h_amt">金额</th><th data-i18n="se_act">操作</th>
             </tr></thead><tbody id="s-body"></tbody></table>
             </div>
           </div>
@@ -913,7 +920,7 @@ const I18N = {
     s_title:"新建配送批次 → 总厂造粒", s_batch:"批次号（可手动输入）", s_date:"日期", s_dest:"目的地（可编辑）", s_pick:"选择配送库存（来自库存台账）",
     s_avail:"可用(kg)", s_ship:"配送(kg)", s_carrier:"承运商", s_vehicle:"车牌", s_driver:"司机", s_eta:"预计到厂", s_print:"🖨 打印配送单", s_save:"保存并同步至总厂", s_save_edit:"保存修改", s_recent:"近期发货记录",
     se_title:"组合检索与导出（含客户全字段）", se_name:"客户姓名", se_phone:"电话", se_acct:"银行卡号", se_from:"起始", se_to:"结束", se_note:"备注含", se_reset:"重置",
-    se_csv:"⬇ CSV", se_xls:"⬇ Excel", se_pdf:"⬇ PDF", se_type:"类型", se_note2:"备注", se_count:"条记录",
+    se_csv:"⬇ CSV", se_xls:"⬇ Excel", se_pdf:"⬇ PDF", se_type:"类型", se_note2:"备注", se_count:"条记录", se_act:"操作",
     churn_title:"特殊筛选 · 可能流失客户 / 缺货恢复", churn_note:"断货时，快速定位「单次供货量大 / 月供货量大」的客户，按材质分类联系其恢复供货；状态标红者优先跟进。",
     churn_single:"单次供货量 ≥ (kg)", churn_month:"月供货量 ≥ (kg)", churn_mat:"按材质", churn_run:"筛选", churn_export:"⬇ 导出联系方式",
     churn_bulk:"大料(kg)", churn_crushed:"破碎料(kg)", churn_pvc:"PVC(kg)", churn_all:"全部", h_mat_pvc:"PVC",
@@ -992,7 +999,7 @@ const I18N = {
     s_title:"New dispatch batch → HQ Pelletizing", s_batch:"Batch # (editable)", s_date:"Date", s_dest:"Destination (editable)", s_pick:"Pick stock to dispatch (from inventory)",
     s_avail:"Available (kg)", s_ship:"Dispatch (kg)", s_carrier:"Carrier", s_vehicle:"Vehicle #", s_driver:"Driver", s_eta:"ETA at HQ", s_print:"🖨 Print dispatch manifest", s_save:"Save & sync to HQ", s_save_edit:"Save changes", s_recent:"Recent shipments",
     se_title:"Combined search & export (full customer info)", se_name:"Customer name", se_phone:"Phone", se_acct:"Bank account", se_from:"From", se_to:"To", se_note:"Note contains", se_reset:"Reset",
-    se_csv:"⬇ CSV", se_xls:"⬇ Excel", se_pdf:"⬇ PDF", se_type:"Type", se_note2:"Note", se_count:"records",
+    se_csv:"⬇ CSV", se_xls:"⬇ Excel", se_pdf:"⬇ PDF", se_type:"Type", se_note2:"Note", se_count:"records", se_act:"Action",
     churn_title:"Special filter · At-risk / restock-recovery customers", churn_note:"When short on stock, quickly find customers with large single or monthly supply, by material, to re-engage; prioritize those flagged red.",
     churn_single:"Single supply ≥ (kg)", churn_month:"Monthly supply ≥ (kg)", churn_mat:"By material", churn_run:"Filter", churn_export:"⬇ Export contacts",
     churn_bulk:"Bulk (kg)", churn_crushed:"Crushed (kg)", churn_pvc:"PVC (kg)", churn_all:"All", h_mat_pvc:"PVC",
@@ -1734,7 +1741,8 @@ function openCustomer(id){
   const months=I18N[lang].repLabels.month;const base=c.kg/6;
   const qty=months.map(()=>Math.round(base*(0.6+Math.random()*0.8)));const amt=qty.map(v=>Math.round(v*210/1000));
   svgLine(document.getElementById('cd-trend'),qty,amt,months);
-  const hist=visibleRecords().filter(r=>r.ty==='Receive'&&r.custId===c.id).slice(0,8);
+  const halfYearAgo=Date.now()-180*24*3600*1000;
+  const hist=visibleRecords().filter(r=>r.ty==='Receive'&&r.custId===c.id&&(r.ts||0)>=halfYearAgo).sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,12);
   document.getElementById('cd-hist').innerHTML = hist.length? hist.map(r=>{
     const it=r.items[0]||{};
     return `<tr><td>${r.dt}</td><td>${it.m||'—'}</td><td>${it.f||'—'}</td><td>${it.c||'—'}</td>
@@ -2469,8 +2477,8 @@ function runSearch(){
       note:(document.getElementById('s-note')||{}).value||''
     };
     const recs=visibleRecords().filter(r=>{
-      if(q.from&&r.dt<q.from)return false;
-      if(q.to&&r.dt>q.to)return false;
+      if(q.from&&r.dt&&r.dt<q.from)return false;
+      if(q.to&&r.dt&&r.dt>q.to)return false;
       if(q.note&&!(r.note||'').toLowerCase().includes(q.note.toLowerCase()))return false;
       const c=customers.find(x=>x.id===r.custId)||{};
       if(q.name&&!(c.name||'').toLowerCase().includes(q.name.toLowerCase()))return false;
@@ -2481,7 +2489,9 @@ function runSearch(){
     const rows=recs.slice(0,500).map(r=>{
       const c=customers.find(x=>x.id===r.custId)||{};
       const it=r.items&&r.items[0]||{};
-      return `<tr><td>${r.dt}</td><td><span class="tag ${typeClass(r.ty)}">${t('ty_'+r.ty)||r.ty}</span></td><td><b>${esc(r.custName||c.name||'')}</b></td><td>${esc(c.phone||'')}</td><td>${esc(c.bank||'')}</td><td>${esc(c.acct||'')}</td><td>${esc(c.addr||'')}</td><td class="muted">${esc(r.note||'')}</td><td>${esc(it.m||'')}</td><td class="num">${Math.round(r.tw||0).toLocaleString()}</td><td class="num">¥ ${Math.round(r.ta||0).toLocaleString()}</td></tr>`;
+      const cid=r.custId?`${r.custId}`:'';
+      const viewLink = cid? `<span class="link" onclick="openCustomer('${cid}')">${lang==='zh'?'查看近半年供货':'6-mo supply'}</span>` : '—';
+      return `<tr><td>${r.dt}</td><td><span class="tag ${typeClass(r.ty)}">${t('ty_'+r.ty)||r.ty}</span></td><td><b>${esc(r.custName||c.name||'')}</b></td><td>${esc(c.phone||'')}</td><td>${esc(c.bank||'')}</td><td>${esc(c.acct||'')}</td><td>${esc(c.addr||'')}</td><td class="muted">${esc(r.note||'')}</td><td>${esc(it.m||'')}</td><td class="num">${Math.round(r.tw||0).toLocaleString()}</td><td class="num">¥ ${Math.round(r.ta||0).toLocaleString()}</td><td>${viewLink}</td></tr>`;
     }).join('');
     setHTML('s-body', rows||`<tr><td colspan="11" class="muted">${lang==='zh'?'无匹配记录':'No records'}</td></tr>`);
     const cnt=document.getElementById('s-count');if(cnt)cnt.textContent=recs.length+(lang==='zh'?' 条记录':' records');
@@ -2557,13 +2567,14 @@ function toggleConn(on){
   settings.conn=on?'online':'offline';saveState();updateSyncUI();
   toast(on?(lang==='zh'?'已切换到在线':'Switched to online'):(lang==='zh'?'已切换到离线':'Switched to offline'));
 }
-/* ===== Auto-sync (online/LAN): ensure pending changes reach cloud within 1 min ===== */
-let autoSyncTimer=null; const AUTO_SYNC_MS=30000; /* 数据变化后 30s 内自动同步（远小于 1 分钟） */
+/* ===== Auto-sync (online/LAN): 数据变化后即时反馈 + 数秒内自动上传，保证各端及时更新 ===== */
+let autoSyncTimer=null; const AUTO_SYNC_MS=5000; /* 数据变化后 5s 内自动同步（远小于 1 分钟） */
 function scheduleAutoSync(){
+  updateSyncUI(); /* 立即刷新「待上传」计数，点击保存即看到反馈，无延迟感 */
   if(autoSyncTimer)return;
   if(settings.conn!=='online')return;
   if((settings.pending||0)<=0)return;
-  autoSyncTimer=setTimeout(function(){ autoSyncTimer=null; if(settings.conn==='online'&&(settings.pending||0)>0) doSync(); }, AUTO_SYNC_MS);
+  autoSyncTimer=setTimeout(function(){ autoSyncTimer=null; if(SYNC.enabled()&&(settings.pending||0)>0) syncTick(); }, AUTO_SYNC_MS);
 }
 /* 数据互通校验：保证每条发货(Ship)都有对应的总厂入库(Inbound)，状态一致，模块链接不报错 */
 function reconcileAll(){
@@ -2727,7 +2738,7 @@ function exportExcel(headers, rows, filename){
   }catch(e){toast('export error');}
 }
 function exportCustomersExcel(){exportExcel(['姓名','电话','开户行','账号','累计供货(kg)','金额(¥)','最近供货'],visibleCustomers().map(c=>[c.name,c.phone,c.bank,c.acct,c.kg,c.amt,c.last]),'customers.xlsx');}
-function exportSearchExcel(){const rows=[];document.querySelectorAll('#s-body tr').forEach(tr=>{const tds=[...tr.children].map(td=>td.textContent);if(tds.length)rows.push(tds);});exportExcel(['日期','类型','客户','电话','开户行','账号','地址','备注','材质','重量','金额'],rows,'search.xlsx');}
+function exportSearchExcel(){const rows=[];document.querySelectorAll('#s-body tr').forEach(tr=>{const tds=[...tr.children].map(td=>td.textContent.trim());if(tds.length)rows.push(tds);});exportExcel(['日期','类型','客户','电话','开户行','账号','地址','备注','材质','重量','金额','操作'],rows,'search.xlsx');}
 function exportTodayExcel(){exportExcel(['日期','客户','材质','形态','颜色','重量','金额'],visibleRecords().filter(r=>r.ty==='Receive'&&r.dt===PLANT_TODAY).flatMap(r=>(r.items||[]).map(it=>[r.dt,r.custName,it.m,it.f,it.c,it.w,r.ta])),'today.xlsx');}
 function exportReportExcel(){const a=repAggregate(currentPeriod);exportExcel(['指标','值'],[['收购量',Math.round(a.recv)],['发货量',Math.round(a.ship)],['金额',Math.round(a.amt)]],'report.xlsx');}
 function exportAllExcel(){const recs=visibleRecords().map(r=>[r.dt,r.ty,r.custName,r.tw,r.ta]);exportExcel(['日期','类型','客户','重量(kg)','金额(¥)'],recs,'all_data.xlsx');}
@@ -2833,6 +2844,15 @@ function go(view){
   else if(view==='shipping'){renderShipRows();renderShipList();}
   else if(view==='reports')setPeriod(currentPeriod,document.querySelector('#rep-seg .active'));
   else if(view==='settings')renderAccounts();
+  else if(view==='search')initSearchDates();
+}
+/* 进入检索视图时初始化日期范围：默认近半年（今天往前 6 个月 ~ 今天）；
+   若用户清空任一日期，则视为「不限」，runSearch 不再截断近期记录。 */
+function initSearchDates(){
+  try{
+    const to=document.getElementById('s-to'); if(to && !to.value) to.value=lastNDays(0);
+    const from=document.getElementById('s-from'); if(from && !from.value) from.value=lastNDays(180);
+  }catch(e){}
 }
 function renderAll(){renderCustomers();renderPricing();runSearch();runChurn();renderToday();renderShipRows();renderProduce();renderSell();renderReceiveList();renderLogistics();renderInventory();recomputeDashboard();drawDashboardCharts();renderAudit();updateSyncUI();renderLan();setPeriod(currentPeriod,document.querySelector('#rep-seg .active'));}
 function refreshAfterSave(){
