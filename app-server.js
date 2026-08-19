@@ -25,18 +25,27 @@ const HOST = process.env.HOST || '0.0.0.0';
 // 默认空密钥 = 免鉴权（适用于同源一体化部署，autoDetectSync 自动连接）。
 // 公网多租户部署请务必通过 SYNC_KEY 环境变量设置一个强密钥，并在 App 设置里填同样的密钥。
 const SYNC_KEY = process.env.SYNC_KEY || '';
-const DATA_FILE = path.join(__dirname, 'sync-data.json');
+const DATA_FILE = process.env.SYNC_DATA_FILE || path.join(__dirname, 'sync-data.json');
 const APP_HTML = path.join(__dirname, '塑料回收收发货管理.html');
 
 /* ---------- 状态 ---------- */
 let ledger = {};        // id -> record
 let deleted = [];       // 已删除 id（墓碑）
+let usersById = {};     // username -> user（账号主数据，跨厂区同步）
+let customersById = {}; // id -> customer（客户主数据，跨厂区同步）
+let deletedUsers = [];  // 已删除账号 username（墓碑）
+let deletedCustomers = []; // 已删除客户 id（墓碑）
 try {
   if (fs.existsSync(DATA_FILE)) {
     const d = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
     ledger = d.ledger || {};
     deleted = d.deleted || [];
-    console.log('[sync] 已载入本地账本：%d 条记录，%d 条删除墓碑', Object.keys(ledger).length, deleted.length);
+    usersById = d.usersById || {};
+    customersById = d.customersById || {};
+    deletedUsers = d.deletedUsers || [];
+    deletedCustomers = d.deletedCustomers || [];
+    console.log('[sync] 已载入本地账本：%d 条记录，%d 条删除墓碑；账号 %d；客户 %d',
+      Object.keys(ledger).length, deleted.length, Object.keys(usersById).length, Object.keys(customersById).length);
   }
 } catch (e) { console.warn('[sync] 载入数据失败，重新开始：', e.message); }
 
@@ -45,7 +54,7 @@ function persist() {
   if (saveTimer) return;
   saveTimer = setTimeout(() => {
     saveTimer = null;
-    fs.writeFile(DATA_FILE, JSON.stringify({ ledger, deleted }, null, 0), (err) => {
+    fs.writeFile(DATA_FILE, JSON.stringify({ ledger, deleted, usersById, customersById, deletedUsers, deletedCustomers }, null, 0), (err) => {
       if (err) console.warn('[sync] 写入失败：', err.message);
     });
   }, 300);
@@ -91,6 +100,20 @@ function mergeRecord(rec) {
     ledger[rec.id] = rec;
   }
 }
+/* 账号合并：按 username 做 LWW（updatedTs 大者胜），使新账号可在任意设备登录 */
+function mergeUser(u) {
+  if (!u || u.username == null) return;
+  if (deletedUsers.indexOf(u.username) >= 0) return;
+  const cur = usersById[u.username];
+  if (!cur || (u.updatedTs || 0) > (cur.updatedTs || 0)) usersById[u.username] = u;
+}
+/* 客户合并：按 id 做 LWW（updatedTs 大者胜），使分厂客户可在老板账号查看 */
+function mergeCustomer(c) {
+  if (!c || c.id == null) return;
+  if (deletedCustomers.indexOf(c.id) >= 0) return;
+  const cur = customersById[c.id];
+  if (!cur || (c.updatedTs || 0) > (cur.updatedTs || 0)) customersById[c.id] = c;
+}
 
 /* ---------- 路由 ---------- */
 const server = http.createServer(async (req, res) => {
@@ -119,6 +142,20 @@ const server = http.createServer(async (req, res) => {
       delete ledger[id];
       if (deleted.indexOf(id) < 0) deleted.push(id);
     });
+    // 账号同步
+    (Array.isArray(body.users) ? body.users : []).forEach(mergeUser);
+    (Array.isArray(body.deletedUsers) ? body.deletedUsers : []).forEach(un => {
+      if (un == null) return;
+      delete usersById[un];
+      if (deletedUsers.indexOf(un) < 0) deletedUsers.push(un);
+    });
+    // 客户同步
+    (Array.isArray(body.customers) ? body.customers : []).forEach(mergeCustomer);
+    (Array.isArray(body.deletedCustomers) ? body.deletedCustomers : []).forEach(cid => {
+      if (cid == null) return;
+      delete customersById[cid];
+      if (deletedCustomers.indexOf(cid) < 0) deletedCustomers.push(cid);
+    });
     persist();
     sendJSON(res, 200, { ok: true, serverTime: Date.now(), count: Object.keys(ledger).length });
     return;
@@ -127,7 +164,15 @@ const server = http.createServer(async (req, res) => {
   // 拉取
   if (p === '/sync/pull' && req.method === 'GET') {
     if (!authOk(req)) { sendJSON(res, 401, { ok: false, error: 'unauthorized' }); return; }
-    sendJSON(res, 200, { ok: true, records: Object.values(ledger), deleted: deleted.slice() });
+    sendJSON(res, 200, {
+      ok: true,
+      records: Object.values(ledger),
+      deleted: deleted.slice(),
+      users: Object.values(usersById),
+      customers: Object.values(customersById),
+      deletedUsers: deletedUsers.slice(),
+      deletedCustomers: deletedCustomers.slice()
+    });
     return;
   }
 

@@ -138,6 +138,26 @@
   .hero .h-title{font-size:18px;font-weight:700;}
   .hero .h-sub{font-size:12.5px;opacity:.9;margin-top:4px;}
   .hero .h-action{margin-left:auto;}
+  /* 发布公告按钮（仅老板/开发管理员可见，醒目样式，统一权限按钮规范） */
+  .btn.announce{background:linear-gradient(120deg,#f59e0b,#f97316);color:#fff;border:none;font-weight:800;font-size:14px;box-shadow:0 4px 14px rgba(249,115,22,.4);letter-spacing:.5px;}
+  .btn.announce:hover{filter:brightness(1.06);transform:translateY(-1px);}
+  .btn.announce:active{transform:translateY(0);}
+  /* 首页公告置顶滚动轮播条 */
+  .ann-bar{display:none;align-items:center;background:linear-gradient(90deg,#fffbeb,#fef3c7);border:1px solid #fcd34d;border-radius:12px;margin-bottom:16px;overflow:hidden;box-shadow:0 3px 10px rgba(251,191,36,.18);min-height:48px;}
+  .ann-flag{flex:0 0 auto;display:flex;align-items:center;gap:6px;background:#f59e0b;color:#fff;font-weight:800;font-size:15px;padding:0 16px;align-self:stretch;}
+  .ann-track-wrap{flex:1;overflow:hidden;position:relative;height:48px;display:flex;align-items:center;}
+  .ann-track{display:inline-flex;white-space:nowrap;align-items:center;animation:ann-scroll 26s linear infinite;will-change:transform;}
+  .ann-track:hover{animation-play-state:paused;}
+  .ann-item{display:inline-flex;align-items:center;gap:12px;padding:0 40px;font-size:16px;color:#92400e;}
+  .ann-item .ann-t{font-weight:800;font-size:18px;color:#b45309;}
+  .ann-item .ann-b{font-size:15.5px;color:#78350f;}
+  .ann-del{margin-left:4px;color:#b91c1c;cursor:pointer;font-size:14px;font-weight:600;}
+  .ann-empty{color:#a16207;font-size:14px;padding:0 18px;}
+  @keyframes ann-scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  /* 单据详情弹窗 */
+  .rec-kv{display:grid;grid-template-columns:110px 1fr;gap:8px 14px;font-size:13px;margin-bottom:12px;}
+  .rec-kv .k{color:var(--muted);font-weight:600;}
+  .rec-kv .num{text-align:right;}
   .combo-list{position:absolute;z-index:30;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(15,23,42,.15);max-height:220px;overflow:auto;display:none;left:0;right:0;margin-top:4px;}
   .combo-list .ci{padding:9px 12px;font-size:12.5px;cursor:pointer;border-bottom:1px solid #f1f5f9;}
   .combo-list .ci:hover{background:#f1f5f9;}
@@ -245,7 +265,7 @@
             <div class="h-title" data-i18n="hero_title">收购作业台</div>
             <div class="h-sub" data-i18n="hero_sub">本厂以废旧塑料收购为核心，记录每日收/发与同步状态</div>
           </div>
-          <div class="h-action"><button class="btn eco lg" onclick="go('receiving')" data-i18n="hero_cta">＋ 新建收购单</button><button id="hero-ann" class="btn ghost lg" style="display:none;margin-left:8px" onclick="openAnnounceModal()" data-i18n="ann_post">📢 发布公告</button></div>
+          <div class="h-action"><button class="btn eco lg" onclick="go('receiving')" data-i18n="hero_cta">＋ 新建收购单</button><button id="hero-ann" class="btn announce lg" style="display:none;margin-left:10px" onclick="openAnnounceModal()" data-i18n="ann_post">📢 发布公告</button></div>
         </div>
         <div id="ann-bar"></div>
         <div class="cards" id="dash-cards">
@@ -440,7 +460,8 @@
               <div class="field"><label data-i18n="s_dest">目的地（可编辑）</label><input id="s-dest" value="总厂造粒厂 · 拉各斯"/></div>
               <div class="field" id="s-factory-wrap" style="display:none"><label data-i18n="liFactory">来源工厂 / Plant</label><select id="s-factory"><option value="Sagamu">总厂 · Sagamu</option><option value="OPIC">OPIC工厂</option><option value="Ikeja">IKEJA工厂</option></select></div>
             </div>
-            <div class="panel-head" style="border:none;padding:6px 0"><h3 style="font-size:13px" data-i18n="s_pick">选择发货库存（来自库存台账）</h3></div>
+            <div class="panel-head" style="border:none;padding:6px 0"><h3 style="font-size:13px" data-i18n="s_pick">配送物料（统一为破碎料）</h3></div>
+            <div class="note" data-i18n="s_pick_note">配送物料统一为破碎料；配送量请按实际装车量填写，不与收购量挂钩。</div>
             <div class="tbl-scroll">
             <table>
               <thead><tr><th data-i18n="h_mat">材质</th><th data-i18n="h_form">形态</th><th data-i18n="s_avail">可用(kg)</th><th data-i18n="s_ship">发货(kg)</th></tr></thead>
@@ -1137,7 +1158,7 @@ const ROLE_PERMS={
   boss:['view:*','customer:*','receive','ship','produce','sell','inbound','crush','pricing','settings.write','audit.view','record.delete','customer.create','customer.edit','customer.delete','account.manage','data.reset','view.allFactories','announce'],
   devAdmin:['view:*','customer:*','receive','ship','produce','sell','inbound','crush','pricing','settings.write','audit.view','record.delete','customer.create','customer.edit','customer.delete','account.manage','data.reset','view.allFactories','announce'],
   factoryAdmin:['view:dashboard','view:customers','view:receiving','view:today','view:pricing','view:shipping','view:crush','view:produce','view:sell','view:logistics','view:inventory','view:search','view:reports','view:settings','view:custdetail','customer.create','customer.edit','customer.delete','receive','ship','produce','sell','pricing','record.delete','settings.write','audit.view'],
-  registrar:['view:dashboard','view:customers','view:receiving','view:today','view:shipping','view:search','view:custdetail','receive','ship'],
+  registrar:['view:dashboard','view:customers','view:receiving','view:today','view:shipping','view:search','view:custdetail','receive','ship','record.delete'],
   auditor:['view:dashboard','view:customers','view:today','view:search','view:reports','view:settings','view:custdetail','audit.view']
 };
 function can(perm){
@@ -1441,7 +1462,7 @@ function toast(msg){
 
 /* ============ State persistence ============ */
 function saveState(){
-  Store.set(STATE_KEY,{customers,priceMap,records,priceHist,auditLog,settings,users,companyName:COMPANY.name,products,invAdjust,deletedGids,tombMeta});
+  Store.set(STATE_KEY,{customers,priceMap,records,priceHist,auditLog,settings,users,companyName:COMPANY.name,products,invAdjust,deletedGids,tombMeta,deletedUsers,deletedCustomers});
   scheduleAutoSync();
 }
 function loadState(){
@@ -1453,15 +1474,17 @@ function loadState(){
   SEED_USERS.forEach(su=>{ if(!users.some(u=>u.username===su.username)){ const salt=genSalt(); users.push({username:su.username,name:su.name,role:su.role,factories:su.factories.slice(),salt,passwordHash:hashPassword(su.pw,salt),mustChange:su.mustChange}); } });
   if(typeof s!=='object'||!s)return;
   if(typeof s.companyName==='string')COMPANY.name=s.companyName;
-  if(Array.isArray(s.customers))customers=s.customers;
+  if(Array.isArray(s.customers))customers=s.customers.map(c=>{if(c.id!=null)c.id=String(c.id);if(!c.factory)c.factory='Sagamu';if(!c.updatedTs)c.updatedTs=0;return c;});
   if(s.priceMap&&typeof s.priceMap==='object')priceMap=s.priceMap;
   if(s.products&&typeof s.products==='object')products=s.products;
-  if(Array.isArray(s.records)){records=s.records.map(r=>{if(!r.items)r.items=[];if(!r.factory)r.factory='Sagamu';if(!r.ts)r.ts=Date.parse((r.dt||'2026-01-01')+'T00:00:00')||Date.now();if(!r.rev)r.rev=1;recTotals(r);return r;});}
+  if(Array.isArray(s.records)){records=s.records.map(r=>{if(r.id!=null)r.id=String(r.id);if(!r.items)r.items=[];if(!r.factory)r.factory='Sagamu';if(!r.ts)r.ts=Date.parse((r.dt||'2026-01-01')+'T00:00:00')||Date.now();if(!r.rev)r.rev=1;recTotals(r);return r;});}
   if(Array.isArray(s.priceHist))priceHist=s.priceHist;
   if(Array.isArray(s.auditLog))auditLog=s.auditLog;
   if(s.settings&&typeof s.settings==='object')settings=Object.assign(settings,s.settings);
   if(s.invAdjust&&typeof s.invAdjust==='object')invAdjust=s.invAdjust;
   if(Array.isArray(s.deletedGids))deletedGids=s.deletedGids.slice();
+  if(Array.isArray(s.deletedUsers))deletedUsers=s.deletedUsers.slice();
+  if(Array.isArray(s.deletedCustomers))deletedCustomers=s.deletedCustomers.slice();
   if(s.tombMeta&&typeof s.tombMeta==='object'){
     for(const k in s.tombMeta){ tombMeta[k]=s.tombMeta[k]; if(deletedGids.indexOf(k)<0)deletedGids.push(k); }
   } else {
@@ -1630,6 +1653,30 @@ function computeInventory(scope){
 function flattenRaw(inv){const out={};for(const k in inv.raw){const p=k.split('|');const nk=p[1]+'|'+p[2];out[nk]=(out[nk]||0)+inv.raw[k];}return out;}
 function flattenPellet(inv){const out={};for(const k in inv.pellet){const p=k.split('|');const nk=p[1]+'|'+(p[2]||'');out[nk]=(out[nk]||0)+inv.pellet[k];}return out;}
 
+/* ============ 单据详情（查看任意单据的完整信息，不再跳转客户页） ============ */
+function closeRecordModal(){const m=document.getElementById('record-modal');if(m)m.classList.add('hidden');}
+function viewRecord(id){
+  const r=records.find(x=>x.id===id);if(!r){toast(lang==='zh'?'单据不存在':'Record not found');return;}
+  const m=document.getElementById('record-modal');if(!m)return;
+  const typeMap={Receive:lang==='zh'?'回收分拣单':'Receiving',Ship:lang==='zh'?'配送单':'Shipment',Inbound:lang==='zh'?'入库单':'Inbound',Crush:lang==='zh'?'破碎清洗单':'Crush',Produce:lang==='zh'?'生产造粒单':'Produce',Sale:lang==='zh'?'出售单':'Sale',Notice:lang==='zh'?'公告':'Notice'};
+  const mat=(r.items||[]).map(it=>`<tr><td>${esc(it.m||'')}</td><td>${esc(it.f||'')}</td><td>${esc(it.c||'')}</td><td class="num">${(+it.w).toLocaleString()} kg</td><td class="num">¥ ${(+it.p||0).toLocaleString()}</td><td class="num">¥ ${((+it.w)*(+it.p||0)).toLocaleString()}</td></tr>`).join('');
+  document.getElementById('record-detail-body').innerHTML=`
+    <div class="rec-kv">
+      <div class="k">${lang==='zh'?'单据类型':'Type'}</div><div>${typeMap[r.ty]||esc(r.ty)}</div>
+      <div class="k">${lang==='zh'?'单据号':'Ticket'}</div><div>${esc(r.ticket||'—')}</div>
+      <div class="k">${lang==='zh'?'日期':'Date'}</div><div>${esc(r.dt||'—')}</div>
+      <div class="k">${lang==='zh'?'客户/对象':'Customer'}</div><div>${esc(r.custName||'—')}</div>
+      <div class="k">${lang==='zh'?'工厂':'Plant'}</div><div>${FACTORIES[r.factory]?FACTORIES[r.factory].name:esc(r.factory||'—')}</div>
+      <div class="k">${lang==='zh'?'操作人':'Operator'}</div><div>${esc(r.op||'—')}</div>
+      <div class="k">${lang==='zh'?'状态':'Status'}</div><div>${esc(r.status||'—')}</div>
+      <div class="k">${lang==='zh'?'备注':'Note'}</div><div>${esc(r.note||'—')}</div>
+      <div class="k">${lang==='zh'?'合计重量':'Total weight'}</div><div class="num">${(+r.tw||0).toLocaleString()} kg</div>
+      <div class="k">${lang==='zh'?'合计金额':'Total amount'}</div><div class="num">¥ ${(+r.ta||0).toLocaleString()}</div>
+    </div>
+    ${(r.items&&r.items.length)?`<table class="tbl"><thead><tr><th>${lang==='zh'?'材质':'Material'}</th><th>${lang==='zh'?'形态':'Form'}</th><th>${lang==='zh'?'颜色':'Color'}</th><th class="num">${lang==='zh'?'重量':'Weight'}</th><th class="num">${lang==='zh'?'单价':'Price'}</th><th class="num">${lang==='zh'?'金额':'Amount'}</th></tr></thead><tbody>${mat}</tbody></table>`:''}
+  `;
+  m.classList.remove('hidden');
+}
 /* ============ Today's receiving (end-of-day reconciliation) ============ */
 function renderToday(){
   const todays=visibleRecords().filter(r=>r.ty==='Receive'&&r.dt===PLANT_TODAY);
@@ -1647,10 +1694,10 @@ function renderToday(){
   todays.forEach(r=>{ if(!map[r.custId])map[r.custId]={id:r.custId,name:r.custName,w:0,a:0,n:0}; map[r.custId].w+=r.tw;map[r.custId].a+=r.ta;map[r.custId].n++; });
   const rows=Object.values(map);
   set('td-sup',rows.length);
-  document.getElementById('td-cust').innerHTML=rows.length?rows.map(x=>`<tr style="cursor:pointer" onclick="openCustomer(${x.id})"><td><b>${esc(x.name)}</b></td><td class="num">${x.n}</td><td class="num">${x.w.toLocaleString()}</td><td class="num">¥ ${x.a.toLocaleString()}</td><td><span class="link">${t('c_view')} →</span></td></tr>`).join(''):`<tr><td colspan="5" class="muted">${lang==='zh'?'无':'None'}</td></tr>`;
+  document.getElementById('td-cust').innerHTML=rows.length?rows.map(x=>`<tr style="cursor:pointer" onclick="openCustomer('${x.id}')"><td><b>${esc(x.name)}</b></td><td class="num">${x.n}</td><td class="num">${x.w.toLocaleString()}</td><td class="num">¥ ${x.a.toLocaleString()}</td><td><span class="link">${t('c_view')} →</span></td></tr>`).join(''):`<tr><td colspan="5" class="muted">${lang==='zh'?'无':'None'}</td></tr>`;
   document.getElementById('td-list').innerHTML=todays.length?todays.map(r=>{
     const mat=(r.items||[]).map(it=>`${it.m} ${it.f} ${it.c} ${(+it.w).toLocaleString()}kg`).join('<br/>');
-    return `<tr><td>${r.ticket||'—'}</td><td>${r.dt}</td><td><b>${esc(r.custName)}</b></td><td class="muted">${mat}</td><td class="num">${r.tw.toLocaleString()}</td><td class="num">¥ ${r.ta.toLocaleString()}</td><td><span class="link" onclick="openCustomer(${r.custId})">${t('c_view')}</span></td></tr>`;
+    return `<tr><td>${r.ticket||'—'}</td><td>${r.dt}</td><td><b>${esc(r.custName)}</b></td><td class="muted">${mat}</td><td class="num">${r.tw.toLocaleString()}</td><td class="num">¥ ${r.ta.toLocaleString()}</td><td><span class="link" onclick="viewRecord('${r.id}')">${t('c_view')}</span></td></tr>`;
   }).join(''):`<tr><td colspan="7" class="muted">${lang==='zh'?'无':'None'}</td></tr>`;
 }
 
@@ -1664,7 +1711,7 @@ function renderCustomers(){
     <td>${esc(c.phone)}</td><td>${esc(c.bank)}</td><td>${esc(c.acct)}</td>
     <td class="num">${c.kg.toLocaleString()} kg</td><td class="num">¥ ${(c.amt/1e6).toFixed(2)}M</td>
     <td class="num">${avg===null?'—':avg+(lang==='zh'?' 天/次':'d')}</td>
-    <td>${c.last}</td><td><span class="link" onclick="openCustomer(${c.id})">${t('c_view')||'查看 →'}</span>${can('customer.delete')?` · <span class="link" style="color:var(--danger)" onclick="deleteCust(${c.id})">${t('c_del')}</span>`:''}</td></tr>`;}).join('');
+    <td>${c.last}</td><td><span class="link" onclick="openCustomer('${c.id}')">${t('c_view')||'查看 →'}</span>${can('customer.delete')?` · <span class="link" style="color:var(--danger)" onclick="deleteCust('${c.id}')">${t('c_del')}</span>`:''}</td></tr>`;}).join('');
   document.getElementById('cust-count').textContent=list.length+' '+(lang==='zh'?'家供货商':'suppliers');
 }
 function filterCustomers(){renderCustomers();}
@@ -1715,6 +1762,7 @@ function deleteCust(id){
   if(c.factory&&c.factory!==currentFactory&&currentRole!=='boss'){toast(lang==='zh'?'不能删除其他工厂的客户':'Cannot delete customer of another factory');return;}
   if(!confirm(lang==='zh'?`确认删除客户「${c.name}」？其历史回收与配送记录仍按名称保留，不再关联该客户。`:`Delete customer ${c.name}? Historical records are kept by name and unlinked.`))return;
   customers=customers.filter(x=>x.id!==id);
+  if(deletedCustomers.indexOf(id)<0)deletedCustomers.push(id);
   auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_cust',target:c.name,detail:lang==='zh'?'客户已删除':'customer deleted'});
   saveState();renderCustomers();renderAudit();runChurn();renderToday();
   if(currentCustId===id){go('customers');}
@@ -1732,12 +1780,12 @@ function saveCustModal(){
   const data={name,phone:document.getElementById('cm-phone').value.trim(),bank:document.getElementById('cm-bank').value.trim(),
     acct,addr:document.getElementById('cm-addr').value.trim(),note:document.getElementById('cm-note').value.trim()};
   if(currentCustId){
-    const c=customers.find(x=>x.id===currentCustId);Object.assign(c,data);
+    const c=customers.find(x=>x.id===currentCustId);Object.assign(c,data);c.updatedTs=Date.now();
     auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_edit',target:name,detail:lang==='zh'?'客户信息已更新':'customer updated'});
     toast(lang==='zh'?'客户已更新':'Customer updated');
   }else{
-    const id=customers.length?Math.max(...customers.map(c=>c.id))+1:1;
-    customers.push(Object.assign({id,kg:0,amt:0,last:PLANT_TODAY,freq:0,factory:effectiveFactory()},data));
+    const id=genGid();
+    customers.push(Object.assign({id,kg:0,amt:0,last:PLANT_TODAY,freq:0,factory:effectiveFactory(),updatedTs:Date.now()},data));
     auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_create',target:name,detail:lang==='zh'?'新建客户':'new customer'});
     toast(lang==='zh'?'客户已创建':'Customer created');
   }
@@ -1751,7 +1799,7 @@ function renderCombo(input,list,matchFn,renderFn,onPick){
   const items=visibleCustomers().filter(c=>!q||matchFn(c).toLowerCase().includes(q));
   list.innerHTML = items.length? items.map(c=>`<div class="ci" data-id="${c.id}">${renderFn(c)}</div>`).join('') : `<div class="ci muted">无匹配</div>`;
   list.style.display='block';
-  list.querySelectorAll('.ci[data-id]').forEach(el=>el.addEventListener('mousedown',e=>{e.preventDefault();onPick(+el.dataset.id);list.style.display='none';}));
+  list.querySelectorAll('.ci[data-id]').forEach(el=>el.addEventListener('mousedown',e=>{e.preventDefault();onPick(el.dataset.id);list.style.display='none';}));
 }
 function setupCombo(inputId,listId,matchFn,renderFn,onPick){
   const input=document.getElementById(inputId),list=document.getElementById(listId);
@@ -1801,7 +1849,7 @@ function renderReceivingIfNeeded(){
 }
 function saveReceiving(view){
   if(!can('receive')){toast(lang==='zh'?'无收购权限':'No receive permission');return;}
-  const id=+document.getElementById('rc-cust-id').value;
+  const id=document.getElementById('rc-cust-id').value;
   const c=customers.find(x=>x.id===id);
   if(!c){toast(lang==='zh'?'请先选择供货客户':'Select a supplier first');return;}
   const ticket=document.getElementById('rc-ticket').value.trim()||('RC-'+Date.now());
@@ -1888,7 +1936,7 @@ function renderReceiveList(){
   const list=visibleRecords().filter(r=>r.ty==='Receive').slice(0,60);
   setHTML('rc-list', list.length?list.map(r=>{
     const mat=(r.items||[]).map(it=>`${it.m} ${it.f} ${it.c} ${(+it.w).toLocaleString()}kg`).join('<br/>');
-    return `<tr><td>${r.dt}</td><td>${r.ticket||'—'}</td><td><b>${esc(r.custName)}</b></td><td class="muted">${mat}</td><td class="num">${r.tw.toLocaleString()}</td><td class="num">¥ ${r.ta.toLocaleString()}</td><td><span class="link" onclick="editReceive(${r.id})">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteReceive(${r.id})">${t('delete')}</span></td></tr>`;
+    return `<tr><td>${r.dt}</td><td>${r.ticket||'—'}</td><td><b>${esc(r.custName)}</b></td><td class="muted">${mat}</td><td class="num">${r.tw.toLocaleString()}</td><td class="num">¥ ${r.ta.toLocaleString()}</td><td><span class="link" onclick="editReceive('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteReceive('${r.id}')">${t('delete')}</span></td></tr>`;
   }).join(''):`<tr><td colspan="7" class="muted">${lang==='zh'?'暂无记录':'No records'}</td></tr>`);
   const cnt=document.getElementById('rc-list-count');if(cnt)cnt.textContent=list.length+(lang==='zh'?' 条':' records');
 }
@@ -2047,16 +2095,16 @@ function saveShipping(view){
   else { document.getElementById('s-batch').focus(); toast(t('s_next').replace('{b}',savedBatch).replace('{n}',nextB)); }
 }
 function printManifest(){toast(lang==='zh'?'已发送发货单至打印机':'Manifest sent to printer');}
-/* 配送视图：按当前分厂实际原料库存动态列出可发货行 */
+/* 配送视图：分厂向总厂配送 —— 物料统一为破碎料，配送量由人工按实际装车量填写，不与收购量挂钩 */
 function renderShipRows(){
   const el=document.getElementById('ship-rows');if(!el)return;
   const fac=effectiveFactory();
   const inv=computeInventory(fac);
   const flat=flattenRaw(inv);
-  const keys=Object.keys(flat).filter(k=>flat[k]>0.0001);
-  if(!keys.length){el.innerHTML=`<tr><td colspan="4" class="muted">${lang==='zh'?'当前无可用库存，请先进行回收分拣':'No stock — receive first'}</td></tr>`;return;}
-  el.innerHTML=keys.map(mf=>{const [m,f]=mf.split('|');const w=Math.max(0,Math.round(flat[mf]));
-    return `<tr data-m="${m}" data-f="${f}"><td><b>${m}</b></td><td>${f==='大料'?t('opt_bulk'):t('opt_frag')}</td><td class="num avail-w">${w.toLocaleString()}</td><td><input class="ship-w" type="number" value="0" min="0" max="${Math.round(flat[mf])}" style="width:110px"/></td></tr>`;
+  const mats=['PP','PE','PVC'];
+  el.innerHTML=mats.map(m=>{
+    const avail=Math.max(0,Math.round(flat[m+'|破碎料']||0));
+    return `<tr data-m="${m}" data-f="破碎料"><td><b>${m}</b></td><td>${t('opt_frag')}</td><td class="num avail-w">${avail.toLocaleString()}</td><td><input class="ship-w" type="number" value="0" min="0" style="width:110px" placeholder="0"/></td></tr>`;
   }).join('');
 }
 
@@ -2065,7 +2113,7 @@ function renderShipList(){
   const fac=effectiveFactory();
   const list=records.filter(r=>r.ty==='Ship'&&(currentRole==='boss'&&currentFactory===ALL_VIEW||r.factory===fac||(currentRole==='boss'&&currentFactory==='Sagamu')));
   if(!list.length){el.innerHTML=`<tr><td colspan="7" class="muted">${lang==='zh'?'暂无发货记录':'No shipments'}</td></tr>`;return;}
-  el.innerHTML=list.map(r=>`<tr><td>${r.dt}</td><td>${FACTORIES[r.factory]?FACTORIES[r.factory].name:r.factory}</td><td>${r.batch}</td><td>${esc(r.dest||'—')}</td><td class="num">${Math.round(r.tw).toLocaleString()}</td><td>${statusTag(r.status||'在途')}</td><td><span class="link" onclick="editShip(${r.id})">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteShip(${r.id})">${t('delete')}</span></td></tr>`).join('');
+  el.innerHTML=list.map(r=>`<tr><td>${r.dt}</td><td>${FACTORIES[r.factory]?FACTORIES[r.factory].name:r.factory}</td><td>${r.batch}</td><td>${esc(r.dest||'—')}</td><td class="num">${Math.round(r.tw).toLocaleString()}</td><td>${statusTag(r.status||'在途')}</td><td><span class="link" onclick="editShip('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteShip('${r.id}')">${t('delete')}</span></td></tr>`).join('');
 }
 function editShip(id){
   const r=records.find(x=>x.id===id&&x.ty==='Ship');if(!r)return;
@@ -2123,6 +2171,8 @@ function setHTML(id,html){const e=document.getElementById(id);if(e)e.innerHTML=h
    seed 记录保留原有数字 id；新建记录用 genGid() 生成字符串，避免跨厂冲突。 */
 let deletedGids=[]; /* 已删除记录的 id 列表（扁平，用于同步线缆格式与本地快速检索） */
 let tombMeta={}; /* id -> {ts, by} 墓碑元数据；by 为删除者角色，老板/开发管理员删除绝对优先，随同步永久生效 */
+let deletedUsers=[]; /* 已删除账号 username（墓碑，随同步传播，使账号删除跨设备生效） */
+let deletedCustomers=[]; /* 已删除客户 id（墓碑，随同步传播，使客户删除跨设备生效） */
 /* 新增/追加一个墓碑：本地删除与跨厂拉取的删除都走这里，保证删除在多设备间永久生效、不被 LWW 复活 */
 function addTomb(id, role){
   if(id==null)return;
@@ -2230,7 +2280,7 @@ function renderProduce(){
   setHTML('pr-inv', invRows||`<tr><td colspan="3" class="muted">—</td></tr>`);
   const list=records.filter(r=>r.ty==='Produce'&&(fac==='Sagamu'||r.factory===fac));
   let rows='';
-  list.forEach(r=>(r.items||[]).forEach(it=>{rows+=`<tr><td>${r.dt}</td><td>${r.batch}</td><td>${r.shift||''}</td><td>${esc(machineName(it.machine))}</td><td><b>${it.m}</b></td><td>${esc(colorLabel(it.c))}</td><td class="num">${it.bags+" "+unitBag()}</td><td>${esc(r.op)}</td><td><span class="link" onclick="editProduce(${r.id})">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteProduce(${r.id})">${t('delete')}</span></td></tr>`;}));
+  list.forEach(r=>(r.items||[]).forEach(it=>{rows+=`<tr><td>${r.dt}</td><td>${r.batch}</td><td>${r.shift||''}</td><td>${esc(machineName(it.machine))}</td><td><b>${it.m}</b></td><td>${esc(colorLabel(it.c))}</td><td class="num">${it.bags+" "+unitBag()}</td><td>${esc(r.op)}</td><td><span class="link" onclick="editProduce('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteProduce('${r.id}')">${t('delete')}</span></td></tr>`;}));
   setHTML('pr-list', rows||`<tr><td colspan="9" class="muted">${lang==='zh'?'暂无记录':'No records'}</td></tr>`);
 }
 
@@ -2341,7 +2391,7 @@ function renderSell(){
   const rev=list.reduce((s,r)=>s+r.ta,0);
   setHTML('sl-rev', (lang==='zh'?'累计销售 ':'Revenue ')+'¥ '+rev.toLocaleString());
   let rows='';
-  list.forEach(r=>(r.items||[]).forEach(it=>{rows+=`<tr><td>${r.dt}</td><td>${r.batch}</td><td><b>${esc(r.custName)}</b></td><td>${it.m}</td><td>${esc(colorLabel(it.c))}</td><td class="num">${it.bags+' '+unitBag()}</td><td class="num">¥ ${it.p}</td><td class="num">¥ ${Math.round(it.w*it.p).toLocaleString()}</td><td><span class="link" onclick="editSell(${r.id})">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteSell(${r.id})">${t('delete')}</span></td></tr>`;}));
+  list.forEach(r=>(r.items||[]).forEach(it=>{rows+=`<tr><td>${r.dt}</td><td>${r.batch}</td><td><b>${esc(r.custName)}</b></td><td>${it.m}</td><td>${esc(colorLabel(it.c))}</td><td class="num">${it.bags+' '+unitBag()}</td><td class="num">¥ ${it.p}</td><td class="num">¥ ${Math.round(it.w*it.p).toLocaleString()}</td><td><span class="link" onclick="editSell('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteSell('${r.id}')">${t('delete')}</span></td></tr>`;}));
   setHTML('sl-list', rows||`<tr><td colspan="9" class="muted">${lang==='zh'?'暂无记录':'No records'}</td></tr>`);
 }
 
@@ -2390,8 +2440,8 @@ function renderLogistics(){
   const all=logisticsAllScope();
   const ships=records.filter(r=>r.ty==='Ship'&&(all||r.factory===currentFactory));
   const inbs=records.filter(r=>r.ty==='Inbound'&&(all||r.fromFac===currentFactory));
-  setHTML('lg-out', ships.length?ships.map(r=>`<tr><td>${r.dt}</td><td>${FACTORIES[r.factory]?FACTORIES[r.factory].name:r.factory}</td><td>${r.batch}</td><td class="num">${Math.round(r.tw).toLocaleString()}</td><td>${statusTag(r.status||'在途')}</td><td><span class="link" onclick="editShip(${r.id})">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteShip(${r.id})">${t('delete')}</span></td></tr>`).join(''):`<tr><td colspan="6" class="muted">${lang==='zh'?'暂无配送记录':'No shipments'}</td></tr>`);
-  setHTML('lg-in', inbs.length?inbs.map(r=>`<tr><td>${r.dt}</td><td>${FACTORIES[r.fromFac]?FACTORIES[r.fromFac].name:r.fromFac}</td><td>${r.batch}</td><td class="num">${Math.round(r.tw).toLocaleString()}</td><td>${statusTag(r.status||'待入库')}</td><td>${r.status==='待入库'?'<button class="btn ghost sm" onclick="confirmInbound('+r.id+')">'+t('logistics_confirm')+'</button> ':''}<span class="link" onclick="editInbound(${r.id})">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteInbound(${r.id})">${t('delete')}</span></td></tr>`).join(''):`<tr><td colspan="6" class="muted">${lang==='zh'?'暂无入库记录':'No inbound'}</td></tr>`);
+  setHTML('lg-out', ships.length?ships.map(r=>`<tr><td>${r.dt}</td><td>${FACTORIES[r.factory]?FACTORIES[r.factory].name:r.factory}</td><td>${r.batch}</td><td class="num">${Math.round(r.tw).toLocaleString()}</td><td>${statusTag(r.status||'在途')}</td><td><span class="link" onclick="editShip('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteShip('${r.id}')">${t('delete')}</span></td></tr>`).join(''):`<tr><td colspan="6" class="muted">${lang==='zh'?'暂无配送记录':'No shipments'}</td></tr>`);
+  setHTML('lg-in', inbs.length?inbs.map(r=>`<tr><td>${r.dt}</td><td>${FACTORIES[r.fromFac]?FACTORIES[r.fromFac].name:r.fromFac}</td><td>${r.batch}</td><td class="num">${Math.round(r.tw).toLocaleString()}</td><td>${statusTag(r.status||'待入库')}</td><td>${r.status==='待入库'?'<button class="btn ghost sm" onclick="confirmInbound(\'+r.id+\')">'+t('logistics_confirm')+'</button> ':''}<span class="link" onclick="editInbound('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteInbound('${r.id}')">${t('delete')}</span></td></tr>`).join(''):`<tr><td colspan="6" class="muted">${lang==='zh'?'暂无入库记录':'No inbound'}</td></tr>`);
   const pend=inbs.filter(r=>r.status==='待入库').reduce((s,r)=>s+r.tw,0);
   const transit=ships.filter(r=>r.status==='在途').reduce((s,r)=>s+r.tw,0);
   setHTML('lg-summary', (lang==='zh'?'在途 ':'In transit ')+transit.toLocaleString()+' kg · '+(lang==='zh'?'待入库 ':'Pending ')+pend.toLocaleString()+' kg');
@@ -2446,7 +2496,7 @@ function runChurn(){
     const rows=visibleCustomers().filter(c=>{
       if(mat!=='全部'&&!records.some(r=>r.ty==='Receive'&&r.custId===c.id&&(r.items||[]).some(it=>it.m===mat)&&r.tw>=single))return false;
       return (c.kg>=single)||(c.kg>=month);
-    }).sort((a,b)=>b.kg-a.kg).slice(0,100).map(c=>`<tr><td><b>${esc(c.name)}</b></td><td>${esc(c.phone||'')}</td><td class="num">${c.kg.toLocaleString()}</td><td class="num">¥ ${(c.amt/1e6).toFixed(2)}M</td><td><span class="link" onclick="contactCust(${c.id})">${t('contact')||'联系'}</span></td></tr>`).join('');
+    }).sort((a,b)=>b.kg-a.kg).slice(0,100).map(c=>`<tr><td><b>${esc(c.name)}</b></td><td>${esc(c.phone||'')}</td><td class="num">${c.kg.toLocaleString()}</td><td class="num">¥ ${(c.amt/1e6).toFixed(2)}M</td><td><span class="link" onclick="contactCust('${c.id}')">${t('contact')||'联系'}</span></td></tr>`).join('');
     setHTML('churn-body', rows||`<tr><td colspan="5" class="muted">—</td></tr>`);
   }catch(e){}
 }
@@ -2559,14 +2609,22 @@ function autoDetectSync(){
 function syncPush(){
   if(!SYNC.enabled()) return Promise.resolve(false);
   if(typeof fetch!=='function') return Promise.resolve(false);
-  const body=JSON.stringify({factory:currentFactory, records:records, deleted:deletedGids});
+  const body=JSON.stringify({
+    factory:currentFactory,
+    records:records,
+    deleted:deletedGids,
+    users:users.map(u=>Object.assign({},u,{updatedTs:u.updatedTs||Date.now()})),
+    customers:customers.map(c=>Object.assign({},c,{updatedTs:c.updatedTs||0})),
+    deletedUsers:deletedUsers,
+    deletedCustomers:deletedCustomers
+  });
   return fetch(SYNC.url()+'/sync/push',{method:'POST',headers:SYNC.headers(),body})
     .then(r=>r.json()).then(j=>{
       if(j&&j.ok){ if(deletedGids.length){deletedGids=[]; tombMeta={};} settings.lastSync=nowStr(); settings.pending=0; saveState(); updateSyncUI(); }
       return !!(j&&j.ok);
     }).catch(e=>{ console.warn('syncPush failed',e); return false; });
 }
-function applyRemote(remoteRecs, deleted){
+function applyRemote(remoteRecs, deleted, remoteUsers, remoteCustomers, remoteDelUsers, remoteDelCustomers){
   const map={}; records.forEach(r=>{map[r.id]=r;});
   (remoteRecs||[]).forEach(rr=>{
     if(rr.id==null)return;
@@ -2576,6 +2634,26 @@ function applyRemote(remoteRecs, deleted){
     else if((rr.ts||0) >= (local.ts||0)){ Object.assign(local, rr); }
   });
   (deleted||[]).forEach(gid=>{ records=records.filter(r=>r.id!==gid); addTomb(gid,'remote'); });
+  /* ---- 账号同步：按 username 做 LWW（updatedTs 大者胜），使新账号可在任意设备登录 ---- */
+  (remoteUsers||[]).forEach(ru=>{
+    if(!ru||ru.username==null)return;
+    if(remoteDelUsers&&remoteDelUsers.indexOf(ru.username)>=0)return; /* 账号墓碑，跨设备删除 */
+    const idx=users.findIndex(u=>u.username===ru.username);
+    if(idx<0){ users.push(ru); }
+    else if((ru.updatedTs||0) > (users[idx].updatedTs||0)){ users[idx]=ru; }
+  });
+  (remoteDelUsers||[]).forEach(un=>{ if(un===currentUser&&currentUser.username==='boss')return; if(users.some(u=>u.username===un&&u.role==='boss'))return; users=users.filter(u=>u.username!==un); if(deletedUsers.indexOf(un)<0)deletedUsers.push(un); });
+  /* ---- 客户同步：按 id 做 LWW，使分厂录入的客户可在老板账号查看 ---- */
+  const cmap={}; customers.forEach(c=>{cmap[c.id]=c;});
+  (remoteCustomers||[]).forEach(rc=>{
+    if(rc==null||rc.id==null)return;
+    if(remoteDelCustomers&&remoteDelCustomers.indexOf(rc.id)>=0)return; /* 客户墓碑，跨设备删除 */
+    if(!cmap[rc.id]){ customers.push(rc); }
+    else if((rc.updatedTs||0) > (cmap[rc.id].updatedTs||0)){ Object.assign(cmap[rc.id], rc); }
+  });
+  (remoteDelCustomers||[]).forEach(cid=>{ customers=customers.filter(c=>c.id!==cid); if(deletedCustomers.indexOf(cid)<0)deletedCustomers.push(cid); });
+  /* 同步后，若当前登录账号对象被替换，重新指向最新引用，避免会话 stale */
+  if(currentUser){ const fresh=users.find(u=>u.username===currentUser.username); if(fresh)currentUser=fresh; }
 }
 function syncPull(){
   if(!SYNC.enabled()) return Promise.resolve(false);
@@ -2584,8 +2662,8 @@ function syncPull(){
   return fetch(SYNC.url()+'/sync/pull?since='+since,{headers:SYNC.headers()})
     .then(r=>r.json()).then(j=>{
       if(!j||!j.records) return false;
-      applyRemote(j.records, j.deleted||[]);
-      settings.lastSync=nowStr(); settings.lastSyncTs=Date.now(); saveState(); refreshAfterSave(); updateSyncUI();
+      applyRemote(j.records, j.deleted||[], j.users||[], j.customers||[], j.deletedUsers||[], j.deletedCustomers||[]);
+      settings.lastSync=nowStr(); settings.lastSyncTs=Date.now(); saveState(); refreshAfterSave(); renderCustomers(); renderAccounts(); updateSyncUI();
       return true;
     }).catch(e=>{ console.warn('syncPull failed',e); return false; });
 }
@@ -2673,7 +2751,7 @@ function importCustomers(input){
   const f=input.files&&input.files[0];if(!f)return;
   const rd=new FileReader();rd.onload=()=>{try{
     const rows=parseCSV(rd.result);let n=0;
-    rows.forEach(r=>{const name=r['姓名']||r['name'];const phone=r['电话']||r['phone'];if(!name)return;if(customers.some(c=>c.name===name&&c.phone===phone))return;customers.push({id:nextId(),name,phone:phone||'',bank:r['开户行']||r['bank']||'',acct:r['账号']||r['acct']||'',addr:r['地址']||r['addr']||'',kg:0,amt:0,last:'',freq:0});n++;});
+    rows.forEach(r=>{const name=r['姓名']||r['name'];const phone=r['电话']||r['phone'];if(!name)return;if(customers.some(c=>c.name===name&&c.phone===phone))return;customers.push({id:genGid(),name,phone:phone||'',bank:r['开户行']||r['bank']||'',acct:r['账号']||r['acct']||'',addr:r['地址']||r['addr']||'',kg:0,amt:0,last:'',freq:0,factory:effectiveFactory(),updatedTs:Date.now()});n++;});
     saveState();renderCustomers();toast(lang==='zh'?('已导入 '+n+' 位客户'):('Imported '+n+' customers'));
   }catch(e){toast('import error');}};rd.readAsText(f);
 }
@@ -2839,7 +2917,7 @@ function submitAcct(){
     /* 老板赋权：更新已有账号角色/工厂，密码留空则不变 */
     const u=users.find(x=>x.username===username);if(!u){if(msg)msg.textContent=lang==='zh'?'账号不存在':'Account not found';return;}
     if(pass){ if(pass.length<6){if(msg)msg.textContent=lang==='zh'?'密码至少 6 位':'Password >= 6 chars';return;} const salt=genSalt(); u.salt=salt; u.passwordHash=hashPassword(pass,salt); u.mustChange=true; }
-    u.name=name; u.role=role; u.factories=factories.slice();
+    u.name=name; u.role=role; u.factories=factories.slice(); u.updatedTs=Date.now();
     settings.pending=(settings.pending||0)+1;
     auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_edit',target:username,detail:lang==='zh'?'赋权 · '+name+' · '+role:'grant · '+name+' · '+role});
     saveState();renderAccounts();updateSyncUI();
@@ -2849,8 +2927,9 @@ function submitAcct(){
   }
   if(users.some(u=>u.username===username)){if(msg)msg.textContent=lang==='zh'?'该账号已存在，请更换':'Account exists';return;}
   if(!pass||pass.length<6){if(msg)msg.textContent=lang==='zh'?'密码至少 6 位':'Password >= 6 chars';return;}
+  const di=deletedUsers.indexOf(username); if(di>=0)deletedUsers.splice(di,1); /* 重新创建同名账号时清除旧墓碑，避免下次同步又被删 */
   const salt=genSalt();
-  users.push({username,name,role,factories:factories.slice(),salt,passwordHash:hashPassword(pass,salt),mustChange:true});
+  users.push({username,name,role,factories:factories.slice(),salt,passwordHash:hashPassword(pass,salt),mustChange:true,updatedTs:Date.now()});
   settings.pending=(settings.pending||0)+1;
   auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_create',target:username,detail:lang==='zh'?'新增账号 · '+name+' · '+role:'new account · '+name+' · '+role});
   saveState();renderAccounts();updateSyncUI();
@@ -2878,9 +2957,16 @@ function deleteAnnounce(id){
   toast(lang==='zh'?'公告已撤回':'Announcement withdrawn');
 }
 function renderAnnouncements(){
-  const bar=document.getElementById('ann-bar'); if(bar){
+  const bar=document.getElementById('ann-bar');
+  if(bar){
     const list=records.filter(r=>r.ty==='Notice').sort((a,b)=>(b.ts||0)-(a.ts||0));
-    bar.innerHTML=list.length?list.map(n=>`<div class="ann-pin"><span class="ann-badge" data-i18n="ann_pin">📢 置顶</span><b>${esc(n.title||'')}</b><span class="ann-body">${esc(n.body||'')}</span>${can('announce')?`<span class="link ann-del" onclick="deleteAnnounce('${n.id}')">${t('ann_del')}</span>`:''}</div>`).join(''):'';
+    if(!list.length){ bar.style.display='none'; bar.innerHTML=''; }
+    else {
+      bar.style.display='flex';
+      const seg=n=>`<span class="ann-item"><span class="ann-t">${esc(n.title||'')}</span><span class="ann-b">${esc(n.body||'')}</span>${can('announce')?`<span class="ann-del" onclick="deleteAnnounce('${n.id}')">${t('ann_del')}</span>`:''}</span>`;
+      /* 内容复制两份，配合 CSS translateX(-50%) 实现无缝循环滚动轮播 */
+      bar.innerHTML=`<div class="ann-flag">📢 公告</div><div class="ann-track-wrap"><div class="ann-track">${list.map(seg).join('')}${list.map(seg).join('')}</div></div>`;
+    }
   }
   const heroBtn=document.getElementById('hero-ann'); if(heroBtn)heroBtn.style.display=can('announce')?'inline-block':'none';
 }
@@ -2890,6 +2976,7 @@ function deleteAccount(username){
   if(u.role==='boss'){toast(lang==='zh'?'不能删除老板账号':'Cannot delete boss');return;}
   if(!confirm(lang==='zh'?`确认删除账号 ${username}？`:`Delete ${username}?`))return;
   users=users.filter(x=>x.username!==username);
+  if(deletedUsers.indexOf(username)<0)deletedUsers.push(username);
   settings.pending=(settings.pending||0)+1;
   auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_delete',target:username,detail:lang==='zh'?'删除账号':'deleted account'});
   saveState();renderAccounts();updateSyncUI();
@@ -2986,6 +3073,15 @@ if(typeof setInterval==='function'){ setInterval(syncTick, 20000); /* 在线时�
       </div>
       <div class="small muted mt" id="ac-msg"></div>
     </div>
+  </div>
+</div>
+
+<!-- ===================== Record detail modal ===================== -->
+<div id="record-modal" class="modal hidden">
+  <div class="modal-card">
+    <div class="panel-head"><h3 data-i18n="rec_detail">单据详情</h3>
+      <button class="btn ghost sm" onclick="closeRecordModal()">✕</button></div>
+    <div class="panel-body" id="record-detail-body"></div>
   </div>
 </div>
 
