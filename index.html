@@ -2601,20 +2601,21 @@ const SYNC = {
 };
 /* 同源自动探测：若应用由本一体化服务器(http/https)托管且未配置同步地址，
    则探测同源 /sync/health，成功即自动把同步服务器指向本机，实现开箱即联网。 */
-async function autoDetectSync(){
+function autoDetectSync(){
   try{
-    if(typeof location==='undefined'||!location)return false;
-    if(location.protocol!=='http:'&&location.protocol!=='https:')return false; // file:// 直接打开则不探测
-    if((settings.syncUrl||'').trim().length>0)return true;
-    if(typeof fetch!=='function')return false;
+    if(typeof location==='undefined'||!location)return;
+    if(location.protocol!=='http:'&&location.protocol!=='https:')return; // file:// 直接打开则不探测
+    if((settings.syncUrl||'').trim().length>0)return;
+    if(typeof fetch!=='function')return;
     const url=location.origin+'/sync/health';
-    const r=await fetch(url,{method:'GET'});
-    const ct=(r.headers&&r.headers.get)?r.headers.get('content-type')||'':'';
-    if(!r.ok||ct.indexOf('json')<0) throw new Error('no-sync-endpoint'); // 静态站点返回 HTML/404，视为无后端
-    const j=await r.json();
-    if(j&&j.ok){ settings.syncUrl=location.origin; if(!settings.syncKey)settings.syncKey=''; saveState(); updateSyncUI(); return true; }
-    return false;
-  }catch(e){ updateSyncUI(); return false; }
+    fetch(url,{method:'GET'}).then(r=>{
+      const ct=(r.headers&&r.headers.get)?r.headers.get('content-type')||'':'';
+      if(!r.ok||ct.indexOf('json')<0) throw new Error('no-sync-endpoint'); // 静态站点返回 HTML/404，视为无后端
+      return r.json();
+    }).then(j=>{
+      if(j&&j.ok){ settings.syncUrl=location.origin; if(!settings.syncKey)settings.syncKey=''; saveState(); updateSyncUI(); }
+    }).catch(()=>{ updateSyncUI(); /* 探测失败：保持"未连同步服务器"红字告警，不再静默 */ });
+  }catch(e){ /* 探测失败不影响本地使用 */ }
 }
 function syncPush(){
   if(!SYNC.enabled()) return Promise.resolve(false);
@@ -2626,8 +2627,7 @@ function syncPush(){
     users:users.map(u=>Object.assign({},u,{updatedTs:u.updatedTs||Date.now()})),
     customers:customers.map(c=>Object.assign({},c,{updatedTs:c.updatedTs||0})),
     deletedUsers:deletedUsers,
-    deletedCustomers:deletedCustomers,
-    settings:{syncUrl:(settings.syncUrl||'').trim(),syncKey:(settings.syncKey||'').trim()}
+    deletedCustomers:deletedCustomers
   });
   return fetch(SYNC.url()+'/sync/push',{method:'POST',headers:SYNC.headers(),body})
     .then(r=>r.json()).then(j=>{
@@ -2635,7 +2635,7 @@ function syncPush(){
       return !!(j&&j.ok);
     }).catch(e=>{ console.warn('syncPush failed',e); return false; });
 }
-function applyRemote(remoteRecs, deleted, remoteUsers, remoteCustomers, remoteDelUsers, remoteDelCustomers, remoteSettings){
+function applyRemote(remoteRecs, deleted, remoteUsers, remoteCustomers, remoteDelUsers, remoteDelCustomers){
   const map={}; records.forEach(r=>{map[r.id]=r;});
   (remoteRecs||[]).forEach(rr=>{
     if(rr.id==null)return;
@@ -2665,11 +2665,6 @@ function applyRemote(remoteRecs, deleted, remoteUsers, remoteCustomers, remoteDe
   (remoteDelCustomers||[]).forEach(cid=>{ customers=customers.filter(c=>c.id!==cid); if(deletedCustomers.indexOf(cid)<0)deletedCustomers.push(cid); });
   /* 同步后，若当前登录账号对象被替换，重新指向最新引用，避免会话 stale */
   if(currentUser){ const fresh=users.find(u=>u.username===currentUser.username); if(fresh)currentUser=fresh; }
-  /* ---- 同步配置合并：本地未配置时采用远程配置，使新设备开箱即联网 ---- */
-  if(remoteSettings&&typeof remoteSettings==='object'){
-    if(!(settings.syncUrl||'').trim()&&remoteSettings.syncUrl) settings.syncUrl=remoteSettings.syncUrl;
-    if(!(settings.syncKey||'').trim()&&remoteSettings.syncKey!==undefined) settings.syncKey=remoteSettings.syncKey;
-  }
 }
 function syncPull(){
   if(!SYNC.enabled()) return Promise.resolve(false);
@@ -2678,7 +2673,7 @@ function syncPull(){
   return fetch(SYNC.url()+'/sync/pull?since='+since,{headers:SYNC.headers()})
     .then(r=>r.json()).then(j=>{
       if(!j||!j.records) return false;
-      applyRemote(j.records, j.deleted||[], j.users||[], j.customers||[], j.deletedUsers||[], j.deletedCustomers||[], j.settings||null);
+      applyRemote(j.records, j.deleted||[], j.users||[], j.customers||[], j.deletedUsers||[], j.deletedCustomers||[]);
       settings.lastSync=nowStr(); settings.lastSyncTs=Date.now(); saveState(); refreshAfterSave(); renderCustomers(); renderAccounts(); updateSyncUI();
       return true;
     }).catch(e=>{ console.warn('syncPull failed',e); return false; });
@@ -2801,21 +2796,11 @@ function populateLoginFactory(){
   fac.value=opts.length?opts[0].value:'';
 }
 function resolveLoginUser(){ populateLoginFactory(); }
-async function signIn(){
+function signIn(){
   const u=document.getElementById('li-user').value.trim();
   const pw=document.getElementById('li-pass').value;
   const fac=document.getElementById('li-factory').value;
   const err=document.getElementById('li-err'); err.textContent='';
-  /* 登录前先确保同步就绪：自动探测同步服务器 + 拉取最新用户/业务数据
-     这样新设备登录同一账号时能拿到最新密码、权限、收购单、客户等，避免"信息不同步" */
-  const btn=document.querySelector('#login button.btn:not(.ghost)');
-  const origText=btn?btn.textContent:'';
-  if(btn){btn.disabled=true;btn.textContent=lang==='zh'?'同步中…':'Syncing…';}
-  try{
-    if(!SYNC.enabled()) await autoDetectSync();
-    if(SYNC.enabled()) await syncPull();
-  }catch(e){ /* 同步失败不阻止离线登录 */ }
-  if(btn){btn.disabled=false;btn.textContent=origText;}
   const user=users.find(x=>x.username===u);
   if(!user){err.textContent=t('login_bad');return;}
   if(!verifyPassword(pw,user.salt,user.passwordHash)){err.textContent=t('login_bad');return;}

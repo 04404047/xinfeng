@@ -35,7 +35,6 @@ let usersById = {};     // username -> user（账号主数据，跨厂区同步�
 let customersById = {}; // id -> customer（客户主数据，跨厂区同步）
 let deletedUsers = [];  // 已删除账号 username（墓碑）
 let deletedCustomers = []; // 已删除客户 id（墓碑）
-let syncSettings = {};     // 同步配置（syncUrl/syncKey），跨设备共享，供新设备开箱即联网
 try {
   if (fs.existsSync(DATA_FILE)) {
     const d = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
@@ -45,7 +44,6 @@ try {
     customersById = d.customersById || {};
     deletedUsers = d.deletedUsers || [];
     deletedCustomers = d.deletedCustomers || [];
-    syncSettings = d.syncSettings || {};
     console.log('[sync] 已载入本地账本：%d 条记录，%d 条删除墓碑；账号 %d；客户 %d',
       Object.keys(ledger).length, deleted.length, Object.keys(usersById).length, Object.keys(customersById).length);
   }
@@ -56,7 +54,7 @@ function persist() {
   if (saveTimer) return;
   saveTimer = setTimeout(() => {
     saveTimer = null;
-    fs.writeFile(DATA_FILE, JSON.stringify({ ledger, deleted, usersById, customersById, deletedUsers, deletedCustomers, syncSettings }, null, 0), (err) => {
+    fs.writeFile(DATA_FILE, JSON.stringify({ ledger, deleted, usersById, customersById, deletedUsers, deletedCustomers }, null, 0), (err) => {
       if (err) console.warn('[sync] 写入失败：', err.message);
     });
   }, 300);
@@ -158,11 +156,6 @@ const server = http.createServer(async (req, res) => {
       delete customersById[cid];
       if (deletedCustomers.indexOf(cid) < 0) deletedCustomers.push(cid);
     });
-    // 同步配置（仅 syncUrl/syncKey，供新设备自动获取服务器地址，开箱即联网）
-    if (body.settings && typeof body.settings === 'object') {
-      if (body.settings.syncUrl) syncSettings.syncUrl = body.settings.syncUrl;
-      if (body.settings.syncKey !== undefined) syncSettings.syncKey = body.settings.syncKey;
-    }
     persist();
     sendJSON(res, 200, { ok: true, serverTime: Date.now(), count: Object.keys(ledger).length });
     return;
@@ -178,8 +171,7 @@ const server = http.createServer(async (req, res) => {
       users: Object.values(usersById),
       customers: Object.values(customersById),
       deletedUsers: deletedUsers.slice(),
-      deletedCustomers: deletedCustomers.slice(),
-      settings: syncSettings
+      deletedCustomers: deletedCustomers.slice()
     });
     return;
   }
