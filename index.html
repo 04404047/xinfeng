@@ -1361,6 +1361,8 @@ const ROLE_PERMS={
 };
 function can(perm){
   if(!currentRole)return false;
+  /* 汇率设置仅限老板：覆盖 devAdmin 的 view:* 通配与 factoryAdmin 的 view:rateset 显式授权 */
+  if(perm==='view:rateset'||perm==='finance.manage.rateset'){ return currentRole==='boss'; }
   const p=ROLE_PERMS[currentRole]||[];
   if(p.includes(perm)||p.includes(perm.split(/[:.]/)[0]+':*'))return true;
   return false;
@@ -3059,7 +3061,8 @@ function rateValid(v){ return typeof v==='number' && isFinite(v) && v>0 && v<=10
 /* 读取当前可见的汇率输入框（独立菜单用 #rate-input，设置页用 #rate-input-tab，二者 id 不同避免冲突） */
 function activeRateInput(){const a=document.getElementById('rate-input');if(a&&a.offsetParent!==null)return a;const b=document.getElementById('rate-input-tab');if(b&&b.offsetParent!==null)return b;return a||b;}
 function saveRate(){
-  if(!can('finance.manage')){toast(lang==='zh'?'无汇率修改权限（需财务权限）':'No permission to edit rate');return;}
+  /* 汇率设置仅限老板：devAdmin 虽有 view:* / finance.manage，亦不允许设置汇率 */
+  if(currentRole!=='boss'){toast(lang==='zh'?'仅老板可设置汇率':'Only boss can set the exchange rate');return;}
   const raw=activeRateInput().value;
   const v=parseFloat(raw);
   if(!rateValid(v)){toast(lang==='zh'?'汇率无效：需为 0–100000 之间的正数，最多 2 位小数':'Invalid rate: positive number 0–100000, ≤2 decimals');return;}
