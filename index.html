@@ -195,6 +195,34 @@
   .fac-switch{font-size:12px;padding:4px 8px;border-radius:8px;border:1px solid var(--line);}
   #btn-logout{margin-left:6px;}
   .login-company{font-weight:700;color:var(--primary-d);margin:-2px 0 4px;font-size:13px;}
+  /* —— 80mm 热敏小票打印：仅打印 #print-area，其余界面隐藏 —— */
+  #print-area{display:none;}
+  @media print{
+    @page{ size:80mm auto; margin:2mm; }
+    body{background:#fff;}
+    #login,#app,.toast,.modal{display:none !important;}
+    #print-area{display:block !important;width:76mm;font-family:"Courier New",monospace;font-size:12px;color:#000;}
+    #print-area .p-title{font-size:15px;font-weight:700;text-align:center;margin-bottom:4px;}
+    #print-area .p-sub{text-align:center;font-size:11px;margin-bottom:8px;}
+    #print-area .p-line{display:flex;justify-content:space-between;margin:2px 0;}
+    #print-area .p-th{display:flex;justify-content:space-between;border-top:1px dashed #000;border-bottom:1px dashed #000;margin:6px 0 2px;font-weight:700;}
+    #print-area .p-row{display:flex;justify-content:space-between;}
+    #print-area .p-tot{display:flex;justify-content:space-between;border-top:1px dashed #000;margin-top:6px;padding-top:4px;font-weight:700;}
+    #print-area .p-foot{text-align:center;font-size:10px;margin-top:10px;}
+  }
+  /* —— 移动端侧边栏折叠（汉堡菜单） —— */
+  .hamburger{display:none;border:none;background:none;font-size:20px;line-height:1;padding:4px 8px;color:var(--ink);cursor:pointer;}
+  .scrim{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:39;}
+  @media(max-width:768px){
+    .hamburger{display:block;}
+    .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:41;transform:translateX(-100%);transition:transform .25s ease;box-shadow:0 0 30px rgba(0,0,0,.3);}
+    .sidebar.open{transform:translateX(0);}
+    .scrim.show{display:block;}
+    #app{flex-direction:column;}
+    .topbar{padding:0 14px;gap:10px;}
+    .content{padding:14px;}
+    .topbar .company-tag,.topbar .factory-tag{display:none;}
+  }
 </style>
 </head>
 <body>
@@ -229,6 +257,7 @@
 </div>
 
 <!-- ===================== APP ===================== -->
+<div class="scrim" id="scrim" onclick="closeSidebar()"></div>
 <div id="app">
   <aside class="sidebar">
     <div class="side-logo">♻ <span id="side-company">鑫丰塑业</span><small>Xinfeng Plastics</small></div>
@@ -258,6 +287,7 @@
 
   <div class="main">
     <div class="topbar">
+      <button type="button" class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="菜单" aria-expanded="false">☰</button>
       <h2 id="page-title">仪表盘</h2>
       <div class="spacer"></div>
       <div class="company-tag" id="company-tag">鑫丰塑业</div>
@@ -767,7 +797,9 @@
               <tr><td data-i18n="role_auditor_s">审计员</td><td><span class="tag g">view</span></td><td><span class="tag r">✕</span></td><td><span class="tag r">✕</span></td><td><span class="tag r">✕</span></td><td><span class="tag g">✓</span></td><td><span class="tag g">✓</span></td></tr>
             </tbody></table></div></div>
         <div id="tab-sync" class="panel hidden"><div class="panel-head"><h3 data-i18n="set_sync">同步与离线状态</h3><div class="right"><button class="btn sm eco" onclick="doSync()" data-i18n="sync_now">立即同步</button></div></div>
-          <div class="panel-body"><div class="kv">
+          <div class="panel-body"><div class="note" id="sync-key-warn" style="display:none">
+            ⚠ <b data-i18n="sy_nokey">同步未加密</b>：当前同步服务器未启用 API Key，账本与账号数据以<b>明文</b>传输与存储。请勿在公网暴露该端口；生产部署请在启动服务器时设置 <code>SYNC_KEY</code> 环境变量，并在本页填入相同密钥。
+          </div><div class="kv">
             <div class="k" data-i18n="sy_conn">连接</div>
             <div><label class="switch"><input type="checkbox" id="sy-toggle" onchange="toggleConn(this.checked)"><span class="sl"></span></label> <span id="sy-conn-text">在线（4G）</span></div>
             <div class="k" data-i18n="net_mode">网络模式</div>
@@ -810,7 +842,10 @@
             <button class="btn ghost" onclick="document.getElementById('cust-import').click()" data-i18n="bk_import">导入客户(CSV)</button>
             <input type="file" id="bk-file" accept="application/json" style="display:none" onchange="restoreBackup(this)"/>
           </div><div class="small muted mt" id="bk-last" data-i18n="bk_last">最近备份：2026-08-15 23:00（自动，云端）</div></div></div>
-        <div id="tab-audit" class="panel hidden"><div class="panel-head"><h3 data-i18n="set_audit">审计日志</h3><div class="right"><button class="btn ghost sm" onclick="exportAudit('audit')" data-i18n="se_csv">⬇ 导出</button></div></div>
+        <div id="tab-audit" class="panel hidden"><div class="panel-head"><h3 data-i18n="set_audit">审计日志</h3><div class="right">
+              <button class="btn ghost sm" onclick="exportAudit('audit')" data-i18n="se_csv">⬇ 导出</button>
+              <button class="btn ghost sm" onclick="clearAudit()" data-i18n="au_clear_all">清空</button>
+            </div></div>
           <div class="panel-body" style="padding:0"><table>
             <thead><tr><th data-i18n="h_time">时间</th><th data-i18n="h_actor">操作人</th><th data-i18n="h_action">动作</th><th data-i18n="h_target">对象</th><th data-i18n="h_detail">明细</th></tr></thead>
             <tbody id="audit-body"></tbody></table></div></div>
@@ -994,7 +1029,7 @@ const I18N = {
     hero_title:"回收作业台", hero_sub:"本厂以废旧塑料回收为核心，记录每日回收与同步状态", hero_cta:"＋ 新建回收单",
     d_crushed:"今日破碎料总量", d_bulk:"今日大料总量", d_sum:"两者之和", d_recamt:"今日回收金额", d_shiptoday:"今日配送量", d_click:"点击查看明细 →",
     d_ov_bulk:"今日大料采购量", d_ov_crushed:"今日破碎料采购量", d_ov_total:"今日合计采购量", d_ov_buyamt:"今日采购金额", d_ov_income:"累计进账", d_ov_expense:"累计支出", d_ov_balance:"当前余额", d_ov_produced:"今日生产颗粒(kg)", d_ov_sold:"今日出售颗粒(kg)", dash_home:"首页总览",
-    fin_cur:"货币", fin_rate:"1 人民币 CNY = ? 奈拉 NGN", fin_fx_equiv:"等值", set_rate:"汇率兑换", rate_tip:"设置当前汇率后，收支登记将按此汇率自动换算展示；仅老板可修改。", fin_fx:"换算试算：输入金额，自动转换为另一种货币",
+    fin_cur:"货币", fin_rate:"1 人民币 CNY = ? 奈拉 NGN", fin_fx_equiv:"等值", fin_equiv:"折合", set_rate:"汇率兑换", rate_tip:"设置当前汇率后，收支登记将按此汇率自动换算展示；仅老板可修改。", fin_fx:"换算试算：输入金额，自动转换为另一种货币",
     acct_grant:"分配权限", ann_body:"公告内容", ann_del:"删除", ann_post:"📢 发布公告", ann_publish:"发布", ann_title:"公告标题", contact:"联系", rec_detail:"回收明细", reset_all:"全部业务数据", s_pick_note:"选择要配送的库存",
     d_trend_title:"近 7 日 回收 vs 出入（kg）", d_legend_rec:"回收", d_legend_ship:"配送", d_legend_ship_in:"入库", d_activity:"近期动态", d_inv_title:"各材质累计原料（kg，在库参考）",
     c_search:"搜索姓名 / 电话", c_new:"+ 新建客户", c_count:"家供货商",
@@ -1019,10 +1054,10 @@ const I18N = {
     r_trend:"回收 vs 出入 趋势", r_trend_hq:"回收 vs 入库 趋势", r_trend_br:"回收 vs 配送 趋势", r_by_mat:"按材质（kg）", r_by_form:"按形态",
     rk_recv:"回收量", rk_ship:"配送量", rk_inbound:"入库量", rk_amt:"金额", rk_diff:"差额(含损耗)",
     r_note:"差额 = 回收量 − 配送/入库量 − 造粒原料消耗 − 破碎损耗（大料→破碎料转换损耗约 8%）。环保合规导出含物料量与供货方登记，对接环保登记库。",
-    set_roles:"角色与权限", set_sync:"同步与离线", set_backup:"备份", set_audit:"审计日志", set_local:"本地化", set_accounts:"账号管理", acct_new:"新增 / 注册账号", acct_username:"账号(邮箱)", acct_name:"姓名", acct_role:"角色", acct_factories:"所属工厂", acct_password:"登录密码", acct_save:"保存账号", acct_delete:"删除账号", acct_genpw:"自动生成密码", acct_reset:"数据归零", reset_title:"归零全部业务数据", register:"注册新账号", reg_note:"提交后将生成本地账号（需老板审核启用）",
+    set_roles:"角色与权限", set_sync:"同步与离线", set_backup:"备份", set_audit:"审计日志", set_local:"本地化", set_accounts:"账号管理", acct_new:"新增 / 注册账号", acct_username:"账号(邮箱)", acct_name:"姓名", acct_role:"角色", acct_factories:"所属工厂", acct_password:"登录密码", acct_save:"保存账号", acct_delete:"删除账号", acct_genpw:"自动生成密码", acct_reset:"数据归零", reset_title:"归零全部业务数据", register:"注册新账号", reg_note:"提交后将生成本地账号（需老板审核启用）", au_clear_all:"清空",
     set_role_col:"角色", set_audit_col:"审计",
     role_owner_s:"厂长 / 老板", role_receiving_s:"回收员", role_shipping_s:"配送员", role_auditor_s:"审计员",
-    sync_now:"立即同步", sy_conn:"连接", sy_online:"在线（4G）", sy_local:"本地库", sy_pending:"待上传", sy_last:"最近同步", sy_conflict:"冲突策略", sy_lww:"末写优先 + 版本向量",
+    sync_now:"立即同步", sy_conn:"连接", sy_online:"在线（4G）", sy_local:"本地库", sy_pending:"待上传", sy_last:"最近同步", sy_conflict:"冲突策略", sy_lww:"末写优先 + 版本向量", sy_nokey:"同步未加密",
     bk_local:"创建本地备份", bk_cloud:"云端备份", bk_restore:"恢复", bk_last:"最近备份：2026-08-15 23:00（自动，云端）",
     h_time:"时间", h_actor:"操作人", h_action:"动作", h_target:"对象", h_detail:"明细",
     ac_price:"调价", ac_create:"新建", ac_edit:"编辑", ac_edit_bank:"银行卡号已更新", ac_receive:"回收", ac_ship:"配送", ac_cust:"客户", ac_crush:"破碎", ac_produce:"造粒", ac_sale:"出售", ac_inbound:"入库", ac_reset:"归零",
@@ -1078,7 +1113,7 @@ const I18N = {
     hero_title:"Recovery Console", hero_sub:"This plant centres on plastic recovery — track daily recovery & dispatch", hero_cta:"＋ New Recovery",
     d_crushed:"Crushed today", d_bulk:"Bulk today", d_sum:"Bulk + Crushed", d_recamt:"Recovered amount today", d_shiptoday:"Dispatched today", d_click:"Click for detail →",
     d_ov_bulk:"Bulk purchased today", d_ov_crushed:"Crushed purchased today", d_ov_total:"Total purchased today", d_ov_buyamt:"Purchase amount today", d_ov_income:"Income (cum.)", d_ov_expense:"Expense (cum.)", d_ov_balance:"Balance", d_ov_produced:"Pellets produced today (kg)", d_ov_sold:"Pellets sold today (kg)", dash_home:"Home Overview",
-    fin_cur:"Currency", fin_rate:"1 CNY = ? NGN", fin_fx_equiv:"Equivalent", set_rate:"Exchange Rate", rate_tip:"Set the current rate; finance entries auto-convert at this rate. Boss only.", fin_fx:"Conversion: enter an amount to auto-convert",
+    fin_cur:"Currency", fin_rate:"1 CNY = ? NGN", fin_fx_equiv:"Equivalent", fin_equiv:"Equiv.", set_rate:"Exchange Rate", rate_tip:"Set the current rate; finance entries auto-convert at this rate. Boss only.", fin_fx:"Conversion: enter an amount to auto-convert",
     acct_grant:"Grant access", ann_body:"Content", ann_del:"Delete", ann_post:"📢 Post", ann_publish:"Publish", ann_title:"Title", contact:"Contact", rec_detail:"Detail", reset_all:"All business data", s_pick_note:"Pick stock to ship",
     d_trend_title:"Receiving vs outbound (last 7 days, kg)", d_legend_rec:"Receive", d_legend_ship:"Ship", d_legend_ship_in:"Inbound", d_activity:"Recent activity", d_inv_title:"Cumulative raw material by material (kg)",
     c_search:"Search name / phone", c_new:"+ New Customer", c_count:"suppliers",
@@ -1103,10 +1138,10 @@ const I18N = {
     r_trend:"Receive vs outbound trend", r_trend_hq:"Receive vs Inbound trend", r_trend_br:"Receive vs Ship trend", r_by_mat:"By material (kg)", r_by_form:"By form",
     rk_recv:"Received", rk_ship:"Shipped", rk_inbound:"Inbound", rk_amt:"Amount", rk_diff:"Difference (incl. loss)",
     r_note:"Difference = Received − Shipped/Inbound − pelletizing consumption − crushing loss (大料→破碎料 loss, ~8%). Eco-compliance export includes material volumes & supplier registry for the environmental registry.",
-    set_roles:"Roles & Permissions", set_sync:"Sync & Offline", set_backup:"Backup", set_audit:"Audit log", set_local:"Localization", set_accounts:"Account Management", acct_new:"New / Register Account", acct_username:"Account (email)", acct_name:"Name", acct_role:"Role", acct_factories:"Plants", acct_password:"Password", acct_save:"Save Account", acct_delete:"Delete Account", acct_genpw:"Auto-generate", acct_reset:"Reset All Data", reset_title:"Reset All Business Data", register:"Register Account", reg_note:"Submits a local account (boss approval to enable)",
+    set_roles:"Roles & Permissions", set_sync:"Sync & Offline", set_backup:"Backup", set_audit:"Audit log", set_local:"Localization", set_accounts:"Account Management", acct_new:"New / Register Account", acct_username:"Account (email)", acct_name:"Name", acct_role:"Role", acct_factories:"Plants", acct_password:"Password", acct_save:"Save Account", acct_delete:"Delete Account", acct_genpw:"Auto-generate", acct_reset:"Reset All Business Data", reset_title:"Reset All Business Data", register:"Register Account", reg_note:"Submits a local account (boss approval to enable)", au_clear_all:"Clear",
     set_role_col:"Role", set_audit_col:"Audit",
     role_owner_s:"Owner / Manager", role_receiving_s:"Recovery Clerk", role_shipping_s:"Dispatch Clerk", role_auditor_s:"Auditor",
-    sync_now:"Sync now", sy_conn:"Connection", sy_online:"Online (4G)", sy_local:"Local DB", sy_pending:"Pending upload", sy_last:"Last sync", sy_conflict:"Conflict policy", sy_lww:"Last-write-wins + version vector",
+    sync_now:"Sync now", sy_conn:"Connection", sy_online:"Online (4G)", sy_local:"Local DB", sy_pending:"Pending upload", sy_last:"Last sync", sy_conflict:"Conflict policy", sy_lww:"Last-write-wins + version vector", sy_nokey:"Sync unencrypted",
     bk_local:"Create local backup", bk_cloud:"Cloud backup", bk_restore:"Restore", bk_last:"Last backup: 2026-08-15 23:00 (auto, cloud)",
     h_time:"Time", h_actor:"Actor", h_action:"Action", h_target:"Target", h_detail:"Detail",
     ac_price:"Price change", ac_create:"Create", ac_edit:"Edit", ac_edit_bank:"bank acct updated", ac_receive:"Receive", ac_ship:"Ship", ac_cust:"Customer", ac_crush:"Crush", ac_produce:"Produce", ac_sale:"Sale", ac_inbound:"Inbound", ac_reset:"Reset",
@@ -1369,7 +1404,9 @@ const Store={
 const STATE_KEY="rf_state_v4";
 
 /* ============ Constants ============ */
-const PLANT_TODAY="2026-08-16";
+/* 业务"今日"基准：默认跟随设备实时日期（确保"当日回收/下班核对"随日历推进）。
+   如需演示固定某天，可在此覆盖为 'YYYY-MM-DD'；否则使用 today() 的本地日期。 */
+const PLANT_TODAY=(typeof DEMO_TODAY!=='undefined'&&DEMO_TODAY)?DEMO_TODAY:today();
 const COLORS=['透明','单色','白色','红色','黄色','蓝色','绿色','紫色','黑色','VJ','GBT','杂色'];
 const COLOR_LABELS={
   zh:{'透明':'透明','单色':'单色','白色':'白色','红色':'红色','黄色':'黄色','蓝色':'蓝色','绿色':'绿色','紫色':'紫色','黑色':'黑色','VJ':'VJ','GBT':'GBT','杂色':'杂色','管子':'管子','扣板':'扣板','混合':'混合','GBT桶':'GBT桶','勺子':'勺子','yellow黄桶':'yellow黄桶','天花板':'天花板'},
@@ -1696,9 +1733,11 @@ function svgPie(el,segs){
 /* ============ Dashboard ============ */
 /* ============ Dashboard (factory-aware) ============ */
 function scopeRecords(){
+  /* 与 visibleRecords 保持同一工厂过滤口径：仅按 record.factory 过滤。
+     Inbound/Ship 记录的 factory 字段已写入目标工厂（如总厂 Sagamu），
+     故无需额外按类型混入，避免总厂/分厂视图口径不一致导致统计或明细显示错位。 */
   if(currentRole==='boss'&&currentFactory==='ALL')return records;
-  if(currentFactory==='Sagamu')return records.filter(r=> r.factory==='Sagamu' || r.ty==='Inbound' || r.ty==='Ship');
-  return records.filter(r=> r.factory===currentFactory);
+  const f=currentFactory; return records.filter(r=> r.factory===f);
 }
 function recomputeDashboard(){
   const scope=(currentRole==='boss'&&currentFactory==='ALL')?'ALL':currentFactory;
@@ -1848,8 +1887,8 @@ function renderToday(){
   set('td-sup',rows.length);
   document.getElementById('td-cust').innerHTML=rows.length?rows.map(x=>`<tr style="cursor:pointer" onclick="openCustomer('${x.id}')"><td><b>${esc(x.name)}</b></td><td class="num">${x.n}</td><td class="num">${x.w.toLocaleString()}</td><td class="num">¥ ${x.a.toLocaleString()}</td><td><span class="link">${t('c_view')} →</span></td></tr>`).join(''):`<tr><td colspan="5" class="muted">${lang==='zh'?'无':'None'}</td></tr>`;
   document.getElementById('td-list').innerHTML=todays.length?todays.map(r=>{
-    const mat=(r.items||[]).map(it=>`${it.m} ${it.f} ${it.c} ${(+it.w).toLocaleString()}kg`).join('<br/>');
-    return `<tr><td>${r.ticket||'—'}</td><td>${r.dt}</td><td><b>${esc(r.custName)}</b></td><td class="muted">${mat}</td><td class="num">${r.tw.toLocaleString()}</td><td class="num">¥ ${r.ta.toLocaleString()}</td><td><span class="link" onclick="viewRecord('${r.id}')">${t('c_view')}</span></td></tr>`;
+    const mat=(r.items||[]).map(it=>`${esc(it.m)} ${esc(it.f)} ${esc(it.c)} ${(+it.w).toLocaleString()}kg`).join('<br/>');
+    return `<tr><td>${esc(r.ticket||'—')}</td><td>${esc(r.dt)}</td><td><b>${esc(r.custName)}</b></td><td class="muted">${mat}</td><td class="num">${r.tw.toLocaleString()}</td><td class="num">¥ ${r.ta.toLocaleString()}</td><td><span class="link" onclick="viewRecord('${r.id}')">${t('c_view')}</span></td></tr>`;
   }).join(''):`<tr><td colspan="7" class="muted">${lang==='zh'?'无':'None'}</td></tr>`;
 }
 
@@ -2100,14 +2139,15 @@ function finTablePanel(titleKey,type,list){
   const rows=list.map(f=>`<tr>
     <td>${f.dt}</td>
     <td>${esc(f.cat)}</td>
-    <td class="num">${fmtWithFx(f.amount,f.currency||'CNY')}</td>
+    <td class="num">${fmtMoney(f.amount)} ${f.currency==='NGN'?'₦':'¥'}</td>
+    <td class="num muted small">${fmtWithFx(f.amount,f.currency||'CNY')}</td>
     <td class="muted small">${esc(f.note||'')}${f.auto?` <span class="tag t-auto">${t('fin_auto')}</span>`:''}</td>
     <td>${esc(f.by||'')}</td>
     <td>${can('finance.manage')?`<span class="link" onclick="editFin('${f.id}')">${t('cd_edit')||'编辑'}</span> · <span class="link" style="color:var(--danger)" onclick="deleteFin('${f.id}')">${t('c_del')}</span>`:''}</td>
   </tr>`).join('');
   return `<div class="panel"><div class="panel-head"><h3>${t(titleKey)}</h3><div class="muted small">${list.length} ${lang==='zh'?'笔':'entries'}</div></div><div class="panel-body" style="padding:0"><div class="tbl-scroll"><table>
-    <thead><tr><th data-i18n="h_date">日期</th><th data-i18n="fin_cat">类别</th><th data-i18n="fin_amount">金额</th><th data-i18n="fin_note">备注</th><th data-i18n="fin_by">经手</th><th></th></tr></thead>
-    <tbody>${rows||`<tr><td colspan="6" class="muted">${lang==='zh'?'暂无':'None'}</td></tr>`}</tbody></table></div></div></div>`;
+    <thead><tr><th data-i18n="h_date">日期</th><th data-i18n="fin_cat">类别</th><th data-i18n="fin_amount">金额</th><th data-i18n="fin_equiv">折合</th><th data-i18n="fin_note">备注</th><th data-i18n="fin_by">经手</th><th></th></tr></thead>
+    <tbody>${rows||`<tr><td colspan="7" class="muted">${lang==='zh'?'暂无':'None'}</td></tr>`}</tbody></table></div></div></div>`;
 }
 function renderFinance(){
   if(!can('finance.view')){toast(lang==='zh'?'无财务查看权限':'No finance permission');return;}
@@ -2286,12 +2326,45 @@ function renderReceiveList(){
   const el=document.getElementById('rc-list');if(!el)return;
   const list=visibleRecords().filter(r=>r.ty==='Receive').slice(0,60);
   setHTML('rc-list', list.length?list.map(r=>{
-    const mat=(r.items||[]).map(it=>`${it.m} ${it.f} ${it.c} ${(+it.w).toLocaleString()}kg`).join('<br/>');
-    return `<tr><td>${r.dt}</td><td>${r.ticket||'—'}</td><td><b>${esc(r.custName)}</b></td><td class="muted">${mat}</td><td class="num">${r.tw.toLocaleString()}</td><td class="num">¥ ${r.ta.toLocaleString()}</td><td><span class="link" onclick="editReceive('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteReceive('${r.id}')">${t('delete')}</span></td></tr>`;
+    const mat=(r.items||[]).map(it=>`${esc(it.m)} ${esc(it.f)} ${esc(it.c)} ${(+it.w).toLocaleString()}kg`).join('<br/>');
+    return `<tr><td>${esc(r.dt)}</td><td>${esc(r.ticket||'—')}</td><td><b>${esc(r.custName)}</b></td><td class="muted">${mat}</td><td class="num">${r.tw.toLocaleString()}</td><td class="num">¥ ${r.ta.toLocaleString()}</td><td><span class="link" onclick="editReceive('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteReceive('${r.id}')">${t('delete')}</span></td></tr>`;
   }).join(''):`<tr><td colspan="7" class="muted">${lang==='zh'?'暂无记录':'No records'}</td></tr>`);
   const cnt=document.getElementById('rc-list-count');if(cnt)cnt.textContent=list.length+(lang==='zh'?' 条':' records');
 }
-function printTicket(){toast(lang==='zh'?'已发送过磅单至 80mm 热敏打印机':'Ticket sent to 80mm thermal printer');}
+function printTicket(){
+  try{
+    const name=document.getElementById('rc-name').value.trim();
+    const bank=document.getElementById('rc-bank').value.trim();
+    const date=document.getElementById('rc-date').value||PLANT_TODAY;
+    const ticket=document.getElementById('rc-ticket').value.trim()||'—';
+    const op=document.getElementById('rc-op').value.trim()||opName();
+    const rows=Array.from(document.querySelectorAll('#rc-body tr')).map(tr=>{
+      const g=s=>{const e=tr.querySelector(s);return e?e.value:'';};
+      return {m:g('.rc-m'),f:g('.rc-f'),c:g('.rc-c'),w:parseFloat(g('.rc-w'))||0,p:parseFloat(g('.rc-p'))||0};
+    }).filter(r=>r.w>0);
+    if(!rows.length){ toast(lang==='zh'?'请先录入明细再打印':'Add items before printing'); return; }
+    let tw=0,ta=0,body='';
+    rows.forEach(r=>{ const amt=r.w*r.p; tw+=r.w; ta+=amt;
+      body+=`<div class="p-row"><span>${esc(r.m)} ${esc(r.f)} ${esc(r.c)}</span><span>${r.w}kg</span><span>¥${amt.toFixed(2)}</span></div>`;
+    });
+    const html=`
+      <div class="p-title">${esc(COMPANY.name)}</div>
+      <div class="p-sub">${esc(COMPANY.nameEn||'')} · 过磅单</div>
+      <div class="p-line"><span>单号: ${esc(ticket)}</span><span>${esc(date)}</span></div>
+      <div class="p-line"><span>客户: ${esc(name)}</span></div>
+      ${bank?`<div class="p-line"><span>账户: ${esc(bank)}</span></div>`:''}
+      <div class="p-line"><span>操作员: ${esc(op)}</span></div>
+      <div class="p-th"><span>品类</span><span>重量</span><span>金额</span></div>
+      ${body}
+      <div class="p-tot"><span>合计</span><span>${tw.toFixed(1)}kg</span><span>¥${ta.toFixed(2)}</span></div>
+      <div class="p-foot">${lang==='zh'?'感谢合作 · 此单为收货凭证':'Thank you · delivery receipt'}</div>`;
+    const pa=document.getElementById('print-area');
+    if(!pa){ toast('print area missing'); return; }
+    pa.innerHTML=html;
+    window.print();
+    setTimeout(()=>{ pa.innerHTML=''; }, 500);
+  }catch(e){ toast(lang==='zh'?'打印失败':'Print failed'); console.warn('printTicket',e); }
+}
 
 /* ============ OCR ticket entry (skeleton) ============ */
 function openOcr(){document.getElementById('ocr-modal').classList.remove('hidden');document.getElementById('ocr-result').classList.add('hidden');document.getElementById('ocr-preview').textContent='';document.getElementById('ocr-file').value='';}
@@ -2799,7 +2872,7 @@ function renderLogistics(){
   const ships=records.filter(r=>r.ty==='Ship'&&(all||r.factory===currentFactory));
   const inbs=records.filter(r=>r.ty==='Inbound'&&(all||r.fromFac===currentFactory));
   setHTML('lg-out', ships.length?ships.map(r=>`<tr><td>${r.dt}</td><td>${FACTORIES[r.factory]?FACTORIES[r.factory].name:r.factory}</td><td>${r.batch}</td><td class="num">${Math.round(r.tw).toLocaleString()}</td><td>${statusTag(r.status||'在途')}</td><td><span class="link" onclick="editShip('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteShip('${r.id}')">${t('delete')}</span></td></tr>`).join(''):`<tr><td colspan="6" class="muted">${lang==='zh'?'暂无配送记录':'No shipments'}</td></tr>`);
-  setHTML('lg-in', inbs.length?inbs.map(r=>`<tr><td>${r.dt}</td><td>${FACTORIES[r.fromFac]?FACTORIES[r.fromFac].name:r.fromFac}</td><td>${r.batch}</td><td class="num">${Math.round(r.tw).toLocaleString()}</td><td>${statusTag(r.status||'待入库')}</td><td>${r.status==='待入库'?'<button class="btn ghost sm" onclick="confirmInbound(\'+r.id+\')">'+t('logistics_confirm')+'</button> ':''}<span class="link" onclick="editInbound('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteInbound('${r.id}')">${t('delete')}</span></td></tr>`).join(''):`<tr><td colspan="6" class="muted">${lang==='zh'?'暂无入库记录':'No inbound'}</td></tr>`);
+  setHTML('lg-in', inbs.length?inbs.map(r=>`<tr><td>${r.dt}</td><td>${FACTORIES[r.fromFac]?FACTORIES[r.fromFac].name:r.fromFac}</td><td>${r.batch}</td><td class="num">${Math.round(r.tw).toLocaleString()}</td><td>${statusTag(r.status||'待入库')}</td><td>${r.status==='待入库'?'<button class="btn ghost sm" onclick="confirmInbound(\'${r.id}\')">'+t('logistics_confirm')+'</button> ':''}<span class="link" onclick="editInbound('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteInbound('${r.id}')">${t('delete')}</span></td></tr>`).join(''):`<tr><td colspan="6" class="muted">${lang==='zh'?'暂无入库记录':'No inbound'}</td></tr>`);
   const pend=inbs.filter(r=>r.status==='待入库').reduce((s,r)=>s+r.tw,0);
   const transit=ships.filter(r=>r.status==='在途').reduce((s,r)=>s+r.tw,0);
   setHTML('lg-summary', (lang==='zh'?'在途 ':'In transit ')+transit.toLocaleString()+' kg · '+(lang==='zh'?'待入库 ':'Pending ')+pend.toLocaleString()+' kg');
@@ -2861,7 +2934,7 @@ function runChurn(){
   }catch(e){}
 }
 function contactCust(id){const c=customers.find(x=>x.id===id);if(c)toast(lang==='zh'?'联系 '+c.name+'：'+c.phone:'Contact '+c.name+': '+c.phone);}
-function exportChurnExcel(){exportExcel(['姓名','电话','累计供货(kg)','金额(¥)'], visibleCustomers().map(c=>[c.name,c.phone,c.kg,c.amt]), 'churn.xlsx');}
+function exportChurnExcel(){exportExcel(['姓名','电话','累计供货(kg)','金额(¥)'], visibleCustomers().map(c=>[c.name,c.phone,c.kg,c.amt]),'churn.xls');}
 function lastNDays(n){const d=new Date();d.setDate(d.getDate()-n);return d.toISOString().slice(0,10);}
 function repAggregate(period){
   const recs=scopeRecords();
@@ -2906,17 +2979,21 @@ function updateSyncUI(){
   const on=settings.conn==='online';
   // 关键：在线但没连上同步服务器（syncUrl 为空或探测失败）必须显式告警，避免"静默单机"
   const srv=SYNC.enabled();
+  // 已连服务器但未设 API Key：数据明文同步（部署端 SYNC_KEY 为空），必须醒目告警
+  const noKey = srv && !SYNC.key();
   const ind=document.getElementById('sync-ind');if(ind)ind.classList.toggle('off',!on||!srv);
-  let txt;
-  if(!on)txt=t('sync_offline');
-  else if(!srv)txt=(lang==='zh'?'⚠ 未连同步服务器 · 仅本机':'⚠ No sync server · local only');
+  let txt, col='';
+  if(!on){ txt=t('sync_offline'); }
+  else if(!srv){ txt=(lang==='zh'?'⚠ 未连同步服务器 · 仅本机':'⚠ No sync server · local only'); col='#dc2626'; }
+  else if(noKey){ txt=(lang==='zh'?'⚠ 同步未加密（无 API Key）':'⚠ Sync unencrypted (no API Key)'); col='#dc2626'; }
   else txt=t('sync_online');
-  const st=document.getElementById('sync-text');if(st){st.textContent=txt;st.style.color=(on&&!srv)?'#dc2626':'';}
-  const ss=document.getElementById('side-sync');if(ss){ss.textContent=txt;ss.style.color=(on&&!srv)?'#dc2626':'';}
+  const st=document.getElementById('sync-text');if(st){st.textContent=txt;st.style.color=col;}
+  const ss=document.getElementById('side-sync');if(ss){ss.textContent=txt;ss.style.color=col;}
   const ct=document.getElementById('sy-conn-text');if(ct)ct.textContent=on?(lang==='zh'?'在线（4G）':'Online (4G)'):(lang==='zh'?'离线':'Offline');
   const tg=document.getElementById('sy-toggle');if(tg)tg.checked=on;
   const pn=document.getElementById('sy-pending-n');if(pn)pn.textContent=settings.pending||0;
   const ls=document.getElementById('sy-last');if(ls&&settings.lastSync)ls.textContent=settings.lastSync;
+  const warn=document.getElementById('sync-key-warn');if(warn)warn.style.display=noKey?'block':'none';
 }
 function toggleConn(on){
   if(!can('settings.write')){toast(lang==='zh'?'无设置权限':'No settings permission');return;}
@@ -3043,7 +3120,10 @@ function syncPull(){
     .then(r=>r.json()).then(j=>{
       if(!j||!j.records) return false;
       applyRemote(j.records, j.deleted||[], j.users||[], j.customers||[], j.deletedUsers||[], j.deletedCustomers||[], j.finances||[], j.deletedFinances||[]);
-      settings.lastSync=nowStr(); settings.lastSyncTs=Date.now(); saveState(); refreshAfterSave(); renderCustomers(); renderAccounts(); renderFinance(); updateSyncUI();
+      settings.lastSync=nowStr();
+      // 用服务端权威时间作为下次增量基线，避免客户端时钟偏差导致漏拉
+      settings.lastSyncTs = j.serverTime || Date.now();
+      saveState(); refreshAfterSave(); renderCustomers(); renderAccounts(); renderFinance(); updateSyncUI();
       return true;
     }).catch(e=>{ console.warn('syncPull failed',e); return false; });
 }
@@ -3093,7 +3173,27 @@ function backupLocal(){settings.lastBackup=nowStr();saveState();const blob=new B
 function backupCloud(){settings.lastBackup=nowStr();saveState();toast(lang==='zh'?'云端备份完成':'Cloud backup done');}
 function restoreBackup(input){const f=input.files&&input.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const s=JSON.parse(rd.result);if(s&&s.records){if(!confirm(lang==='zh'?'恢复备份将覆盖当前数据，确定？':'Overwrite current data?'))return;if(Array.isArray(s.customers))customers=s.customers;if(Array.isArray(s.records))records=s.records.map(r=>{if(!r.items)r.items=[];if(!r.factory)r.factory='Sagamu';recTotals(r);return r;});if(s.priceMap)priceMap=s.priceMap;if(s.products)products=s.products;if(s.priceHist)priceHist=s.priceHist;if(s.auditLog)auditLog=s.auditLog;if(s.settings)settings=Object.assign(settings,s.settings);if(Array.isArray(s.users)&&s.users.length)users=s.users;saveState();renderAll();toast(lang==='zh'?'已恢复备份':'Backup restored');}}catch(e){toast(lang==='zh'?'恢复失败':'Restore failed');}};rd.readAsText(f);}
 function saveLocal(){const el=document.getElementById('lo-lang');if(el)settings.lang=el.value;saveState();setLang(settings.lang||'zh');toast(lang==='zh'?'设置已保存':'Settings saved');}
-function renderAudit(){const el=document.getElementById('audit-body');if(!el)return;const rows=(auditLog||[]).slice(0,300).map(r=>`<tr><td class="muted">${esc(r.time||'')}</td><td>${esc(r.actor||'')}</td><td>${esc(t(r.action)||r.action||'')}</td><td>${esc(r.target||'')}</td><td class="muted">${esc(r.detail||'')}</td></tr>`).join('');el.innerHTML=rows||`<tr><td colspan="5" class="muted">—</td></tr>`;}
+function renderAudit(){const el=document.getElementById('audit-body');if(!el)return;const rows=(auditLog||[]).slice(0,300).map((r,i)=>`<tr><td class="muted">${esc(r.time||'')}</td><td>${esc(r.actor||'')}</td><td>${esc(t(r.action)||r.action||'')}</td><td>${esc(r.target||'')}</td><td class="muted">${esc(r.detail||'')}</td><td><span class="link" style="color:var(--danger)" onclick="deleteAuditItem(${i})">${t('delete')}</span></td></tr>`).join('');el.innerHTML=rows||`<tr><td colspan="6" class="muted">—</td></tr>`;}
+/* 单条删除审计记录（操作本身记入审计，形成闭环可追溯） */
+function deleteAuditItem(idx){
+  if(typeof idx!=='number'||!auditLog[idx])return;
+  const item=auditLog[idx];
+  if(!confirm(lang==='zh'?'确认删除该审计记录？':'Delete this audit entry?'))return;
+  auditLog.splice(idx,1);
+  auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_delete',target:lang==='zh'?'审计条目':'audit entry',detail:(lang==='zh'?'删除审计：':'deleted audit: ')+(t(item.action)||item.action||'')+' / '+(item.target||'')});
+  saveState();renderAudit();
+  toast(lang==='zh'?'已删除该审计记录':'Audit entry deleted');
+}
+/* 清空全部审计记录（操作本身记入审计，形成闭环可追溯） */
+function clearAudit(){
+  if(!auditLog||!auditLog.length){toast(lang==='zh'?'审计日志为空':'Audit log empty');return;}
+  if(!confirm(lang==='zh'?'确认清空全部审计日志？此操作不可撤销。':'Clear all audit log? This cannot be undone.'))return;
+  const n=auditLog.length;
+  auditLog=[];
+  auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_clear',target:lang==='zh'?'审计日志':'audit log',detail:(lang==='zh'?'清空审计日志':'cleared audit log')+' · '+n+' '+(lang==='zh'?'条':'entries')});
+  saveState();renderAudit();
+  toast(lang==='zh'?'已清空审计日志':'Audit log cleared');
+}
 function xmlEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function xlsCell(v){if(typeof v==='number')return '<Cell><Data ss:Type="Number">'+v+'</Data></Cell>';return '<Cell><Data ss:Type="String">'+xmlEsc(v)+'</Data></Cell>';}
 function downloadFile(name,content,type){try{const blob=new Blob([content],{type:type||'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);}catch(e){toast('download error');}}
@@ -3106,22 +3206,22 @@ function exportExcel(headers, rows, filename){
     downloadFile(filename, xml, 'application/vnd.ms-excel');
   }catch(e){toast('export error');}
 }
-function exportCustomersExcel(){exportExcel(['姓名','电话','开户行','账号','累计供货(kg)','金额(¥)','最近供货'],visibleCustomers().map(c=>[c.name,c.phone,c.bank,c.acct,c.kg,c.amt,c.last]),'customers.xlsx');}
-function exportSearchExcel(){const rows=[];document.querySelectorAll('#s-body tr').forEach(tr=>{const tds=[...tr.children].map(td=>td.textContent.trim());if(tds.length)rows.push(tds);});exportExcel(['日期','类型','客户','电话','开户行','账号','地址','备注','材质','重量','金额','操作'],rows,'search.xlsx');}
-function exportTodayExcel(){exportExcel(['日期','客户','材质','形态','颜色','重量','金额'],visibleRecords().filter(r=>r.ty==='Receive'&&r.dt===PLANT_TODAY).flatMap(r=>(r.items||[]).map(it=>[r.dt,r.custName,it.m,it.f,it.c,it.w,r.ta])),'today.xlsx');}
-function exportReportExcel(){const a=repAggregate(currentPeriod);exportExcel(['指标','值'],[['收购量',Math.round(a.recv)],['发货量',Math.round(a.ship)],['金额',Math.round(a.amt)]],'report.xlsx');}
-function exportAllExcel(){const recs=visibleRecords().map(r=>[r.dt,r.ty,r.custName,r.tw,r.ta]);exportExcel(['日期','类型','客户','重量(kg)','金额(¥)'],recs,'all_data.xlsx');}
+function exportCustomersExcel(){exportExcel(['姓名','电话','开户行','账号','累计供货(kg)','金额(¥)','最近供货'],visibleCustomers().map(c=>[c.name,c.phone,c.bank,c.acct,c.kg,c.amt,c.last]),'customers.xls');}
+function exportSearchExcel(){const rows=[];document.querySelectorAll('#s-body tr').forEach(tr=>{const tds=[...tr.children].map(td=>td.textContent.trim());if(tds.length)rows.push(tds);});exportExcel(['日期','类型','客户','电话','开户行','账号','地址','备注','材质','重量','金额','操作'],rows,'search.xls');}
+function exportTodayExcel(){exportExcel(['日期','客户','材质','形态','颜色','重量','金额'],visibleRecords().filter(r=>r.ty==='Receive'&&r.dt===PLANT_TODAY).flatMap(r=>(r.items||[]).map(it=>[r.dt,r.custName,it.m,it.f,it.c,it.w,r.ta])),'today.xls');}
+function exportReportExcel(){const a=repAggregate(currentPeriod);exportExcel(['指标','值'],[['收购量',Math.round(a.recv)],['发货量',Math.round(a.ship)],['金额',Math.round(a.amt)]],'report.xls');}
+function exportAllExcel(){const recs=visibleRecords().map(r=>[r.dt,r.ty,r.custName,r.tw,r.ta]);exportExcel(['日期','类型','客户','重量(kg)','金额(¥)'],recs,'all_data.xls');}
 function exportAudit(kind,fmt){
   try{
-    if(kind==='search'){const rows=[];document.querySelectorAll('#s-body tr').forEach(tr=>{const tds=[...tr.children].map(td=>td.textContent);if(tds.length)rows.push(tds);});exportExcel(['日期','类型','客户','电话','开户行','账号','地址','备注','材质','重量','金额'],rows,'search.xlsx');return;}
+    if(kind==='search'){const rows=[];document.querySelectorAll('#s-body tr').forEach(tr=>{const tds=[...tr.children].map(td=>td.textContent);if(tds.length)rows.push(tds);});exportExcel(['日期','类型','客户','电话','开户行','账号','地址','备注','材质','重量','金额'],rows,'search.xls');return;}
     const rows=(auditLog||[]).map(r=>[r.time,r.actor,t(r.action)||r.action,r.target,r.detail]);
-    exportExcel(['时间','操作人','动作','对象','明细'],rows,'audit.xlsx');
+    exportExcel(['时间','操作人','动作','对象','明细'],rows,'audit.xls');
   }catch(e){toast('export error');}
 }
 function exportNesrea(){
   try{
     const rows=visibleRecords().filter(r=>r.ty==='Receive').flatMap(r=>(r.items||[]).map(it=>[r.dt,r.custName,it.m,it.f,it.w]));
-    exportExcel(['日期','供货方','材质','形态','重量(kg)'],rows,'nesrea.xlsx');
+    exportExcel(['日期','供货方','材质','形态','重量(kg)'],rows,'nesrea.xls');
     toast(lang==='zh'?'环保合规上报已导出':'NESREA export done');
   }catch(e){toast('export error');}
 }
@@ -3132,7 +3232,7 @@ function importCustomers(input){
   const rd=new FileReader();rd.onload=()=>{try{
     const rows=parseCSV(rd.result);let n=0;
     rows.forEach(r=>{const name=r['姓名']||r['name'];const phone=r['电话']||r['phone'];if(!name)return;if(customers.some(c=>c.name===name&&c.phone===phone))return;customers.push({id:genGid(),name,phone:phone||'',bank:r['开户行']||r['bank']||'',acct:r['账号']||r['acct']||'',addr:r['地址']||r['addr']||'',kg:0,amt:0,last:'',freq:0,factory:effectiveFactory(),updatedTs:Date.now()});n++;});
-    saveState();renderCustomers();toast(lang==='zh'?('已导入 '+n+' 位客户'):('Imported '+n+' customers'));
+    saveState();renderCustomers();toast(lang==='zh'?('已导入 '+n+' 位客户'):('Imported '+n+'customers.xls'));
   }catch(e){toast('import error');}};rd.readAsText(f);
 }
 
@@ -3141,7 +3241,7 @@ function renderLan(){
   const on=settings.lanEnabled!==false;
   const tg=document.getElementById('lan-toggle');if(tg)tg.checked=on;
   const seg=document.getElementById('lan-seg');if(seg)seg.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.mode===(settings.netMode||'lan')));
-  const list=document.getElementById('lan-devices');if(list){list.innerHTML=on?lanDevices.map(d=>`<div class="device-row"><span style="color:var(--eco)">●</span> ${d.name} <span class="muted" style="margin-left:auto">${d.ip}</span></div>`).join(''):`<div class="muted">${lang==='zh'?'局域网自动发现已关闭':'LAN discovery off'}</div>`;}
+  const list=document.getElementById('lan-devices');if(list){list.innerHTML=on?lanDevices.map(d=>`<div class="device-row"><span style="color:var(--eco)">●</span> ${esc(d.name)} <span class="muted" style="margin-left:auto">${esc(d.ip)}</span></div>`).join(''):`<div class="muted">${lang==='zh'?'局域网自动发现已关闭':'LAN discovery off'}</div>`;}
 }
 function setNetMode(m){settings.netMode=m;saveState();updateSyncUI();renderLan();}
 function toggleLan(on){settings.lanEnabled=on;saveState();updateSyncUI();renderLan();toast(on?(lang==='zh'?'已启用局域网自动发现':'LAN discovery enabled'):(lang==='zh'?'已关闭局域网发现':'LAN discovery off'));}
@@ -3254,6 +3354,7 @@ function go(view){
   const el=document.getElementById('view-'+view);if(!el)return;el.classList.add('active');
   document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('active',a.dataset.view===view||(view==='custdetail'&&a.dataset.view==='customers')));
   document.getElementById('page-title').textContent=t(titles[view]||'nav_dashboard');
+  if(window.matchMedia&&window.matchMedia('(max-width:768px)').matches)closeSidebar();
   if(view==='produce')renderProduce();
   else if(view==='sell')renderSell();
   else if(view==='receiving')renderReceiveList();
@@ -3264,7 +3365,10 @@ function go(view){
   else if(view==='settings')renderAccounts();
   else if(view==='search')initSearchDates();
   else if(view==='finance')renderFinance();
+  else if(view==='dashboard'){ recomputeDashboard(); drawDashboardCharts(); renderToday(); }
 }
+function toggleSidebar(){const sb=document.getElementById('sidebar')||document.querySelector('.sidebar');const sc=document.getElementById('scrim');const hb=document.getElementById('hamburger');if(!sb)return;const open=sb.classList.toggle('open');if(sc)sc.classList.toggle('show',open);if(hb)hb.setAttribute('aria-expanded',open?'true':'false');}
+function closeSidebar(){const sb=document.getElementById('sidebar')||document.querySelector('.sidebar');const sc=document.getElementById('scrim');const hb=document.getElementById('hamburger');if(sb)sb.classList.remove('open');if(sc)sc.classList.remove('show');if(hb)hb.setAttribute('aria-expanded','false');}
 /* 进入检索视图时初始化日期范围：默认近半年（今天往前 6 个月 ~ 今天）；
    若用户清空任一日期，则视为「不限」，runSearch 不再截断近期记录。 */
 function initSearchDates(){
@@ -3543,6 +3647,9 @@ if(typeof setInterval==='function'){ setInterval(syncTick, 20000); /* 在线时�
     </div>
   </div>
 </div>
+
+<!-- 热敏小票打印专用区域（仅打印时显示） -->
+<div id="print-area"></div>
 
 </body>
 </html>

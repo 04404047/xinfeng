@@ -31,26 +31,33 @@ const APP_HTML = path.join(__dirname, '塑料回收收发货管理.html');
 
 /* ---------- 状态 ---------- */
 let ledger = {};        // id -> record
-let deleted = [];       // 已删除 id（墓碑）
+// 墓碑：{id, ts} 数组（ts=删除发生时间，用于增量 pull）；载入时兼容旧版纯字符串数组
+let deleted = [];
 let usersById = {};     // username -> user（账号主数据，跨厂区同步）
 let customersById = {}; // id -> customer（客户主数据，跨厂区同步）
-let deletedUsers = [];  // 已删除账号 username（墓碑）
-let deletedCustomers = []; // 已删除客户 id（墓碑）
+let deletedUsers = [];  // 已删除账号 {username, ts}（墓碑）
+let deletedCustomers = []; // 已删除客户 {id, ts}（墓碑）
 let financesById = {};  // id -> finance（财务主数据，跨厂区同步，支持老板全局汇总）
-let deletedFinances = []; // 已删除财务 id（墓碑）
+let deletedFinances = []; // 已删除财务 {id, ts}（墓碑）
+
+/* 墓碑归一化：兼容旧版 ['id1','id2'] 与新版 [{id,ts}] 两种格式，统一为对象数组 */
+function normTomb(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr.map(x => (typeof x === 'string' ? { id: x, ts: 0 } : { id: x.id, ts: x.ts || 0 }));
+}
 try {
   if (fs.existsSync(DATA_FILE)) {
     let raw = fs.readFileSync(DATA_FILE, 'utf8');
     if (raw.startsWith('ENC:')) raw = decryptData(raw.slice(4));
     const d = JSON.parse(raw);
     ledger = d.ledger || {};
-    deleted = d.deleted || [];
+    deleted = normTomb(d.deleted);
     usersById = d.usersById || {};
     customersById = d.customersById || {};
-    deletedUsers = d.deletedUsers || [];
-    deletedCustomers = d.deletedCustomers || [];
+    deletedUsers = normTomb(d.deletedUsers);
+    deletedCustomers = normTomb(d.deletedCustomers);
     financesById = d.financesById || {};
-    deletedFinances = d.deletedFinances || [];
+    deletedFinances = normTomb(d.deletedFinances);
     console.log('[sync] 已载入本地账本：%d 条记录，%d 条删除墓碑；账号 %d；客户 %d；财务 %d',
       Object.keys(ledger).length, deleted.length, Object.keys(usersById).length, Object.keys(customersById).length, Object.keys(financesById).length);
   }
@@ -203,50 +210,65 @@ const server = http.createServer(async (req, res) => {
     const recs = Array.isArray(body.records) ? body.records : [];
     recs.forEach(mergeRecord);
     const del = Array.isArray(body.deleted) ? body.deleted : [];
+    const now = Date.now();
     del.forEach(id => {
       if (id == null) return;
       delete ledger[id];
-      if (deleted.indexOf(id) < 0) deleted.push(id);
+      if (deleted.findIndex(t => t.id === id) < 0) deleted.push({ id, ts: now });
     });
     // 账号同步
     (Array.isArray(body.users) ? body.users : []).forEach(mergeUser);
     (Array.isArray(body.deletedUsers) ? body.deletedUsers : []).forEach(un => {
       if (un == null) return;
       delete usersById[un];
-      if (deletedUsers.indexOf(un) < 0) deletedUsers.push(un);
+      if (deletedUsers.findIndex(t => t.id === un) < 0) deletedUsers.push({ id: un, ts: now });
     });
     // 客户同步
     (Array.isArray(body.customers) ? body.customers : []).forEach(mergeCustomer);
     (Array.isArray(body.deletedCustomers) ? body.deletedCustomers : []).forEach(cid => {
       if (cid == null) return;
       delete customersById[cid];
-      if (deletedCustomers.indexOf(cid) < 0) deletedCustomers.push(cid);
+      if (deletedCustomers.findIndex(t => t.id === cid) < 0) deletedCustomers.push({ id: cid, ts: now });
     });
     // 财务同步
     (Array.isArray(body.finances) ? body.finances : []).forEach(mergeFinance);
     (Array.isArray(body.deletedFinances) ? body.deletedFinances : []).forEach(fid => {
       if (fid == null) return;
       delete financesById[fid];
-      if (deletedFinances.indexOf(fid) < 0) deletedFinances.push(fid);
+      if (deletedFinances.findIndex(t => t.id === fid) < 0) deletedFinances.push({ id: fid, ts: now });
     });
     persist();
     sendJSON(res, 200, { ok: true, serverTime: Date.now(), count: Object.keys(ledger).length }, req);
     return;
   }
 
-  // 拉取
+  // 拉取（增量：since 之后的变更才返回，避免数据增长后每次全量下发）
   if (p === '/sync/pull' && req.method === 'GET') {
     if (!authOk(req)) { sendJSON(res, 401, { ok: false, error: 'unauthorized' }, req); return; }
+    let since = parseInt(url.searchParams.get('since') || '0', 10);
+    if (!(since > 0)) since = 0;
+    const srvTime = Date.now();
+    const incRecords = Object.values(ledger).filter(r => (r.ts || 0) > since);
+    const incUsers = Object.values(usersById).filter(u => (u.updatedTs || 0) > since);
+    const incCustomers = Object.values(customersById).filter(c => (c.updatedTs || 0) > since);
+    const incFinances = Object.values(financesById).filter(f => (f.ts || 0) > since);
+    // 墓碑：仅返回删除时间晚于 since 的（首次 since=0 全量下发，保证历史清理一致）
+    const incDeleted = deleted.filter(t => t.ts > since).map(t => t.id);
+    const incDelUsers = deletedUsers.filter(t => t.ts > since).map(t => t.id);
+    const incDelCustomers = deletedCustomers.filter(t => t.ts > since).map(t => t.id);
+    const incDelFinances = deletedFinances.filter(t => t.ts > since).map(t => t.id);
     sendJSON(res, 200, {
       ok: true,
-      records: Object.values(ledger),
-      deleted: deleted.slice(),
-      users: Object.values(usersById),
-      customers: Object.values(customersById),
-      deletedUsers: deletedUsers.slice(),
-      deletedCustomers: deletedCustomers.slice(),
-      finances: Object.values(financesById),
-      deletedFinances: deletedFinances.slice()
+      serverTime: srvTime,
+      since,
+      records: incRecords,
+      deleted: incDeleted,
+      users: incUsers,
+      customers: incCustomers,
+      deletedUsers: incDelUsers,
+      deletedCustomers: incDelCustomers,
+      finances: incFinances,
+      deletedFinances: incDelFinances
     }, req);
     return;
   }
