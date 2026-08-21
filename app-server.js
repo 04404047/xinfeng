@@ -39,6 +39,8 @@ let deletedUsers = [];  // 已删除账号 {username, ts}（墓碑）
 let deletedCustomers = []; // 已删除客户 {id, ts}（墓碑）
 let financesById = {};  // id -> finance（财务主数据，跨厂区同步，支持老板全局汇总）
 let deletedFinances = []; // 已删除财务 {id, ts}（墓碑）
+// 汇率主数据（跨厂区/设备一致）：LWW 由 lastRateTs 决定；所有设备显示的 CNY/NGN 换算口径统一
+let rateState = { rate: 0, rateHistory: [], lastRateTs: 0 };
 
 /* 墓碑归一化：兼容旧版 ['id1','id2'] 与新版 [{id,ts}] 两种格式，统一为对象数组 */
 function normTomb(arr) {
@@ -58,6 +60,7 @@ try {
     deletedCustomers = normTomb(d.deletedCustomers);
     financesById = d.financesById || {};
     deletedFinances = normTomb(d.deletedFinances);
+    rateState = d.rateState || { rate: 0, rateHistory: [], lastRateTs: 0 };
     console.log('[sync] 已载入本地账本：%d 条记录，%d 条删除墓碑；账号 %d；客户 %d；财务 %d',
       Object.keys(ledger).length, deleted.length, Object.keys(usersById).length, Object.keys(customersById).length, Object.keys(financesById).length);
   }
@@ -97,7 +100,7 @@ function persist() {
   if (saveTimer) return;
   saveTimer = setTimeout(() => {
     saveTimer = null;
-    const plain = JSON.stringify({ ledger, deleted, usersById, customersById, deletedUsers, deletedCustomers, financesById, deletedFinances }, null, 0);
+    const plain = JSON.stringify({ ledger, deleted, usersById, customersById, deletedUsers, deletedCustomers, financesById, deletedFinances, rateState }, null, 0);
     const packed = encryptData(plain);
     const tmp = DATA_FILE + '.tmp';
     /* 先写临时文件再原子 rename，避免进程崩溃/断电时损坏数据文件 */
@@ -237,6 +240,12 @@ const server = http.createServer(async (req, res) => {
       delete financesById[fid];
       if (deletedFinances.findIndex(t => t.id === fid) < 0) deletedFinances.push({ id: fid, ts: now });
     });
+    // 汇率同步：按 lastRateTs 做 LWW（大者胜），保证各厂区/设备汇率口径一致
+    if (body && typeof body.lastRateTs === 'number' && body.lastRateTs > (rateState.lastRateTs || 0)) {
+      if (typeof body.rate === 'number' && body.rate > 0) rateState.rate = body.rate;
+      if (Array.isArray(body.rateHistory)) rateState.rateHistory = body.rateHistory;
+      rateState.lastRateTs = body.lastRateTs;
+    }
     persist();
     sendJSON(res, 200, { ok: true, serverTime: Date.now(), count: Object.keys(ledger).length }, req);
     return;
@@ -268,7 +277,10 @@ const server = http.createServer(async (req, res) => {
       deletedUsers: incDelUsers,
       deletedCustomers: incDelCustomers,
       finances: incFinances,
-      deletedFinances: incDelFinances
+      deletedFinances: incDelFinances,
+      rate: rateState.rate,
+      rateHistory: rateState.rateHistory,
+      lastRateTs: rateState.lastRateTs
     }, req);
     return;
   }
