@@ -19,6 +19,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const PORT = parseInt(process.env.PORT || '8787', 10);
 const HOST = process.env.HOST || '0.0.0.0';
@@ -35,42 +36,98 @@ let usersById = {};     // username -> user（账号主数据，跨厂区同步�
 let customersById = {}; // id -> customer（客户主数据，跨厂区同步）
 let deletedUsers = [];  // 已删除账号 username（墓碑）
 let deletedCustomers = []; // 已删除客户 id（墓碑）
-let syncSettings = {};     // 同步配置（syncUrl/syncKey），跨设备共享，供新设备开箱即联网
+let financesById = {};  // id -> finance（财务主数据，跨厂区同步，支持老板全局汇总）
+let deletedFinances = []; // 已删除财务 id（墓碑）
 try {
   if (fs.existsSync(DATA_FILE)) {
-    const d = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+    let raw = fs.readFileSync(DATA_FILE, 'utf8');
+    if (raw.startsWith('ENC:')) raw = decryptData(raw.slice(4));
+    const d = JSON.parse(raw);
     ledger = d.ledger || {};
     deleted = d.deleted || [];
     usersById = d.usersById || {};
     customersById = d.customersById || {};
     deletedUsers = d.deletedUsers || [];
     deletedCustomers = d.deletedCustomers || [];
-    syncSettings = d.syncSettings || {};
-    console.log('[sync] 已载入本地账本：%d 条记录，%d 条删除墓碑；账号 %d；客户 %d',
-      Object.keys(ledger).length, deleted.length, Object.keys(usersById).length, Object.keys(customersById).length);
+    financesById = d.financesById || {};
+    deletedFinances = d.deletedFinances || [];
+    console.log('[sync] 已载入本地账本：%d 条记录，%d 条删除墓碑；账号 %d；客户 %d；财务 %d',
+      Object.keys(ledger).length, deleted.length, Object.keys(usersById).length, Object.keys(customersById).length, Object.keys(financesById).length);
   }
 } catch (e) { console.warn('[sync] 载入数据失败，重新开始：', e.message); }
 
 let saveTimer = null;
+/* 落盘脱敏：配置了 SYNC_KEY 时，用 AES-256-GCM（密钥由 SYNC_KEY 派生）加密磁盘文件，
+   避免明文 JSON（含账号密码哈希）意外泄露；未配置密钥则明文存储并提示风险。 */
+function deriveKey() {
+  if (!SYNC_KEY) return null;
+  return crypto.scryptSync(SYNC_KEY, 'recycleflow-sync-v1', 32);
+}
+function encryptData(plain) {
+  const key = deriveKey();
+  if (!key) return { enc: false, data: plain };
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+  const enc = Buffer.concat([cipher.update(plain, 'utf8'), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return { enc: true, data: iv.toString('base64') + ':' + tag.toString('base64') + ':' + enc.toString('base64') };
+}
+function decryptData(str) {
+  const key = deriveKey();
+  if (!key) return str;
+  const parts = str.split(':');
+  if (parts.length !== 3) return str; // 非加密内容（或旧明文）
+  try {
+    const iv = Buffer.from(parts[0], 'base64');
+    const tag = Buffer.from(parts[1], 'base64');
+    const enc = Buffer.from(parts[2], 'base64');
+    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+    decipher.setAuthTag(tag);
+    return Buffer.concat([decipher.update(enc), decipher.final()]).toString('utf8');
+  } catch (e) { return str; }
+}
 function persist() {
   if (saveTimer) return;
   saveTimer = setTimeout(() => {
     saveTimer = null;
-    fs.writeFile(DATA_FILE, JSON.stringify({ ledger, deleted, usersById, customersById, deletedUsers, deletedCustomers, syncSettings }, null, 0), (err) => {
-      if (err) console.warn('[sync] 写入失败：', err.message);
+    const plain = JSON.stringify({ ledger, deleted, usersById, customersById, deletedUsers, deletedCustomers, financesById, deletedFinances }, null, 0);
+    const packed = encryptData(plain);
+    const tmp = DATA_FILE + '.tmp';
+    /* 先写临时文件再原子 rename，避免进程崩溃/断电时损坏数据文件 */
+    fs.writeFile(tmp, packed.enc ? ('ENC:' + packed.data) : plain, (err) => {
+      if (err) { console.warn('[sync] 写入失败：', err.message); return; }
+      fs.rename(tmp, DATA_FILE, (e2) => { if (e2) console.warn('[sync] 重命名失败：', e2.message); });
     });
   }, 300);
 }
 
 /* ---------- 工具 ---------- */
-function sendJSON(res, code, obj) {
+/* CORS 限源：仅允许与服务器同 Host 的来源（即由本服务器托管的页面），
+   阻断任意第三方网站跨站读取/写入同步数据；可用 SYNC_CORS_ORIGIN 显式放行额外源。 */
+function originAllowed(req) {
+  const origin = req.headers.origin;
+  if (!origin) return null;
+  let o; try { o = new URL(origin); } catch (e) { return null; }
+  if (o.protocol !== 'http:' && o.protocol !== 'https:') return null;
+  const hostHdr = (req.headers.host || '').toLowerCase();
+  const oHost = o.host.toLowerCase();
+  if (oHost && hostHdr && oHost === hostHdr) return origin;
+  const list = (process.env.SYNC_CORS_ORIGIN || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+  if (list.includes(origin.toLowerCase()) || list.includes(oHost)) return origin;
+  return null;
+}
+function sendJSON(res, code, obj, req) {
+  const origin = req ? originAllowed(req) : null;
   const body = JSON.stringify(obj);
-  res.writeHead(code, {
+  const headers = {
     'Content-Type': 'application/json; charset=utf-8',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, X-Api-Key',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
-  });
+    'Vary': 'Origin'
+  };
+  // 同源/白名单来源才回显；否则置 'null' 由浏览器拒绝跨站访问
+  headers['Access-Control-Allow-Origin'] = origin || 'null';
+  headers['Access-Control-Allow-Headers'] = 'Content-Type, X-Api-Key';
+  headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
+  res.writeHead(code, headers);
   res.end(body);
 }
 function authOk(req) {
@@ -116,6 +173,13 @@ function mergeCustomer(c) {
   const cur = customersById[c.id];
   if (!cur || (c.updatedTs || 0) > (cur.updatedTs || 0)) customersById[c.id] = c;
 }
+/* 财务合并：按 id 做 LWW（ts 大者胜），使三厂财务可在老板账号全局汇总 */
+function mergeFinance(f) {
+  if (!f || f.id == null) return;
+  if (deletedFinances.indexOf(f.id) >= 0) return;
+  const cur = financesById[f.id];
+  if (!cur || (f.ts || 0) > (cur.ts || 0)) financesById[f.id] = f;
+}
 
 /* ---------- 路由 ---------- */
 const server = http.createServer(async (req, res) => {
@@ -123,19 +187,19 @@ const server = http.createServer(async (req, res) => {
   const p = url.pathname;
 
   // CORS 预检
-  if (req.method === 'OPTIONS') { sendJSON(res, 204, {}); return; }
+  if (req.method === 'OPTIONS') { sendJSON(res, 204, {}, req); return; }
 
   // 健康检查（无需鉴权，供前端同源探测自动启用同步）
   if (p === '/sync/health' && req.method === 'GET') {
-    sendJSON(res, 200, { ok: true, count: Object.keys(ledger).length, key: !!SYNC_KEY });
+    sendJSON(res, 200, { ok: true, count: Object.keys(ledger).length, key: !!SYNC_KEY }, req);
     return;
   }
 
   // 推送
   if (p === '/sync/push' && req.method === 'POST') {
-    if (!authOk(req)) { sendJSON(res, 401, { ok: false, error: 'unauthorized' }); return; }
+    if (!authOk(req)) { sendJSON(res, 401, { ok: false, error: 'unauthorized' }, req); return; }
     let body;
-    try { body = await readBody(req); } catch (e) { sendJSON(res, 400, { ok: false, error: 'bad json' }); return; }
+    try { body = await readBody(req); } catch (e) { sendJSON(res, 400, { ok: false, error: 'bad json' }, req); return; }
     const recs = Array.isArray(body.records) ? body.records : [];
     recs.forEach(mergeRecord);
     const del = Array.isArray(body.deleted) ? body.deleted : [];
@@ -158,19 +222,21 @@ const server = http.createServer(async (req, res) => {
       delete customersById[cid];
       if (deletedCustomers.indexOf(cid) < 0) deletedCustomers.push(cid);
     });
-    // 同步配置（仅 syncUrl/syncKey，供新设备自动获取服务器地址，开箱即联网）
-    if (body.settings && typeof body.settings === 'object') {
-      if (body.settings.syncUrl) syncSettings.syncUrl = body.settings.syncUrl;
-      if (body.settings.syncKey !== undefined) syncSettings.syncKey = body.settings.syncKey;
-    }
+    // 财务同步
+    (Array.isArray(body.finances) ? body.finances : []).forEach(mergeFinance);
+    (Array.isArray(body.deletedFinances) ? body.deletedFinances : []).forEach(fid => {
+      if (fid == null) return;
+      delete financesById[fid];
+      if (deletedFinances.indexOf(fid) < 0) deletedFinances.push(fid);
+    });
     persist();
-    sendJSON(res, 200, { ok: true, serverTime: Date.now(), count: Object.keys(ledger).length });
+    sendJSON(res, 200, { ok: true, serverTime: Date.now(), count: Object.keys(ledger).length }, req);
     return;
   }
 
   // 拉取
   if (p === '/sync/pull' && req.method === 'GET') {
-    if (!authOk(req)) { sendJSON(res, 401, { ok: false, error: 'unauthorized' }); return; }
+    if (!authOk(req)) { sendJSON(res, 401, { ok: false, error: 'unauthorized' }, req); return; }
     sendJSON(res, 200, {
       ok: true,
       records: Object.values(ledger),
@@ -179,32 +245,33 @@ const server = http.createServer(async (req, res) => {
       customers: Object.values(customersById),
       deletedUsers: deletedUsers.slice(),
       deletedCustomers: deletedCustomers.slice(),
-      settings: syncSettings
-    });
+      finances: Object.values(financesById),
+      deletedFinances: deletedFinances.slice()
+    }, req);
     return;
   }
 
   // 静态前端（优先 index.html，兼容标准托管平台；回退到原始文件名）
   if (p === '/' || p === '/index.html') {
     const idx = path.join(__dirname, 'index.html');
-    serveFile(res, fs.existsSync(idx) ? idx : APP_HTML);
+    serveFile(res, fs.existsSync(idx) ? idx : APP_HTML, req);
     return;
   }
   // 其它静态文件（可选）
   if (req.method === 'GET') {
     const cand = path.join(__dirname, path.normalize(p).replace(/^(\.\.[/\\])+/, ''));
     if (cand.startsWith(__dirname) && fs.existsSync(cand) && fs.statSync(cand).isFile()) {
-      serveFile(res, cand);
+      serveFile(res, cand, req);
       return;
     }
   }
 
-  sendJSON(res, 404, { ok: false, error: 'not found' });
+  sendJSON(res, 404, { ok: false, error: 'not found' }, req);
 });
 
-function serveFile(res, file) {
+function serveFile(res, file, req) {
   fs.readFile(file, (err, data) => {
-    if (err) { sendJSON(res, 404, { ok: false, error: 'file not found' }); return; }
+    if (err) { sendJSON(res, 404, { ok: false, error: 'file not found' }, req); return; }
     const ext = path.extname(file).toLowerCase();
     res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
     res.end(data);
