@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>RecycleFlow NG — 废旧塑料回收工厂收发管理</title>
 <style>
+
   :root{
     --bg:#f4f6f9; --panel:#ffffff; --ink:#1f2937; --muted:#6b7280;
     --line:#e5e7eb; --primary:#2563eb; --primary-d:#1d4ed8;
@@ -228,6 +229,102 @@
     .panel-body>table{min-width:560px;}
     .panel-body>.tbl-scroll{overflow:visible;}
   }
+
+/* ============================================================
+   RecycleFlow NG — 增强层（v2 重构追加，纯叠加，不修改原有契约）
+   目标：更精致的视觉、更流畅的交互、更强的响应式/可达性
+   ============================================================ */
+*,*::before,*::after{ -webkit-tap-highlight-color:transparent; }
+html{ -webkit-text-size-adjust:100%; }
+body{ text-rendering:optimizeLegibility; -webkit-font-smoothing:antialiased; }
+
+/* —— 流畅微交互：按钮/输入/链接/卡片的过渡 —— */
+.btn,.tag,input,select,textarea,.nav a,.card,.panel,.side-logo,.login-card{
+  transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease,
+             transform .12s ease,color .16s ease,opacity .16s ease;
+}
+.btn:active{ transform:translateY(1px) scale(.99); }
+.btn:hover{ box-shadow:0 2px 8px rgba(37,99,235,.22); }
+.btn.ghost:hover{ background:#eef2ff; }
+
+/* —— 可达性：键盘聚焦轮廓 —— */
+:focus-visible{ outline:2px solid var(--primary); outline-offset:2px; border-radius:6px; }
+button:focus:not(:focus-visible),a:focus:not(:focus-visible){ outline:none; }
+
+/* —— 选区与滚动条 —— */
+::selection{ background:rgba(37,99,235,.18); }
+*::-webkit-scrollbar{ width:10px;height:10px; }
+*::-webkit-scrollbar-thumb{ background:#cbd5e1;border-radius:8px;border:2px solid transparent;background-clip:content-box; }
+*::-webkit-scrollbar-thumb:hover{ background:#94a3b8; }
+*::-webkit-scrollbar-track{ background:transparent; }
+* { scrollbar-width:thin; scrollbar-color:#cbd5e1 transparent; }
+
+/* —— 表单控件更精致 —— */
+input,select,textarea{
+  background:#fff; transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(37,99,235,.14);
+  outline:none;
+}
+[readonly],input[disabled],select[disabled]{ background:#f8fafc; color:var(--muted); cursor:not-allowed; }
+
+/* —— 卡片悬浮微交互 + 轻投影 —— */
+.card:hover,.panel:hover{ box-shadow:0 4px 18px rgba(15,23,42,.10),0 1px 3px rgba(15,23,42,.06); }
+.card{ border:1px solid var(--line); }
+
+/* —— 吸顶表头：长表格滚动时表头常驻 —— */
+.panel-body{ position:relative; }
+.panel-body>table thead th,
+.panel-body>.tbl-scroll>table thead th{
+  position:sticky; top:0; z-index:2;
+  background:#f1f5f9; box-shadow:inset 0 -1px 0 var(--line);
+}
+tbody tr{ transition:background .12s ease; }
+
+/* —— 空状态 —— */
+.empty{ padding:34px 16px;text-align:center;color:var(--muted);font-size:13px; }
+.empty::before{ content:"∅"; display:block;font-size:30px;opacity:.4;margin-bottom:6px; }
+
+/* —— 模态：毛玻璃背景 + 轻微上浮 —— */
+.modal{ backdrop-filter:blur(2px); }
+.modal .panel,.modal .login-card{ animation:rf-pop .18s ease; }
+@keyframes rf-pop{ from{ transform:translateY(8px) scale(.985); opacity:.6;} to{ transform:none; opacity:1;} }
+
+/* —— Toast 进出动画增强 —— */
+.toast{ animation:rf-toast-in .2s ease; }
+@keyframes rf-toast-in{ from{ transform:translateY(-8px); opacity:0;} to{ transform:none; opacity:1;} }
+
+/* —— 视图切换轻微淡入（不影响显示/隐藏逻辑） —— */
+.view{ animation:rf-fade .18s ease; }
+@keyframes rf-fade{ from{ opacity:.4;} to{ opacity:1;} }
+
+/* —— 顶部同步指示灯脉冲 —— */
+.sync .dot{ box-shadow:0 0 0 0 rgba(22,163,74,.5); animation:rf-pulse 2.4s infinite; }
+@keyframes rf-pulse{ 0%{box-shadow:0 0 0 0 rgba(22,163,74,.45);} 70%{box-shadow:0 0 0 7px rgba(22,163,74,0);} 100%{box-shadow:0 0 0 0 rgba(22,163,74,0);} }
+
+/* —— 响应式微调：更紧凑的卡片间距 / 更大的移动端点按区 —— */
+@media (max-width:1100px){ .content{ padding:16px; } }
+@media (max-width:768px){
+  /* 移动端输入框字号>=16px，避免 iOS 自动缩放；点按区更大 */
+  .login-card input,.login-card select,.modal input,.modal select,.modal textarea{ font-size:16px; }
+  .nav a{ padding:12px 18px; }
+  .btn{ padding:10px 16px; }
+  .topbar h2{ font-size:15px; }
+}
+@media (max-width:480px){
+  .cards{ grid-template-columns:1fr !important; }
+  .login-card{ width:calc(100vw - 32px); padding:26px 20px; }
+  .content{ padding:12px; }
+  .topbar{ padding:0 10px; }
+}
+
+/* —— 尊重“减少动态效果”系统偏好 —— */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+}
+
 </style>
 </head>
 <body>
@@ -821,7 +918,22 @@
               <tr><td data-i18n="role_auditor_s">审计员</td><td><span class="tag g">view</span></td><td><span class="tag r">✕</span></td><td><span class="tag r">✕</span></td><td><span class="tag r">✕</span></td><td><span class="tag g">✓</span></td><td><span class="tag g">✓</span></td></tr>
             </tbody></table></div></div>
         <div id="tab-sync" class="panel hidden"><div class="panel-head"><h3 data-i18n="set_sync">同步与离线状态</h3><div class="right"><button class="btn sm eco" onclick="doSync()" data-i18n="sync_now">立即同步</button></div></div>
-          <div class="panel-body"><div class="note" id="sync-key-warn" style="display:none">
+          <div class="panel-body">
+          <div class="panel" style="margin-top:0;border:2px solid var(--primary);box-shadow:0 0 0 4px rgba(37,99,235,.12)">
+            <div class="panel-head"><h3>① 同步服务器（多厂联网）— 先填这里</h3>
+              <div class="right"><button class="btn ghost sm" onclick="testSync()" id="sy-test">连接测试</button></div></div>
+            <div class="panel-body">
+              <div class="note mb">要联网同步，先填「服务器地址」和「同步密码」，再点 <b>保存并连接</b>。服务器地址在 Render 上一般已自动填好，通常不用改。</div>
+              <div class="field" style="max-width:420px"><label>服务器地址</label><input id="sy-url" placeholder="http://服务器IP:8787" /></div>
+              <div class="field" style="max-width:420px"><label>同步密码（API Key）</label><input id="sy-key" placeholder="填你在 Render 设置的 SYNC_KEY（就是那串同步密码）" /></div>
+              <div class="row mt" style="gap:10px">
+                <button class="btn eco sm" onclick="saveSyncConfig()">保存并连接</button>
+                <button class="btn ghost sm" onclick="doSync()">立即同步</button>
+                <span id="sy-status" class="muted"></span>
+              </div>
+            </div>
+          </div>
+          <div class="note" id="sync-key-warn" style="display:none">
             ⚠ <b data-i18n="sy_nokey">同步未加密</b>：当前同步服务器未启用 API Key，账本与账号数据以<b>明文</b>传输与存储。请勿在公网暴露该端口；生产部署请在启动服务器时设置 <code>SYNC_KEY</code> 环境变量，并在本页填入相同密钥。
           </div><div class="kv">
             <div class="k" data-i18n="sy_conn">连接</div>
@@ -832,20 +944,6 @@
             <div class="k" data-i18n="sy_pending">待上传</div><div><span id="sy-pending-n">3</span> 条</div>
             <div class="k" data-i18n="sy_last">最近同步</div><div id="sy-last">2026-08-16 09:40</div>
             <div class="k" data-i18n="sy_conflict">冲突策略</div><div data-i18n="sy_lww">末写优先 + 版本向量</div>
-          </div>
-          <div class="panel" style="margin-top:14px">
-            <div class="panel-head"><h3>同步服务器（多厂联网）</h3>
-              <div class="right"><button class="btn ghost sm" onclick="testSync()" id="sy-test">连接测试</button></div></div>
-            <div class="panel-body">
-              <div class="note mb">配置后各厂区数据通过中央同步服务实时互通（分厂发货→总厂「待入库」自动出现）。服务器地址形如 http://192.168.1.10:8787</div>
-              <div class="field" style="max-width:420px"><label>服务器地址</label><input id="sy-url" placeholder="http://服务器IP:8787" /></div>
-              <div class="field" style="max-width:420px"><label>API Key</label><input id="sy-key" placeholder="与 sync-server.js 的 SYNC_KEY 一致" /></div>
-              <div class="row mt" style="gap:10px">
-                <button class="btn eco sm" onclick="saveSyncConfig()">保存并连接</button>
-                <button class="btn ghost sm" onclick="doSync()">立即同步</button>
-                <span id="sy-status" class="muted"></span>
-              </div>
-            </div>
           </div>
           <div class="panel" style="margin-top:14px">
             <div class="panel-head"><h3 data-i18n="lan_title">局域网互联（零配置）</h3>
@@ -1042,6 +1140,7 @@
 </div>
 
 <script>
+
 /* ============ i18n ============ */
 const I18N = {
   zh:{
@@ -3780,6 +3879,7 @@ if(!loadSession()){
 })();
 /* 心跳同步：在线且有待上传时，最多 60s 内自动同步到云端（双重保障，满足 ≤1 分钟要求） */
 if(typeof setInterval==='function'){ setInterval(syncTick, 20000); /* 在线时每 20s 自动推送本地变更并拉取其他厂区数据，满足 ≤1 分钟联网要求 */ }
+
 
 </script>
 <!-- ===================== Account modal ===================== -->
