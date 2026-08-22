@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>RecycleFlow NG — 废旧塑料回收工厂收发管理</title>
 <style>
-
   :root{
     --bg:#f4f6f9; --panel:#ffffff; --ink:#1f2937; --muted:#6b7280;
     --line:#e5e7eb; --primary:#2563eb; --primary-d:#1d4ed8;
@@ -82,8 +81,7 @@
   .panel-body{padding:16px;}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
   .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
-  @media(max-width:1100px){.cards{grid-template-columns:repeat(3,1fr);}.grid2,.grid3{grid-template-columns:1fr;}}
-  @media(max-width:680px){.cards{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:1100px){.cards{grid-template-columns:repeat(2,1fr);}.grid2,.grid3{grid-template-columns:1fr;}}
   table{width:100%;border-collapse:collapse;font-size:12.5px;}
   th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);}
   th{color:var(--muted);font-weight:600;background:#fafbfc;font-size:11.5px;text-transform:uppercase;letter-spacing:.3px;}
@@ -224,107 +222,7 @@
     .topbar{padding:0 14px;gap:10px;}
     .content{padding:14px;}
     .topbar .company-tag,.topbar .factory-tag{display:none;}
-    /* 窄屏下宽表格横向滚动，避免内容溢出或挤压变形（已自带 .tbl-scroll 的表同样受益） */
-    .panel-body{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-    .panel-body>table{min-width:560px;}
-    .panel-body>.tbl-scroll{overflow:visible;}
   }
-
-/* ============================================================
-   RecycleFlow NG — 增强层（v2 重构追加，纯叠加，不修改原有契约）
-   目标：更精致的视觉、更流畅的交互、更强的响应式/可达性
-   ============================================================ */
-*,*::before,*::after{ -webkit-tap-highlight-color:transparent; }
-html{ -webkit-text-size-adjust:100%; }
-body{ text-rendering:optimizeLegibility; -webkit-font-smoothing:antialiased; }
-
-/* —— 流畅微交互：按钮/输入/链接/卡片的过渡 —— */
-.btn,.tag,input,select,textarea,.nav a,.card,.panel,.side-logo,.login-card{
-  transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease,
-             transform .12s ease,color .16s ease,opacity .16s ease;
-}
-.btn:active{ transform:translateY(1px) scale(.99); }
-.btn:hover{ box-shadow:0 2px 8px rgba(37,99,235,.22); }
-.btn.ghost:hover{ background:#eef2ff; }
-
-/* —— 可达性：键盘聚焦轮廓 —— */
-:focus-visible{ outline:2px solid var(--primary); outline-offset:2px; border-radius:6px; }
-button:focus:not(:focus-visible),a:focus:not(:focus-visible){ outline:none; }
-
-/* —— 选区与滚动条 —— */
-::selection{ background:rgba(37,99,235,.18); }
-*::-webkit-scrollbar{ width:10px;height:10px; }
-*::-webkit-scrollbar-thumb{ background:#cbd5e1;border-radius:8px;border:2px solid transparent;background-clip:content-box; }
-*::-webkit-scrollbar-thumb:hover{ background:#94a3b8; }
-*::-webkit-scrollbar-track{ background:transparent; }
-* { scrollbar-width:thin; scrollbar-color:#cbd5e1 transparent; }
-
-/* —— 表单控件更精致 —— */
-input,select,textarea{
-  background:#fff; transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;
-}
-input:focus,select:focus,textarea:focus{
-  border-color:var(--primary);
-  box-shadow:0 0 0 3px rgba(37,99,235,.14);
-  outline:none;
-}
-[readonly],input[disabled],select[disabled]{ background:#f8fafc; color:var(--muted); cursor:not-allowed; }
-
-/* —— 卡片悬浮微交互 + 轻投影 —— */
-.card:hover,.panel:hover{ box-shadow:0 4px 18px rgba(15,23,42,.10),0 1px 3px rgba(15,23,42,.06); }
-.card{ border:1px solid var(--line); }
-
-/* —— 吸顶表头：长表格滚动时表头常驻 —— */
-.panel-body{ position:relative; }
-.panel-body>table thead th,
-.panel-body>.tbl-scroll>table thead th{
-  position:sticky; top:0; z-index:2;
-  background:#f1f5f9; box-shadow:inset 0 -1px 0 var(--line);
-}
-tbody tr{ transition:background .12s ease; }
-
-/* —— 空状态 —— */
-.empty{ padding:34px 16px;text-align:center;color:var(--muted);font-size:13px; }
-.empty::before{ content:"∅"; display:block;font-size:30px;opacity:.4;margin-bottom:6px; }
-
-/* —— 模态：毛玻璃背景 + 轻微上浮 —— */
-.modal{ backdrop-filter:blur(2px); }
-.modal .panel,.modal .login-card{ animation:rf-pop .18s ease; }
-@keyframes rf-pop{ from{ transform:translateY(8px) scale(.985); opacity:.6;} to{ transform:none; opacity:1;} }
-
-/* —— Toast 进出动画增强 —— */
-.toast{ animation:rf-toast-in .2s ease; }
-@keyframes rf-toast-in{ from{ transform:translateY(-8px); opacity:0;} to{ transform:none; opacity:1;} }
-
-/* —— 视图切换轻微淡入（不影响显示/隐藏逻辑） —— */
-.view{ animation:rf-fade .18s ease; }
-@keyframes rf-fade{ from{ opacity:.4;} to{ opacity:1;} }
-
-/* —— 顶部同步指示灯脉冲 —— */
-.sync .dot{ box-shadow:0 0 0 0 rgba(22,163,74,.5); animation:rf-pulse 2.4s infinite; }
-@keyframes rf-pulse{ 0%{box-shadow:0 0 0 0 rgba(22,163,74,.45);} 70%{box-shadow:0 0 0 7px rgba(22,163,74,0);} 100%{box-shadow:0 0 0 0 rgba(22,163,74,0);} }
-
-/* —— 响应式微调：更紧凑的卡片间距 / 更大的移动端点按区 —— */
-@media (max-width:1100px){ .content{ padding:16px; } }
-@media (max-width:768px){
-  /* 移动端输入框字号>=16px，避免 iOS 自动缩放；点按区更大 */
-  .login-card input,.login-card select,.modal input,.modal select,.modal textarea{ font-size:16px; }
-  .nav a{ padding:12px 18px; }
-  .btn{ padding:10px 16px; }
-  .topbar h2{ font-size:15px; }
-}
-@media (max-width:480px){
-  .cards{ grid-template-columns:1fr !important; }
-  .login-card{ width:calc(100vw - 32px); padding:26px 20px; }
-  .content{ padding:12px; }
-  .topbar{ padding:0 10px; }
-}
-
-/* —— 尊重“减少动态效果”系统偏好 —— */
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
-}
-
 </style>
 </head>
 <body>
@@ -380,7 +278,6 @@ tbody tr{ transition:background .12s ease; }
       <a data-view="pricing"><span class="ic">¥</span><span data-i18n="nav_pricing">价格</span></a>
       <a data-view="search"><span class="ic">⌕</span><span data-i18n="nav_search">检索</span></a>
       <a data-view="finance"><span class="ic">¥</span><span data-i18n="nav_finance">财务</span></a>
-      <a data-view="rateset"><span class="ic">⇄</span><span data-i18n="nav_rateset">汇率设置</span></a>
       <a data-view="reports"><span class="ic">📊</span><span data-i18n="nav_reports">报表</span></a>
       <div class="nav-group" data-i18n="g_sys">系统</div>
       <a data-view="settings"><span class="ic">⚙</span><span data-i18n="nav_settings">设置</span></a>
@@ -530,6 +427,7 @@ tbody tr{ transition:background .12s ease; }
               <div class="field"><label data-i18n="rc_ticket">过磅单号（可编辑）</label><input id="rc-ticket" value="RC-2045"/></div>
               <div class="field"><label data-i18n="rc_op">操作员（可编辑）</label><input id="rc-op" value=""/></div>
               <div class="field" id="rc-factory-wrap" style="display:none"><label data-i18n="liFactory">工厂 / Plant</label><select id="rc-factory"><option value="Sagamu">总厂 · Sagamu</option><option value="OPIC">OPIC工厂</option><option value="Ikeja">IKEJA工厂</option></select></div>
+              <div class="field"><label data-i18n="fin_cur">货币</label><select id="rc-cur"><option value="NGN">₦ 奈拉 NGN</option><option value="CNY">¥ 人民币 CNY</option></select></div>
             </div>
             <input type="hidden" id="rc-cust-id"/>
             <div class="tbl-scroll">
@@ -537,7 +435,7 @@ tbody tr{ transition:background .12s ease; }
               <thead><tr>
                 <th style="width:110px" data-i18n="h_mat">材质</th><th style="width:100px" data-i18n="h_form">形态</th>
                 <th style="width:130px" data-i18n="h_color">颜色</th><th style="width:110px" data-i18n="h_w">重量(kg)</th>
-                <th style="width:110px" data-i18n="h_price">单价 ¥</th><th data-i18n="h_amt">行金额</th><th></th>
+                <th style="width:110px" data-i18n="h_price">单价</th><th data-i18n="h_amt">行金额</th><th></th>
               </tr></thead>
               <tbody id="rc-body"></tbody>
             </table>
@@ -694,9 +592,10 @@ tbody tr{ transition:background .12s ease; }
                 <div class="field"><label data-i18n="sell_cust">购货客户 *</label><input id="sl-cust" placeholder="输入客户名称…" style="width:200px"/></div>
                 <div class="field"><label data-i18n="rc_date">日期 *</label><input id="sl-date" type="date"/></div>
                 <div class="field"><label>订单号</label><input id="sl-order" value="SO-101"/></div>
+                <div class="field"><label data-i18n="fin_cur">货币</label><select id="sl-cur"><option value="NGN">₦ 奈拉 NGN</option><option value="CNY">¥ 人民币 CNY</option></select></div>
               </div>
               <div class="tbl-scroll"><table>
-                <thead><tr><th style="width:90px" data-i18n="sell_mat">材质</th><th style="width:90px" data-i18n="h_color">颜色</th><th data-i18n="sell_w">数量(kg)</th><th data-i18n="sell_avail">可用库存</th><th data-i18n="sell_price">单价 ¥/kg</th><th data-i18n="sell_amt">销售额</th><th></th></tr></thead>
+                <thead><tr><th style="width:90px" data-i18n="sell_mat">材质</th><th style="width:90px" data-i18n="h_color">颜色</th><th data-i18n="sell_w">数量(kg)</th><th data-i18n="sell_avail">可用库存</th><th data-i18n="sell_price">单价 /kg</th><th data-i18n="sell_amt">销售额</th><th></th></tr></thead>
                 <tbody id="sl-body"></tbody>
               </table></div>
               <div class="totals"><div><div class="k" data-i18n="sell_rev">累计销售额</div><div class="v" id="sl-total">¥ 0</div></div></div>
@@ -880,24 +779,6 @@ tbody tr{ transition:background .12s ease; }
       </section>
 
       <!-- ===== Settings ===== -->
-      <section class="view" id="view-rateset">
-        <div class="panel">
-          <div class="panel-head"><h3 data-i18n="rate_set_title">汇率设置（人民币 / 奈拉）</h3></div>
-          <div class="panel-body">
-            <div class="note mb" data-i18n="rate_tip2">调整后立即应用于当天所有财务收支的人民币/奈拉换算与汇总展示；变更将记入下方记录便于追溯。</div>
-            <div class="row" style="align-items:flex-end;gap:12px">
-              <div class="field" style="max-width:260px"><label data-i18n="rate_cur_label">1 人民币 CNY = ? 奈拉 NGN</label><input id="rate-input" type="number" min="0" step="0.01" oninput="rateChanged()"/></div>
-              <button class="btn eco sm" onclick="saveRate()" data-i18n="rate_save">保存汇率</button>
-            </div>
-            <div class="small muted mt" data-i18n="rate_precision">汇率保留 2 位小数；0 < 汇率 ≤ 100000</div>
-            <div class="mt" style="border-top:1px dashed #ddd;padding-top:12px">
-              <h4 style="margin:0 0 8px;font-size:13px;color:var(--muted)" data-i18n="rate_history">汇率变更记录</h4>
-              <div class="tbl-scroll"><table><thead><tr><th data-i18n="h_time">时间</th><th data-i18n="rate_by">修改人</th><th data-i18n="rate_old">原汇率</th><th data-i18n="rate_new">新汇率</th></tr></thead><tbody id="rate-history"></tbody></table></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section class="view" id="view-settings">
         <div class="tabs" id="set-tabs">
           <button class="active" data-t="roles" onclick="setTab('roles',this)" data-i18n="set_roles">角色与权限</button>
@@ -918,22 +799,7 @@ tbody tr{ transition:background .12s ease; }
               <tr><td data-i18n="role_auditor_s">审计员</td><td><span class="tag g">view</span></td><td><span class="tag r">✕</span></td><td><span class="tag r">✕</span></td><td><span class="tag r">✕</span></td><td><span class="tag g">✓</span></td><td><span class="tag g">✓</span></td></tr>
             </tbody></table></div></div>
         <div id="tab-sync" class="panel hidden"><div class="panel-head"><h3 data-i18n="set_sync">同步与离线状态</h3><div class="right"><button class="btn sm eco" onclick="doSync()" data-i18n="sync_now">立即同步</button></div></div>
-          <div class="panel-body">
-          <div class="panel" style="margin-top:0;border:2px solid var(--primary);box-shadow:0 0 0 4px rgba(37,99,235,.12)">
-            <div class="panel-head"><h3>① 同步服务器（多厂联网）— 先填这里</h3>
-              <div class="right"><button class="btn ghost sm" onclick="testSync()" id="sy-test">连接测试</button></div></div>
-            <div class="panel-body">
-              <div class="note mb">要联网同步，先填「服务器地址」和「同步密码」，再点 <b>保存并连接</b>。服务器地址在 Render 上一般已自动填好，通常不用改。</div>
-              <div class="field" style="max-width:420px"><label>服务器地址</label><input id="sy-url" placeholder="http://服务器IP:8787" /></div>
-              <div class="field" style="max-width:420px"><label>同步密码（API Key）</label><input id="sy-key" placeholder="填你在 Render 设置的 SYNC_KEY（就是那串同步密码）" /></div>
-              <div class="row mt" style="gap:10px">
-                <button class="btn eco sm" onclick="saveSyncConfig()">保存并连接</button>
-                <button class="btn ghost sm" onclick="doSync()">立即同步</button>
-                <span id="sy-status" class="muted"></span>
-              </div>
-            </div>
-          </div>
-          <div class="note" id="sync-key-warn" style="display:none">
+          <div class="panel-body"><div class="note" id="sync-key-warn" style="display:none">
             ⚠ <b data-i18n="sy_nokey">同步未加密</b>：当前同步服务器未启用 API Key，账本与账号数据以<b>明文</b>传输与存储。请勿在公网暴露该端口；生产部署请在启动服务器时设置 <code>SYNC_KEY</code> 环境变量，并在本页填入相同密钥。
           </div><div class="kv">
             <div class="k" data-i18n="sy_conn">连接</div>
@@ -944,6 +810,20 @@ tbody tr{ transition:background .12s ease; }
             <div class="k" data-i18n="sy_pending">待上传</div><div><span id="sy-pending-n">3</span> 条</div>
             <div class="k" data-i18n="sy_last">最近同步</div><div id="sy-last">2026-08-16 09:40</div>
             <div class="k" data-i18n="sy_conflict">冲突策略</div><div data-i18n="sy_lww">末写优先 + 版本向量</div>
+          </div>
+          <div class="panel" style="margin-top:14px">
+            <div class="panel-head"><h3>同步服务器（多厂联网）</h3>
+              <div class="right"><button class="btn ghost sm" onclick="testSync()" id="sy-test">连接测试</button></div></div>
+            <div class="panel-body">
+              <div class="note mb">配置后各厂区数据通过中央同步服务实时互通（分厂发货→总厂「待入库」自动出现）。服务器地址形如 http://192.168.1.10:8787</div>
+              <div class="field" style="max-width:420px"><label>服务器地址</label><input id="sy-url" placeholder="http://服务器IP:8787" /></div>
+              <div class="field" style="max-width:420px"><label>API Key</label><input id="sy-key" placeholder="与 sync-server.js 的 SYNC_KEY 一致" /></div>
+              <div class="row mt" style="gap:10px">
+                <button class="btn eco sm" onclick="saveSyncConfig()">保存并连接</button>
+                <button class="btn ghost sm" onclick="doSync()">立即同步</button>
+                <span id="sy-status" class="muted"></span>
+              </div>
+            </div>
           </div>
           <div class="panel" style="margin-top:14px">
             <div class="panel-head"><h3 data-i18n="lan_title">局域网互联（零配置）</h3>
@@ -1006,13 +886,12 @@ tbody tr{ transition:background .12s ease; }
             <div class="small muted mb" data-i18n="reg_note">老板可在此新增分厂账号、分配密码与工厂；注册入口同时开放于登录页。</div>
             <table><thead><tr><th data-i18n="acct_username">账号</th><th data-i18n="acct_name">姓名</th><th data-i18n="acct_role">角色</th><th data-i18n="acct_factories">工厂</th><th></th></tr></thead>
             <tbody id="accounts-body"></tbody></table>
-          </div>
-        </div>
+          </div></div>
         <div id="tab-rate" class="panel hidden"><div class="panel-head"><h3 data-i18n="set_rate">汇率兑换（人民币 / 奈拉）</h3></div>
           <div class="panel-body">
             <div class="note mb" data-i18n="rate_tip">设置当前汇率后，收支登记将按此汇率自动换算展示；具备财务权限（老板 / 工厂管理员）即可修改。</div>
             <div class="row" style="align-items:flex-end;gap:12px">
-              <div class="field" style="max-width:260px"><label data-i18n="fin_rate">1 人民币 CNY = ? 奈拉 NGN</label><input id="rate-input-tab" type="number" min="0" step="0.01" oninput="rateChanged()"/></div>
+              <div class="field" style="max-width:260px"><label data-i18n="fin_rate">1 人民币 CNY = ? 奈拉 NGN</label><input id="rate-input" type="number" min="0" step="0.01" oninput="rateChanged()"/></div>
               <button class="btn eco sm" onclick="saveRate()" data-i18n="lo_save">保存汇率</button>
             </div>
             <div class="mt" style="border-top:1px dashed #ddd;padding-top:12px">
@@ -1031,7 +910,7 @@ tbody tr{ transition:background .12s ease; }
 </div>
 
 <!-- ===================== Customer modal ===================== -->
-<div id="cust-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="cust-modal-title">
+<div id="cust-modal" class="modal hidden">
   <div class="modal-card">
     <div class="panel-head"><h3 id="cust-modal-title" data-i18n="cm_title_new">新建客户</h3>
       <button class="btn ghost sm" onclick="closeCustModal()">✕</button></div>
@@ -1061,7 +940,7 @@ tbody tr{ transition:background .12s ease; }
 </div>
 
 <!-- ===================== Finance modal ===================== -->
-<div id="fin-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="fin-modal-title">
+<div id="fin-modal" class="modal hidden">
   <div class="modal-card">
     <div class="panel-head"><h3 id="fin-modal-title" data-i18n="fin_add">新增财务记录</h3>
       <button class="btn ghost sm" onclick="closeFinModal()">✕</button></div>
@@ -1094,9 +973,9 @@ tbody tr{ transition:background .12s ease; }
 <div class="toast" id="toast"></div>
 
 <!-- ===================== OCR (ticket photo) modal ===================== -->
-<div id="ocr-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="ocr-modal-title">
+<div id="ocr-modal" class="modal hidden">
   <div class="modal-card">
-    <div class="panel-head"><h3 id="ocr-modal-title" data-i18n="ocr_title">票据照片识别录入</h3><button class="btn ghost sm" onclick="closeOcr()">✕</button></div>
+    <div class="panel-head"><h3 data-i18n="ocr_title">票据照片识别录入</h3><button class="btn ghost sm" onclick="closeOcr()">✕</button></div>
     <div class="panel-body">
       <div class="note" data-i18n="ocr_note">上传或过磅单照片，系统将自动识别关键字段并预填到收购单；识别结果为演示数据，正式版接入 OCR 引擎。请核对后确认。</div>
       <div class="field"><label data-i18n="ocr_file">票据图片（拍照 / 上传）</label><input id="ocr-file" type="file" accept="image/*" capture="environment" onchange="ocrPreview()"/></div>
@@ -1125,9 +1004,9 @@ tbody tr{ transition:background .12s ease; }
 </div>
 
 <!-- ===================== Force password change ===================== -->
-<div id="pwd-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="pwd-modal-title">
+<div id="pwd-modal" class="modal hidden">
   <div class="modal-card">
-    <div class="panel-head"><h3 id="pwd-modal-title" data-i18n="pwd_title">首次登录 · 请设置新密码</h3></div>
+    <div class="panel-head"><h3 data-i18n="pwd_title">首次登录 · 请设置新密码</h3></div>
     <div class="panel-body">
       <div class="field"><label data-i18n="pwd_new">新密码（≥12位，含大小写与数字）</label><input id="pwd-new" type="password"/></div>
       <div class="field"><label data-i18n="pwd_confirm">确认新密码</label><input id="pwd-confirm" type="password" onkeydown="if(event.key==='Enter')submitForceChange()"/></div>
@@ -1140,7 +1019,6 @@ tbody tr{ transition:background .12s ease; }
 </div>
 
 <script>
-
 /* ============ i18n ============ */
 const I18N = {
   zh:{
@@ -1185,7 +1063,6 @@ const I18N = {
     bk_local:"创建本地备份", bk_cloud:"云端备份", bk_restore:"恢复", bk_last:"最近备份：2026-08-15 23:00（自动，云端）",
     h_time:"时间", h_actor:"操作人", h_action:"动作", h_target:"对象", h_detail:"明细",
     ac_price:"调价", ac_create:"新建", ac_edit:"编辑", ac_edit_bank:"银行卡号已更新", ac_receive:"回收", ac_ship:"配送", ac_cust:"客户", ac_crush:"破碎", ac_produce:"造粒", ac_sale:"出售", ac_inbound:"入库", ac_reset:"归零",
-    nav_rateset:"汇率设置", rate_set_title:"汇率设置（人民币 / 奈拉）", rate_cur_label:"1 人民币 CNY = ? 奈拉 NGN", rate_save:"保存汇率", rate_history:"汇率变更记录", rate_old:"原汇率", rate_new:"新汇率", rate_by:"修改人", rate_precision:"汇率保留 2 位小数；0 < 汇率 ≤ 100000", rate_invalid:"汇率无效：需为 0–100000 之间的正数，最多 2 位小数", rate_applied:"汇率已生效（1 CNY = ", rate_tip2:"调整后立即应用于当天所有财务收支的人民币/奈拉换算与汇总展示；变更将记入下方记录便于追溯。",
     lo_lang:"界面语言", lo_lang_opt_zh:"中文", lo_lang_opt_en:"English", lo_cur:"货币", lo_date_fmt:"日期格式", lo_num:"数字格式", lo_printer:"打印机 / 地磅", lo_save:"保存设置", lo_note:"语言切换即时生效；其余本地化参数随版本固化（人民币 ¥ / YYYY-MM-DD）。点击「保存设置」将偏好写入本地。",
     h_date:"日期", h_mat:"材质", h_form:"形态", h_color:"颜色", h_w:"重量", h_price:"单价 ¥", h_amt:"金额",
     cm_title_new:"新建客户", cm_title_edit:"编辑客户", cm_name:"姓名 *", cm_phone:"电话", cm_bank:"开户行", cm_acct:"账号", cm_addr:"地址", cm_note:"备注", cm_save:"保存", cm_cancel:"取消",
@@ -1270,7 +1147,6 @@ const I18N = {
     bk_local:"Create local backup", bk_cloud:"Cloud backup", bk_restore:"Restore", bk_last:"Last backup: 2026-08-15 23:00 (auto, cloud)",
     h_time:"Time", h_actor:"Actor", h_action:"Action", h_target:"Target", h_detail:"Detail",
     ac_price:"Price change", ac_create:"Create", ac_edit:"Edit", ac_edit_bank:"bank acct updated", ac_receive:"Receive", ac_ship:"Ship", ac_cust:"Customer", ac_crush:"Crush", ac_produce:"Produce", ac_sale:"Sale", ac_inbound:"Inbound", ac_reset:"Reset",
-    nav_rateset:"Exchange Rate", rate_set_title:"Exchange Rate (CNY / NGN)", rate_cur_label:"1 CNY = ? NGN", rate_save:"Save Rate", rate_history:"Rate change history", rate_old:"Old", rate_new:"New", rate_by:"Changed by", rate_precision:"Rate: 2 decimals; 0 < rate ≤ 100000", rate_invalid:"Invalid rate: positive number 0–100000 with ≤2 decimals", rate_applied:"Rate applied (1 CNY = ", rate_tip2:"Changes apply immediately to all of today's CNY/NGN conversions and finance summaries; every change is logged below for traceability.",
     lo_lang:"UI language", lo_lang_opt_zh:"中文", lo_lang_opt_en:"English", lo_cur:"Currency", lo_date_fmt:"Date format", lo_num:"Number format", lo_printer:"Printer / weighbridge", lo_save:"Save settings", lo_note:"Language switch applies instantly; other localization params are fixed per build (China ¥ / YYYY-MM-DD). Click “Save settings” to persist preference locally.",
     h_date:"Date", h_mat:"Material", h_form:"Form", h_color:"Color", h_w:"Weight", h_price:"Unit ¥", h_amt:"Amount",
     cm_title_new:"New Customer", cm_title_edit:"Edit Customer", cm_name:"Name *", cm_phone:"Phone", cm_bank:"Bank", cm_acct:"Account", cm_addr:"Address", cm_note:"Remark", cm_save:"Save", cm_cancel:"Cancel",
@@ -1425,10 +1301,10 @@ const FACTORIES={
 };
 /* 各工厂可见业务模块（导航能力感知） */
 const FACTORY_VIEWS={
-  Sagamu:['dashboard','receiving','today','customers','finance','rateset','logistics','produce','sell','inventory','pricing','search','reports','settings'],
-  OPIC:  ['dashboard','receiving','today','customers','finance','rateset','shipping','pricing','search','reports','settings'],
-  Ikeja: ['dashboard','receiving','today','customers','finance','rateset','shipping','pricing','search','reports','settings'],
-  ALL:   ['dashboard','receiving','today','customers','finance','rateset','logistics','produce','sell','inventory','pricing','search','reports','settings']
+  Sagamu:['dashboard','receiving','today','customers','finance','logistics','produce','sell','inventory','pricing','search','reports','settings'],
+  OPIC:  ['dashboard','receiving','today','customers','finance','shipping','pricing','search','reports','settings'],
+  Ikeja: ['dashboard','receiving','today','customers','finance','shipping','pricing','search','reports','settings'],
+  ALL:   ['dashboard','receiving','today','customers','finance','logistics','produce','sell','inventory','pricing','search','reports','settings']
 };
 /* 当前工厂是否仅收大料（分厂一） */
 function isBulkOnlyFactory(factory){return factory==='OPIC';}
@@ -1454,14 +1330,12 @@ function buildSeedUsers(){
 const ROLE_PERMS={
   boss:['view:*','customer:*','receive','ship','produce','sell','inbound','crush','pricing','settings.write','audit.view','record.delete','customer.create','customer.edit','customer.delete','account.manage','data.reset','view.allFactories','announce','finance.view','finance.manage'],
   devAdmin:['view:*','customer:*','receive','ship','produce','sell','inbound','crush','pricing','settings.write','audit.view','record.delete','customer.create','customer.edit','customer.delete','account.manage','data.reset','view.allFactories','announce','finance.view','finance.manage'],
-  factoryAdmin:['view:dashboard','view:customers','view:receiving','view:today','view:pricing','view:shipping','view:crush','view:produce','view:sell','view:logistics','view:inventory','view:search','view:reports','view:settings','view:rateset','view:custdetail','view:finance','customer.create','customer.edit','customer.delete','receive','ship','produce','sell','pricing','record.delete','settings.write','audit.view','finance.view','finance.manage'],
+  factoryAdmin:['view:dashboard','view:customers','view:receiving','view:today','view:pricing','view:shipping','view:crush','view:produce','view:sell','view:logistics','view:inventory','view:search','view:reports','view:settings','view:custdetail','view:finance','customer.create','customer.edit','customer.delete','receive','ship','produce','sell','pricing','record.delete','settings.write','audit.view','finance.view','finance.manage'],
   registrar:['view:dashboard','view:customers','view:receiving','view:today','view:shipping','view:search','view:custdetail','receive','ship','record.delete'],
   auditor:['view:dashboard','view:customers','view:today','view:search','view:reports','view:settings','view:custdetail','view:finance','audit.view','finance.view']
 };
 function can(perm){
   if(!currentRole)return false;
-  /* 汇率设置仅限老板：覆盖 devAdmin 的 view:* 通配与 factoryAdmin 的 view:rateset 显式授权 */
-  if(perm==='view:rateset'||perm==='finance.manage.rateset'){ return currentRole==='boss'; }
   const p=ROLE_PERMS[currentRole]||[];
   if(p.includes(perm)||p.includes(perm.split(/[:.]/)[0]+':*'))return true;
   return false;
@@ -1737,7 +1611,7 @@ let auditLog = [
   {time:"08:31",actor:"Receiving Clerk",action:"ac_receive",target:"RC-2040",detail:"540 kg PVC 破碎料"},
   {time:"Yesterday",actor:"Manager",action:"ac_edit",target:"Blessing",detail:"ac_edit_bank"}
 ];
-let settings = {lang:'zh', conn:'online', pending:3, lastSync:'2026-08-16 09:40', netMode:'lan', lanEnabled:true, syncUrl:'', syncKey:'', rate:230, rateHistory:[], lastSyncTs:0};
+let settings = {lang:'zh', conn:'online', pending:3, lastSync:'2026-08-16 09:40', netMode:'lan', lanEnabled:true, syncUrl:'', syncKey:'', rate:230, lastSyncTs:0};
 let invAdjust = {}; // 成品库存校正（袋）：'材质|颜色' -> 相对计算值的袋数偏移（老板可编辑）
 /* 财务记录：三厂独立录入、老板可全局汇总。
    {id, dt, factory, type:'income'|'expense', cat, amount, note, by, ts, rev, auto, src}
@@ -1766,57 +1640,9 @@ function rcPrice(m,f,c){const k=`${m}|${f}|${c}`;return priceMap[k]!==undefined?
 /* ============ Toast ============ */
 let toastTimer=null;
 function toast(msg){
-  const el=document.getElementById('toast');
-  if(!el)return; /* 守卫：DOM 缺失时不抛错 */
-  el.textContent=msg;el.classList.add('show');
+  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
   clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2600);
 }
-
-/* ============ Accessible Modal layer ============ */
-/* 统一的对话框管理：自动设置 role/aria、焦点陷阱、ESC 关闭、打开时锁定
-   body 滚动、关闭后将焦点归还触发元素，避免键盘用户被困/迷失焦点。 */
-const _modalStack=[];
-let _modalLastFocus=null;
-function _modalFocusable(m){
-  return m.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])');
-}
-function showModal(id){
-  const m=document.getElementById(id);if(!m)return;
-  if(!m.hasAttribute('role'))m.setAttribute('role','dialog');
-  m.setAttribute('aria-modal','true');
-  if(!m.getAttribute('aria-labelledby')){
-    const h=m.querySelector('h3,h2');if(h&&h.id)m.setAttribute('aria-labelledby',h.id);
-  }
-  _modalLastFocus=document.activeElement;
-  m.classList.remove('hidden');
-  document.body.style.overflow='hidden';
-  const f=_modalFocusable(m);
-  const first=f[0]||m;
-  /* 延迟到下一帧聚焦，确保元素已显示 */
-  requestAnimationFrame(()=>{ try{first.focus();}catch(e){} });
-  if(_modalStack.indexOf(id)<0)_modalStack.push(id);
-}
-function hideModal(id){
-  const m=document.getElementById(id);if(!m)return;
-  m.classList.add('hidden');
-  const i=_modalStack.indexOf(id);if(i>=0)_modalStack.splice(i,1);
-  if(!_modalStack.length){document.body.style.overflow='';if(_modalLastFocus&&_modalLastFocus.focus)try{_modalLastFocus.focus();}catch(e){}}
-}
-function closeTopModal(){
-  if(!_modalStack.length)return false;
-  hideModal(_modalStack[_modalStack.length-1]);
-  return true;
-}
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){ if(closeTopModal())e.preventDefault(); return; }
-  if(e.key!=='Tab')return;
-  const id=_modalStack[_modalStack.length-1];if(!id)return;
-  const m=document.getElementById(id);if(!m)return;
-  const f=_modalFocusable(m);if(!f.length)return;
-  const first=f[0],last=f[f.length-1];
-  if(e.shiftKey && document.activeElement===first){e.preventDefault();last.focus();}
-  else if(!e.shiftKey && document.activeElement===last){e.preventDefault();first.focus();}
-});
 
 /* ============ State persistence ============ */
 function saveState(){
@@ -1839,7 +1665,6 @@ function loadState(){
   if(Array.isArray(s.priceHist))priceHist=s.priceHist;
   if(Array.isArray(s.auditLog))auditLog=s.auditLog;
   if(s.settings&&typeof s.settings==='object')settings=Object.assign(settings,s.settings);
-  if(!Array.isArray(settings.rateHistory))settings.rateHistory=[];
   if(s.invAdjust&&typeof s.invAdjust==='object')invAdjust=s.invAdjust;
   if(Array.isArray(s.deletedGids))deletedGids=s.deletedGids.slice();
   if(Array.isArray(s.deletedUsers))deletedUsers=s.deletedUsers.slice();
@@ -1921,10 +1746,10 @@ function recomputeDashboard(){
   const recs=scopeRecords().filter(r=>r.dt===PLANT_TODAY);
   let recKg=0,recAmt=0,crushed=0,bulk=0,shipW=0,crushW=0,prodW=0,saleW=0,saleAmt=0,pendingW=0;
   recs.forEach(r=>{
-    if(r.ty==='Receive'){recKg+=r.tw;recAmt+=r.ta;r.items.forEach(it=>{if(it.f==='大料')bulk+=it.w;else if(it.f==='破碎料')crushed+=it.w;});}
+    if(r.ty==='Receive'){recKg+=r.tw;recAmt+=toNGN(toCNY(r.ta,r.currency||'NGN'));r.items.forEach(it=>{if(it.f==='大料')bulk+=it.w;else if(it.f==='破碎料')crushed+=it.w;});}
     else if(r.ty==='Ship'){shipW+=r.tw;}
     else if(r.ty==='Produce'){prodW+=r.items.reduce((s,it)=>s+it.outW,0);}
-    else if(r.ty==='Sale'){saleAmt+=r.ta;saleW+=r.tw;}
+    else if(r.ty==='Sale'){saleAmt+=toNGN(toCNY(r.ta,r.currency||'NGN'));saleW+=r.tw;}
     else if(r.ty==='Inbound'&&r.status==='待入库'){pendingW+=r.tw;}
   });
   const inv=computeInventory(scope);
@@ -1934,18 +1759,18 @@ function recomputeDashboard(){
   records.filter(r=>r.ty==='Ship'&&r.status==='在途').forEach(r=>{if(logisticsAllScope()||r.factory===currentFactory)transitW+=r.tw;});
   const setC=(i,l,v)=>{const e=document.getElementById('dash-c'+i);if(e)e.innerHTML=v;const le=document.getElementById('dash-l'+i);if(le)le.textContent=l;};
   const kg=v=>Math.round(v).toLocaleString()+' <small>kg</small>';
-  /* 首页总览：9 项指标（按工厂过滤；财务折算为人民币口径汇总） */
+  /* 首页总览：9 项指标（按工厂过滤；财务与回收金额统一折算为奈拉(NGN)主导口径汇总） */
   const finScope=finances.filter(f=>scope==='ALL'||f.factory===scope);
-  const income=finScope.filter(f=>f.type==='income').reduce((s,f)=>s+toCNY(f.amount,f.currency||'CNY'),0);
-  const expense=finScope.filter(f=>f.type==='expense').reduce((s,f)=>s+toCNY(f.amount,f.currency||'CNY'),0);
+  const income=finScope.filter(f=>f.type==='income').reduce((s,f)=>s+toNGN(f.amount,f.currency||'NGN'),0);
+  const expense=finScope.filter(f=>f.type==='expense').reduce((s,f)=>s+toNGN(f.amount,f.currency||'NGN'),0);
   const balance=income-expense;
-  const M=v=>fmtWithFx(v,'CNY');
+  const M=v=>fmtWithFx(v,'NGN');
   setC(1,t('d_ov_bulk'),kg(bulk));
   setC(2,t('d_ov_crushed'),kg(crushed));
   setC(3,t('d_ov_total'),kg(recKg));
   setC(4,t('d_ov_buyamt'),M(recAmt));
   setC(5,t('d_ov_income'),M(income));
-  setC(6,t('d_ov_expense'),fmtExpense(expense,'CNY'));
+  setC(6,t('d_ov_expense'),fmtExpense(expense,'NGN'));
   setC(7,t('d_ov_balance'),M(balance));
   setC(8,t('d_ov_produced'),kg(prodW));
   setC(9,t('d_ov_sold'),kg(saleW));
@@ -2022,7 +1847,7 @@ function flattenRaw(inv){const out={};for(const k in inv.raw){const p=k.split('|
 function flattenPellet(inv){const out={};for(const k in inv.pellet){const p=k.split('|');const nk=p[1]+'|'+(p[2]||'');out[nk]=(out[nk]||0)+inv.pellet[k];}return out;}
 
 /* ============ 单据详情（查看任意单据的完整信息，不再跳转客户页） ============ */
-function closeRecordModal(){hideModal('record-modal');}
+function closeRecordModal(){const m=document.getElementById('record-modal');if(m)m.classList.add('hidden');}
 function viewRecord(id){
   const r=records.find(x=>x.id===id);if(!r){toast(lang==='zh'?'单据不存在':'Record not found');return;}
   const m=document.getElementById('record-modal');if(!m)return;
@@ -2041,14 +1866,14 @@ function viewRecord(id){
       <div class="k">${lang==='zh'?'合计重量':'Total weight'}</div><div class="num">${(+r.tw||0).toLocaleString()} kg</div>
       <div class="k">${lang==='zh'?'合计金额':'Total amount'}</div><div class="num">¥ ${(+r.ta||0).toLocaleString()}</div>
     </div>
-      ${(r.items&&r.items.length)?`<table class="tbl"><thead><tr><th>${lang==='zh'?'材质':'Material'}</th><th>${lang==='zh'?'形态':'Form'}</th><th>${lang==='zh'?'颜色':'Color'}</th><th class="num">${lang==='zh'?'重量':'Weight'}</th><th class="num">${lang==='zh'?'单价':'Price'}</th><th class="num">${lang==='zh'?'金额':'Amount'}</th></tr></thead><tbody>${mat}</tbody></table>`:''}
+    ${(r.items&&r.items.length)?`<table class="tbl"><thead><tr><th>${lang==='zh'?'材质':'Material'}</th><th>${lang==='zh'?'形态':'Form'}</th><th>${lang==='zh'?'颜色':'Color'}</th><th class="num">${lang==='zh'?'重量':'Weight'}</th><th class="num">${lang==='zh'?'单价':'Price'}</th><th class="num">${lang==='zh'?'金额':'Amount'}</th></tr></thead><tbody>${mat}</tbody></table>`:''}
   `;
-  showModal('record-modal');
+  m.classList.remove('hidden');
 }
 /* ============ Today's receiving (end-of-day reconciliation) ============ */
 function renderToday(){
   const todays=visibleRecords().filter(r=>r.ty==='Receive'&&r.dt===PLANT_TODAY);
-  const totalA=todays.reduce((s,r)=>s+r.ta,0);
+  const totalA=todays.reduce((s,r)=>s+toNGN(toCNY(r.ta,r.currency||'NGN')),0);
   const crushedW=todays.reduce((s,r)=>s+(r.items||[]).filter(it=>it.f==='破碎料').reduce((a,it)=>a+(+it.w||0),0),0);
   const bulkW=todays.reduce((s,r)=>s+(r.items||[]).filter(it=>it.f==='大料').reduce((a,it)=>a+(+it.w||0),0),0);
   const sumW=crushedW+bulkW;
@@ -2057,15 +1882,15 @@ function renderToday(){
   set('td-crushed',crushedW.toLocaleString()+' <small>kg</small>');
   set('td-bulk',bulkW.toLocaleString()+' <small>kg</small>');
   set('td-sum',sumW.toLocaleString()+' <small>kg</small>');
-  set('td-a','¥ '+totalA.toLocaleString());
+  set('td-a',fmtWithFx(totalA,'NGN'));
   const map={};
-  todays.forEach(r=>{ if(!map[r.custId])map[r.custId]={id:r.custId,name:r.custName,w:0,a:0,n:0}; map[r.custId].w+=r.tw;map[r.custId].a+=r.ta;map[r.custId].n++; });
+  todays.forEach(r=>{ if(!map[r.custId])map[r.custId]={id:r.custId,name:r.custName,w:0,a:0,n:0,cur:r.currency||'NGN'}; map[r.custId].w+=r.tw;map[r.custId].a+=toNGN(toCNY(r.ta,r.currency||'NGN'));map[r.custId].n++; });
   const rows=Object.values(map);
   set('td-sup',rows.length);
-  document.getElementById('td-cust').innerHTML=rows.length?rows.map(x=>`<tr style="cursor:pointer" onclick="openCustomer('${esc(x.id)}')"><td><b>${esc(x.name)}</b></td><td class="num">${x.n}</td><td class="num">${x.w.toLocaleString()}</td><td class="num">¥ ${x.a.toLocaleString()}</td><td><span class="link">${t('c_view')} →</span></td></tr>`).join(''):`<tr><td colspan="5" class="muted">${lang==='zh'?'无':'None'}</td></tr>`;
+  document.getElementById('td-cust').innerHTML=rows.length?rows.map(x=>`<tr style="cursor:pointer" onclick="openCustomer('${x.id}')"><td><b>${esc(x.name)}</b></td><td class="num">${x.n}</td><td class="num">${x.w.toLocaleString()}</td><td class="num">${fmtWithFx(x.a,'NGN')}</td><td><span class="link">${t('c_view')} →</span></td></tr>`).join(''):`<tr><td colspan="5" class="muted">${lang==='zh'?'无':'None'}</td></tr>`;
   document.getElementById('td-list').innerHTML=todays.length?todays.map(r=>{
     const mat=(r.items||[]).map(it=>`${esc(it.m)} ${esc(it.f)} ${esc(it.c)} ${(+it.w).toLocaleString()}kg`).join('<br/>');
-    return `<tr><td>${esc(r.ticket||'—')}</td><td>${esc(r.dt)}</td><td><b>${esc(r.custName)}</b></td><td class="muted">${mat}</td><td class="num">${r.tw.toLocaleString()}</td><td class="num">¥ ${r.ta.toLocaleString()}</td><td><span class="link" onclick="viewRecord('${r.id}')">${t('c_view')}</span></td></tr>`;
+    return `<tr><td>${esc(r.ticket||'—')}</td><td>${esc(r.dt)}</td><td><b>${esc(r.custName)}</b></td><td class="muted">${mat}</td><td class="num">${r.tw.toLocaleString()}</td><td class="num">${fmtCur(r.ta,r.currency||'NGN')}</td><td><span class="link" onclick="viewRecord('${r.id}')">${t('c_view')}</span></td></tr>`;
   }).join(''):`<tr><td colspan="7" class="muted">${lang==='zh'?'无':'None'}</td></tr>`;
 }
 
@@ -2079,7 +1904,7 @@ function renderCustomers(){
     <td>${esc(c.phone)}</td><td>${esc(c.bank)}</td><td>${esc(c.acct)}</td>
     <td class="num">${c.kg.toLocaleString()} kg</td><td class="num">¥ ${(c.amt/1e6).toFixed(2)}M</td>
     <td class="num">${avg===null?'—':avg+(lang==='zh'?' 天/次':'d')}</td>
-    <td>${c.last}</td><td><span class="link" onclick="openCustomer('${esc(c.id)}')">${t('c_view')||'查看 →'}</span>${can('customer.delete')?` · <span class="link" style="color:var(--danger)" onclick="deleteCust('${esc(c.id)}')">${t('c_del')}</span>`:''}</td></tr>`;}).join('');
+    <td>${c.last}</td><td><span class="link" onclick="openCustomer('${c.id}')">${t('c_view')||'查看 →'}</span>${can('customer.delete')?` · <span class="link" style="color:var(--danger)" onclick="deleteCust('${c.id}')">${t('c_del')}</span>`:''}</td></tr>`;}).join('');
   document.getElementById('cust-count').textContent=list.length+' '+(lang==='zh'?'家供货商':'suppliers');
 }
 function filterCustomers(){renderCustomers();}
@@ -2117,15 +1942,15 @@ function openCustomer(id){
 function openCustNew(){if(!can('customer.create')){toast(lang==='zh'?'无新建客户权限':'No create permission');return;}currentCustId=null;document.getElementById('cust-modal-title').textContent=t('cm_title_new');
   ['cm-name','cm-phone','cm-bank','cm-acct','cm-addr','cm-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('cust-form-err').classList.add('hidden');
-  showModal('cust-modal');}
+  document.getElementById('cust-modal').classList.remove('hidden');}
 function openCustEdit(id){const c=customers.find(x=>x.id===id);if(!c)return;currentCustId=id;
   document.getElementById('cust-modal-title').textContent=t('cm_title_edit');
   document.getElementById('cm-name').value=c.name;document.getElementById('cm-phone').value=c.phone||'';
   document.getElementById('cm-bank').value=c.bank||'';document.getElementById('cm-acct').value=c.acct||'';
   document.getElementById('cm-addr').value=c.addr||'';document.getElementById('cm-note').value=c.note||'';
   document.getElementById('cust-form-err').classList.add('hidden');
-  showModal('cust-modal');}
-function closeCustModal(){hideModal('cust-modal');}
+  document.getElementById('cust-modal').classList.remove('hidden');}
+function closeCustModal(){document.getElementById('cust-modal').classList.add('hidden');}
 function deleteCust(id){
   if(!can('customer.delete')){toast(lang==='zh'?'无删除权限（仅工厂管理员 / 老板）':'No delete permission (factory admin/boss only)');return;}
   const c=customers.find(x=>x.id===id);if(!c)return;
@@ -2243,9 +2068,9 @@ function openFinModal(){
   document.getElementById('fin-note').value='';
   document.getElementById('fin-form-err').classList.add('hidden');
   finTypeChange();
-  showModal('fin-modal');
+  document.getElementById('fin-modal').classList.remove('hidden');
 }
-function closeFinModal(){hideModal('fin-modal');}
+function closeFinModal(){document.getElementById('fin-modal').classList.add('hidden');}
 /* 收支登记时：金额 + 货币 → 实时显示另一种货币等价 */
 function finFxPreview(){
   const fx=document.getElementById('fin-fx'); if(!fx)return;
@@ -2293,7 +2118,7 @@ function editFin(id){const f=finances.find(x=>x.id===id);if(!f)return;editingFin
   document.getElementById('fin-form-err').classList.add('hidden');
   finTypeChange();
   finFxPreview();
-  showModal('fin-modal');
+  document.getElementById('fin-modal').classList.remove('hidden');
 }
 function deleteFin(id){
   if(!can('finance.manage')){toast(lang==='zh'?'无财务删除权限':'No finance permission');return;}
@@ -2326,8 +2151,8 @@ function finTablePanel(titleKey,type,list){
   const rows=list.map(f=>`<tr>
     <td>${f.dt}</td>
     <td>${esc(f.cat)}</td>
-    <td class="num">${type==='expense'?fmtExpense(f.amount,f.currency||'CNY'):fmtWithFx(f.amount,f.currency||'CNY')}</td>
-    <td class="num muted small">${type==='expense'?('¥ '+fmtMoney(toCNY(f.amount,f.currency||'CNY'))):fmtWithFx(f.amount,f.currency||'CNY')}</td>
+    <td class="num">${type==='expense'?fmtExpense(f.amount,f.currency||'NGN'):fmtWithFx(f.amount,'NGN')}</td>
+    <td class="num muted small">${'₦ '+fmtMoney(toNGN(f.amount,f.currency||'NGN'))}</td>
     <td class="muted small">${esc(f.note||'')}${f.auto?` <span class="tag t-auto">${t('fin_auto')}</span>`:''}</td>
     <td>${esc(f.by||'')}</td>
     <td>${can('finance.manage')?`<span class="link" onclick="editFin('${f.id}')">${t('cd_edit')||'编辑'}</span> · <span class="link" style="color:var(--danger)" onclick="deleteFin('${f.id}')">${t('c_del')}</span>`:''}</td>
@@ -2414,7 +2239,7 @@ function recalc(){
   let tw=0,ta=0;document.querySelectorAll('#rc-body tr').forEach(tr=>{
     const w=+tr.querySelector('.rc-w').value||0;const p=+tr.querySelector('.rc-p').value||0;
     tr.querySelector('.rc-la').textContent='¥'+(w*p).toLocaleString();tw+=w;ta+=w*p;});
-  document.getElementById('rc-tw').textContent=tw.toLocaleString()+' kg';document.getElementById('rc-ta').textContent='¥ '+ta.toLocaleString();
+  document.getElementById('rc-tw').textContent=tw.toLocaleString()+' kg';const rcCur0=(document.getElementById('rc-cur')||{}).value||'NGN';document.getElementById('rc-ta').textContent=curSymbol(rcCur0)+' '+ta.toLocaleString();
 }
 function renderReceivingIfNeeded(){
   document.querySelectorAll('#rc-body tr').forEach(tr=>{
@@ -2445,7 +2270,8 @@ function saveReceiving(view){
   if(editingReceiveId){
     const r=records.find(x=>x.id===editingReceiveId);if(!r)return;
     const oldCust=r.custId;
-    r.dt=date;r.items=items;r.tw=tw;r.ta=ta;r.ticket=ticket;r.op=op;r.custName=c.name;r.note=`${ticket} · ${op}`;r.ts=Date.now();
+    const rcCurE=(document.getElementById('rc-cur')||{}).value||'NGN';
+    r.dt=date;r.items=items;r.tw=tw;r.ta=ta;r.ticket=ticket;r.op=op;r.custName=c.name;r.note=`${ticket} · ${op}`;r.currency=rcCurE;r.ts=Date.now();
     recalcCustomer(oldCust);recalcCustomer(c.id);
     auditLog.unshift({time:nowHMS(),actor:op,action:'ac_receive',target:ticket,detail:(lang==='zh'?'修改 · ':'edited · ')+c.name+' · '+tw.toLocaleString()+' kg'});
     editingReceiveId=null;
@@ -2458,12 +2284,13 @@ function saveReceiving(view){
     return;
   }
   const rid=genGid();
+  const rcCur1=(document.getElementById('rc-cur')||{}).value||'NGN';
   pushRec(Object.assign({id:rid,dt:date,ty:'Receive',custId:c.id,custName:c.name,batch:'',dest:'',note:`${ticket} · ${op}`,factory:fac},{
-    items, tw, ta, ticket, op
+    items, tw, ta, ticket, op, currency:rcCur1
   }));
   c.kg+=tw;c.amt+=ta;c.last=date;
   settings.pending=(settings.pending||0)+1;
-  auditLog.unshift({time:nowHMS(),actor:op,action:'ac_receive',target:ticket,detail:`${c.name} · ${tw.toLocaleString()} kg · ¥ ${ta.toLocaleString()}`});
+  auditLog.unshift({time:nowHMS(),actor:op,action:'ac_receive',target:ticket,detail:`${c.name} · ${tw.toLocaleString()} kg · ${curSymbol(rcCur1)} ${ta.toLocaleString()}`});
   saveState();refreshAfterSave();
   const savedTicket=ticket;
   const nextT=incTicket(savedTicket);
@@ -2490,6 +2317,7 @@ function editReceive(id){
   document.getElementById('rc-date').value=r.dt;
   document.getElementById('rc-ticket').value=r.ticket||'';
   document.getElementById('rc-op').value=r.op||'';
+  const rcEl=document.getElementById('rc-cur');if(rcEl)rcEl.value=r.currency||'NGN';
   const tb=document.getElementById('rc-body');tb.innerHTML='';
   (r.items||[]).forEach(it=>tb.appendChild(buildRow({m:it.m,f:it.f,c:it.c,w:it.w,p:it.p,manual:true})));
   const sb=document.getElementById('rc-save-btn');if(sb)sb.textContent=(lang==='zh'?'保存修改':'Save changes');
@@ -2554,8 +2382,8 @@ function printTicket(){
 }
 
 /* ============ OCR ticket entry (skeleton) ============ */
-function openOcr(){showModal('ocr-modal');document.getElementById('ocr-result').classList.add('hidden');document.getElementById('ocr-preview').textContent='';document.getElementById('ocr-file').value='';}
-function closeOcr(){hideModal('ocr-modal');}
+function openOcr(){document.getElementById('ocr-modal').classList.remove('hidden');document.getElementById('ocr-result').classList.add('hidden');document.getElementById('ocr-preview').textContent='';document.getElementById('ocr-file').value='';}
+function closeOcr(){document.getElementById('ocr-modal').classList.add('hidden');}
 function ocrPreview(){const f=document.getElementById('ocr-file');if(f.files&&f.files[0])document.getElementById('ocr-preview').textContent=(lang==='zh'?'已选择文件：':'Selected: ')+f.files[0].name;}
 const COLOR_CODE={
   'PP':{'l':'透明','b':'黑色','c':'单色','w':'白色','r':'红色','y':'黄色','bl':'蓝色','g':'绿色','p':'紫色','m':'混合'},
@@ -2727,7 +2555,7 @@ function renderShipList(){
   const fac=effectiveFactory();
   const list=records.filter(r=>r.ty==='Ship'&&(currentRole==='boss'&&currentFactory===ALL_VIEW||r.factory===fac||(currentRole==='boss'&&currentFactory==='Sagamu')));
   if(!list.length){el.innerHTML=`<tr><td colspan="7" class="muted">${lang==='zh'?'暂无发货记录':'No shipments'}</td></tr>`;return;}
-  el.innerHTML=list.map(r=>`<tr><td>${esc(r.dt||'')}</td><td>${FACTORIES[r.factory]?FACTORIES[r.factory].name:esc(r.factory)}</td><td>${esc(r.batch||'')}</td><td>${esc(r.dest||'—')}</td><td class="num">${Math.round(r.tw).toLocaleString()}</td><td>${statusTag(r.status||'在途')}</td><td><span class="link" onclick="editShip('${esc(r.id)}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteShip('${esc(r.id)}')">${t('delete')}</span></td></tr>`).join('');
+  el.innerHTML=list.map(r=>`<tr><td>${r.dt}</td><td>${FACTORIES[r.factory]?FACTORIES[r.factory].name:r.factory}</td><td>${r.batch}</td><td>${esc(r.dest||'—')}</td><td class="num">${Math.round(r.tw).toLocaleString()}</td><td>${statusTag(r.status||'在途')}</td><td><span class="link" onclick="editShip('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteShip('${r.id}')">${t('delete')}</span></td></tr>`).join('');
 }
 function editShip(id){
   const r=records.find(x=>x.id===id&&x.ty==='Ship');if(!r)return;
@@ -2809,7 +2637,7 @@ function statusTag(s){
   return `<span class="tag ${m[0]}">${lbl}</span>`;
 }
 /* ===== Reconstructed JS (Crush module intentionally removed) ===== */
-const titles={dashboard:'nav_dashboard',receiving:'nav_receiving',today:'nav_today',customers:'nav_customers',produce:'nav_produce',sell:'nav_sell',inventory:'nav_inventory',shipping:'nav_shipping',logistics:'nav_logistics',pricing:'nav_pricing',search:'nav_search',reports:'nav_reports',settings:'nav_settings',rateset:'nav_rateset'};
+const titles={dashboard:'nav_dashboard',receiving:'nav_receiving',today:'nav_today',customers:'nav_customers',produce:'nav_produce',sell:'nav_sell',inventory:'nav_inventory',shipping:'nav_shipping',logistics:'nav_logistics',pricing:'nav_pricing',search:'nav_search',reports:'nav_reports',settings:'nav_settings'};
 const roleBadgeMap={boss:{zh:'老板',en:'Boss'},devAdmin:{zh:'开发管理员',en:'Dev Admin'},factoryAdmin:{zh:'工厂管理员',en:'Factory Admin'},registrar:{zh:'登记员',en:'Registrar'},auditor:{zh:'审计员',en:'Auditor'}};
 const lanDevices=[{name:'OPIC 终端',ip:'192.168.1.21'},{name:'Ikeja 终端',ip:'192.168.1.22'},{name:'仓库 PDA',ip:'192.168.1.30'}];
 let currentPeriod='month'; /* 报表周期：month / quarter / year / all */
@@ -2926,14 +2754,16 @@ function addSellRow(o){
 }
 function sellRecalc(){
   let tot=0;
+  const cur=(document.getElementById('sl-cur')||{}).value||'NGN';
+  const sym=curSymbol(cur);
   document.querySelectorAll('#sl-body tr').forEach(tr=>{
     const m=tr.querySelector('.sl-m').value,c=tr.querySelector('.sl-c').value,bags=Math.max(0,Math.floor(+tr.querySelector('.sl-w').value||0)),p=+tr.querySelector('.sl-p').value||0;
     const avail=availFor(m,c);
     const av=tr.querySelector('.sl-avail');if(av)av.textContent=Math.round(avail/BAG_KG).toLocaleString()+' '+unitBag();
-    const am=tr.querySelector('.sl-amt');if(am)am.textContent='¥'+((bags*BAG_KG)*p).toLocaleString();
+    const am=tr.querySelector('.sl-amt');if(am)am.textContent=sym+((bags*BAG_KG)*p).toLocaleString();
     tot+=(bags*BAG_KG)*p;
   });
-  const tEl=document.getElementById('sl-total');if(tEl)tEl.textContent='¥ '+tot.toLocaleString();
+  const tEl=document.getElementById('sl-total');if(tEl)tEl.textContent=sym+' '+tot.toLocaleString();
 }
 function resetSell(){
   editingSellId=null;
@@ -2964,15 +2794,17 @@ function saveSell(){
   if(editingSellId){
     const r=records.find(x=>x.id===editingSellId);if(!r)return;
     const order=r.batch;
-    r.dt=date;r.custName=cust;r.items=items;r.tw=items.reduce((s,it)=>s+it.w,0);r.ta=tot;r.note=cust;r.ts=Date.now();
-    auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_sale',target:order,detail:(lang==='zh'?'修改 · ':'edited · ')+cust+' · ¥ '+tot.toLocaleString()});
+    const cur=(document.getElementById('sl-cur')||{}).value||'NGN';
+    r.dt=date;r.custName=cust;r.items=items;r.tw=items.reduce((s,it)=>s+it.w,0);r.ta=tot;r.currency=cur;r.note=cust;r.ts=Date.now();
+    auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_sale',target:order,detail:(lang==='zh'?'修改 · ':'edited · ')+cust+' · '+curSymbol(cur)+' '+tot.toLocaleString()});
     editingSellId=null;
     const sb=document.getElementById('sl-save-btn');if(sb)sb.textContent=t('sell_save');
     toast(lang==='zh'?'出售单已修改':'Sale updated');
   }else{
     const order='SO-'+nextBatchNum('SO-');
-    pushRec({id:genGid(),dt:date,ty:'Sale',custId:0,custName:cust,items,tw:items.reduce((s,it)=>s+it.w,0),ta:tot,ticket:'',op:opName(),batch:order,note:cust,factory:fac});
-    auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_sale',target:order,detail:`${cust} · ¥ ${tot.toLocaleString()}`});
+    const cur=(document.getElementById('sl-cur')||{}).value||'NGN';
+    pushRec({id:genGid(),dt:date,ty:'Sale',custId:0,custName:cust,items,tw:items.reduce((s,it)=>s+it.w,0),ta:tot,currency:cur,ticket:'',op:opName(),batch:order,note:cust,factory:fac});
+    auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_sale',target:order,detail:`${cust} · ${curSymbol(cur)} ${tot.toLocaleString()}`});
     toast(lang==='zh'?`出售单 ${order} 已保存`:`Sale ${order} saved`);
   }
   settings.pending=(settings.pending||0)+1;
@@ -2985,6 +2817,7 @@ function editSell(id){
   document.getElementById('sl-cust').value=r.custName||'';
   document.getElementById('sl-date').value=r.dt;
   document.getElementById('sl-order').value=r.batch||('SO-'+nextBatchNum('SO-'));
+  const scEl=document.getElementById('sl-cur');if(scEl)scEl.value=r.currency||'NGN';
   const tb=document.getElementById('sl-body');tb.innerHTML='';
   (r.items||[]).forEach(it=>addSellRow({m:it.m,c:it.c,bags:it.bags,p:it.p}));
   const sb=document.getElementById('sl-save-btn');if(sb)sb.textContent=(lang==='zh'?'保存修改':'Save changes');
@@ -3008,10 +2841,10 @@ function renderSell(){
   const invRows=Object.keys(pel).filter(k=>pel[k]>0.0001).sort().map(k=>{const [m,c]=k.split('|');return `<tr><td><b>${m}</b></td><td>${c?esc(colorLabel(c)):'—'}</td><td class="num">${Math.round(pel[k]/BAG_KG).toLocaleString()} ${unitBag()}</td></tr>`;}).join('');
   setHTML('sl-inv', invRows||`<tr><td colspan="3" class="muted">—</td></tr>`);
   const list=records.filter(r=>r.ty==='Sale'&&(fac==='Sagamu'||r.factory===fac));
-  const rev=list.reduce((s,r)=>s+r.ta,0);
-  setHTML('sl-rev', (lang==='zh'?'累计销售 ':'Revenue ')+'¥ '+rev.toLocaleString());
+  const rev=list.reduce((s,r)=>s+toNGN(toCNY(r.ta,r.currency||'NGN')),0);
+  setHTML('sl-rev', (lang==='zh'?'累计销售 ':'Revenue ')+fmtWithFx(rev,'NGN'));
   let rows='';
-  list.forEach(r=>(r.items||[]).forEach(it=>{rows+=`<tr><td>${r.dt}</td><td>${r.batch}</td><td><b>${esc(r.custName)}</b></td><td>${it.m}</td><td>${esc(colorLabel(it.c))}</td><td class="num">${it.bags+' '+unitBag()}</td><td class="num">¥ ${it.p}</td><td class="num">¥ ${Math.round(it.w*it.p).toLocaleString()}</td><td><span class="link" onclick="editSell('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteSell('${r.id}')">${t('delete')}</span></td></tr>`;}));
+  list.forEach(r=>(r.items||[]).forEach(it=>{rows+=`<tr><td>${r.dt}</td><td>${r.batch}</td><td><b>${esc(r.custName)}</b></td><td>${it.m}</td><td>${esc(colorLabel(it.c))}</td><td class="num">${it.bags+' '+unitBag()}</td><td class="num">${fmtCur(it.p,r.currency||'NGN')}</td><td class="num">${fmtCur(Math.round(it.w*it.p),r.currency||'NGN')}</td><td><span class="link" onclick="editSell('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteSell('${r.id}')">${t('delete')}</span></td></tr>`;}));
   setHTML('sl-list', rows||`<tr><td colspan="9" class="muted">${lang==='zh'?'暂无记录':'No records'}</td></tr>`);
 }
 
@@ -3129,9 +2962,9 @@ function repAggregate(period){
   const recs=scopeRecords();
   let recv=0,ship=0,amt=0;
   recs.forEach(r=>{
-    if(r.ty==='Receive'){recv+=r.tw;amt+=r.ta;}
+    if(r.ty==='Receive'){recv+=r.tw;amt+=toNGN(toCNY(r.ta,r.currency||'NGN'));}
     else if(r.ty==='Ship')ship+=r.tw;
-    else if(r.ty==='Sale')amt+=r.ta;
+    else if(r.ty==='Sale')amt+=toNGN(toCNY(r.ta,r.currency||'NGN'));
   });
   return {recv,ship,amt};
 }
@@ -3142,7 +2975,7 @@ function setPeriod(p,btn){
     const setC=(i,v)=>{const e=document.getElementById('rv'+i);if(e)e.innerHTML=v;};
     setC(1,Math.round(a.recv).toLocaleString()+' <small>kg</small>');
     setC(2,Math.round(a.ship).toLocaleString()+' <small>kg</small>');
-    setC(3,'¥ '+(a.amt/1e6).toFixed(1)+' <small>M</small>');
+    setC(3,'₦ '+(a.amt/1e6).toFixed(1)+' <small>M</small>');
     const diff=a.recv-a.ship;
     setC(4,Math.round(diff).toLocaleString()+' <small>kg</small>');
     const trend=document.getElementById('rep-trend');if(trend)svgLine(trend,[a.recv],[a.ship],['收','发']);
@@ -3150,42 +2983,12 @@ function setPeriod(p,btn){
     const pie=document.getElementById('rep-pie');if(pie)svgPie(pie,[{l:'大料',v:a.recv*0.6,c:'#2563eb'},{l:'破碎料',v:a.recv*0.4,c:'#16a34a'}]);
   }catch(e){}
 }
-function setTab(t,btn){document.querySelectorAll('#set-tabs button').forEach(b=>b.classList.toggle('active',b.dataset.t===t));document.querySelectorAll('#view-settings .panel').forEach(p=>p.classList.toggle('hidden',p.id!=='tab-'+t));if(t==='sync')renderSyncConfig();if(t==='rate')renderRateTab();}
+function setTab(t,btn){document.querySelectorAll('#set-tabs button').forEach(b=>b.classList.toggle('active',b.dataset.t===t));document.querySelectorAll('#view-settings > .panel').forEach(p=>p.classList.toggle('hidden',p.id!=='tab-'+t));if(t==='sync')renderSyncConfig();if(t==='rate')renderRateTab();}
 
 /* ===== Settings / Sync ===== */
-function renderRateTab(){const inp=document.getElementById('rate-input-tab');if(inp)inp.value=(settings.rate>0)?settings.rate:'';rateConvertPreview();}
+function renderRateTab(){const inp=document.getElementById('rate-input');if(inp)inp.value=(settings.rate>0)?settings.rate:'';rateConvertPreview();}
 function rateChanged(){const out=document.getElementById('fx-out');if(out)out.textContent='';}
-/* 汇率校验：正数、0 < v ≤ 100000、最多 2 位小数 */
-function rateValid(v){ return typeof v==='number' && isFinite(v) && v>0 && v<=100000 && Math.round(v*100)===v*100; }
-/* 读取当前可见的汇率输入框（独立菜单用 #rate-input，设置页用 #rate-input-tab，二者 id 不同避免冲突） */
-function activeRateInput(){const a=document.getElementById('rate-input');if(a&&a.offsetParent!==null)return a;const b=document.getElementById('rate-input-tab');if(b&&b.offsetParent!==null)return b;return a||b;}
-function saveRate(){
-  /* 汇率设置仅限老板：devAdmin 虽有 view:* / finance.manage，亦不允许设置汇率 */
-  if(currentRole!=='boss'){toast(lang==='zh'?'仅老板可设置汇率':'Only boss can set the exchange rate');return;}
-  const raw=activeRateInput().value;
-  const v=parseFloat(raw);
-  if(!rateValid(v)){toast(lang==='zh'?'汇率无效：需为 0–100000 之间的正数，最多 2 位小数':'Invalid rate: positive number 0–100000, ≤2 decimals');return;}
-  const old=settings.rate>0?settings.rate:null;
-  if(old!==null && old===v){toast(lang==='zh'?'汇率未变化':'Rate unchanged');return;}
-  settings.rate=v;
-  /* 变更记录：时间 / 修改人 / 旧→新，便于追溯 */
-  settings.rateHistory.unshift({ts:Date.now(), time:nowStr(), by:opName(), from:old, to:v});
-  if(settings.rateHistory.length>200)settings.rateHistory.length=200;
-  saveState();
-  /* 需求2：汇率即时生效，统一刷新所有关联视图（财务列表/汇总/每日收支/仪表盘卡片/双货币预览/独立菜单） */
-  refreshRateDependentViews();
-  toast(lang==='zh'?'汇率已生效：1 CNY = '+v+' NGN':'Rate applied: 1 CNY = '+v+' NGN');
-}
-/* 统一刷新所有依赖汇率的视图，避免各模块数据不一致 */
-function refreshRateDependentViews(){
-  renderFinance();recomputeDashboard();renderRateTab();renderRateHistory();renderRateSetView();
-}
-function renderRateHistory(){
-  const el=document.getElementById('rate-history');if(!el)return;
-  if(!settings.rateHistory||!settings.rateHistory.length){el.innerHTML=`<tr><td colspan="4" class="muted">${lang==='zh'?'暂无变更记录':'No changes yet'}</td></tr>`;return;}
-  el.innerHTML=settings.rateHistory.slice(0,50).map(h=>`<tr><td class="muted">${esc(h.time||'')}</td><td>${esc(h.by||'—')}</td><td class="num">${h.from!=null?('1¥ = '+h.from+'₦'):'—'}</td><td class="num"><b>1¥ = ${h.to}₦</b></td></tr>`).join('');
-}
-function renderRateSetView(){const inp=document.getElementById('rate-input');if(inp&&document.getElementById('view-rateset')&&document.getElementById('view-rateset').classList.contains('active'))inp.value=(settings.rate>0)?settings.rate:'';rateConvertPreview();}
+function saveRate(){if(!can('finance.manage')){toast(lang==='zh'?'无汇率修改权限（需财务权限）':'No permission to edit rate');return;}const v=parseFloat(document.getElementById('rate-input').value)||0;if(v<=0){toast(lang==='zh'?'汇率需大于 0':'Rate must be > 0');return;}settings.rate=v;saveState();renderFinance();recomputeDashboard();renderRateTab();toast(lang==='zh'?'汇率已保存：1 CNY = '+v+' NGN':'Rate saved: 1 CNY = '+v+' NGN');}
 function rateConvertPreview(){const amt=parseFloat(document.getElementById('fx-amt').value)||0;const cur=document.getElementById('fx-cur')?document.getElementById('fx-cur').value:'CNY';const out=document.getElementById('fx-out');if(!out)return;if(amt<=0||fxRate()<=0){out.innerHTML='—';return;}out.innerHTML=fmtWithFx(amt,cur);}
 function toggleBossTabs(){const rt=document.getElementById('set-tab-rate');if(rt)rt.style.display=can('finance.manage')?'':'none';}
 function updateRoleBadge(){
@@ -3281,9 +3084,7 @@ function syncPush(){
     deletedUsers:deletedUsers,
     deletedCustomers:deletedCustomers,
     finances:finances.map(f=>Object.assign({},f,{updatedTs:f.ts||0})),
-    deletedFinances:deletedFinances,
-    /* 汇率同步：仅同步 rate 与变更记录，使各厂区/设备展示口径一致（LWW 由 lastRateTs 决定） */
-    rate:settings.rate, rateHistory:settings.rateHistory, lastRateTs:settings.lastRateTs||0
+    deletedFinances:deletedFinances
   });
   return fetch(SYNC.url()+'/sync/push',{method:'POST',headers:SYNC.headers(),body})
     .then(r=>r.json()).then(j=>{
@@ -3291,7 +3092,7 @@ function syncPush(){
       return !!(j&&j.ok);
     }).catch(e=>{ console.warn('syncPush failed',e); return false; });
 }
-function applyRemote(remoteRecs, deleted, remoteUsers, remoteCustomers, remoteDelUsers, remoteDelCustomers, remoteFinances, remoteDelFinances, remoteRate, remoteRateHistory, remoteLastRateTs){
+function applyRemote(remoteRecs, deleted, remoteUsers, remoteCustomers, remoteDelUsers, remoteDelCustomers, remoteFinances, remoteDelFinances){
   const map={}; records.forEach(r=>{map[r.id]=r;});
   (remoteRecs||[]).forEach(rr=>{
     if(rr.id==null)return;
@@ -3330,12 +3131,6 @@ function applyRemote(remoteRecs, deleted, remoteUsers, remoteCustomers, remoteDe
     else if((rf.ts||0) > (local.ts||0) || ((rf.ts||0)===(local.ts||0) && (rf.rev||0) > (local.rev||0))){ Object.assign(local, rf); }
   });
   (remoteDelFinances||[]).forEach(fid=>{ finances=finances.filter(f=>f.id!==fid); if(deletedFinances.indexOf(fid)<0)deletedFinances.push(fid); });
-  /* 汇率同步：按 lastRateTs 做 LWW，使各厂区/设备展示口径一致，避免汇率在多端不一致 */
-  if(remoteLastRateTs && (remoteLastRateTs > (settings.lastRateTs||0))){
-    if(typeof remoteRate==='number' && remoteRate>0) settings.rate=remoteRate;
-    if(Array.isArray(remoteRateHistory)) settings.rateHistory=remoteRateHistory;
-    settings.lastRateTs=remoteLastRateTs;
-  }
   /* 同步后，若当前登录账号对象被替换，重新指向最新引用，避免会话 stale */
   if(currentUser){ const fresh=users.find(u=>u.username===currentUser.username); if(fresh)currentUser=fresh; }
 }
@@ -3346,7 +3141,10 @@ function syncPull(){
   return fetch(SYNC.url()+'/sync/pull?since='+since,{headers:SYNC.headers()})
     .then(r=>r.json()).then(j=>{
       if(!j||!j.records) return false;
-      applyRemote(j.records, j.deleted||[], j.users||[], j.customers||[], j.deletedUsers||[], j.deletedCustomers||[], j.finances||[], j.deletedFinances||[], j.rate, j.rateHistory, j.lastRateTs);
+      applyRemote(j.records, j.deleted||[], j.users||[], j.customers||[], j.deletedUsers||[], j.deletedCustomers||[], j.finances||[], j.deletedFinances||[]);
+      /* 数据互通：拉取后重新校验「发货→总厂入库」配对，确保总厂始终有可确认的来料入库单
+         （分厂发货在分厂本地生成入库单可能因未同步而不到达总厂，此处以总厂本地补齐） */
+      reconcileAll();
       settings.lastSync=nowStr();
       // 用服务端权威时间作为下次增量基线，避免客户端时钟偏差导致漏拉
       settings.lastSyncTs = j.serverTime || Date.now();
@@ -3502,13 +3300,6 @@ function togglePwd(){
   btn.setAttribute('aria-label', show?'隐藏密码':'显示密码');
   el.focus();
 }
-/* 通用密码显示切换（按元素 id），供多个密码框复用 */
-function togglePwdById(id){
-  const el=document.getElementById(id); if(!el)return;
-  const show = el.type==='password';
-  el.type = show?'text':'password';
-  el.focus();
-}
 /* 记住账号密码：勾选后保存明文账号+密码到本地，下次自动填充；取消勾选则清除 */
 const REMEMBER_KEY='rf_remember_v1';
 function saveRemembered(){
@@ -3553,20 +3344,8 @@ function signIn(){
   }
   finishSignIn(user, pw, fac, err);
 }
-function finishSignIn(user, pw, fac, err, retried){
-  if(!verifyPassword(pw,user.salt,user.passwordHash)){
-    /* 本地密码不匹配：很可能是其他设备刚改了密码而本地仍是旧哈希。
-       若已开启同步且尚未重试过，先拉取云端最新账号再尝试一次，确保新密码即时在多端生效。 */
-    if(SYNC.enabled() && !retried){
-      err.textContent=lang==='zh'?'正在校验云端最新密码…':'Verifying cloud password…';
-      return syncPull().then(()=>{
-        const fresh=users.find(x=>x.username===user.username);
-        if(fresh) finishSignIn(fresh, pw, fac, err, true);
-        else err.textContent=t('login_bad');
-      }).catch(()=>{ err.textContent=t('login_bad'); });
-    }
-    err.textContent=t('login_bad');return;
-  }
+function finishSignIn(user, pw, fac, err){
+  if(!verifyPassword(pw,user.salt,user.passwordHash)){err.textContent=t('login_bad');return;}
   if(fac!==ALL_VIEW && !user.factories.includes(fac)){err.textContent=t('login_badfac');return;}
   setSession(user,fac);
   saveRemembered();
@@ -3611,7 +3390,6 @@ function go(view){
   else if(view==='settings')renderAccounts();
   else if(view==='search')initSearchDates();
   else if(view==='finance')renderFinance();
-  else if(view==='rateset'){renderRateSetView();renderRateHistory();}
   else if(view==='dashboard'){ recomputeDashboard(); drawDashboardCharts(); renderToday(); }
 }
 function toggleSidebar(){const sb=document.getElementById('sidebar')||document.querySelector('.sidebar');const sc=document.getElementById('scrim');const hb=document.getElementById('hamburger');if(!sb)return;const open=sb.classList.toggle('open');if(sc)sc.classList.toggle('show',open);if(hb)hb.setAttribute('aria-expanded',open?'true':'false');}
@@ -3625,36 +3403,11 @@ function initSearchDates(){
   }catch(e){}
 }
 function renderAll(){renderCustomers();renderPricing();runSearch();runChurn();renderToday();renderShipRows();renderProduce();renderSell();renderReceiveList();renderLogistics();renderInventory();renderFinance();recomputeDashboard();drawDashboardCharts();renderAudit();updateSyncUI();renderLan();setPeriod(currentPeriod,document.querySelector('#rep-seg .active'));}
-/* 按当前激活视图分派渲染（不切换视图），供保存后增量刷新复用，避免重渲染所有视图 */
-function renderCurrentView(){
-  const active=document.querySelector('.view.active');
-  const view=active&&active.id ? active.id.replace('view-','') : 'dashboard';
-  switch(view){
-    case 'produce': renderProduce(); break;
-    case 'sell': renderSell(); break;
-    case 'receiving': renderReceiveList(); break;
-    case 'logistics': renderLogistics(); break;
-    case 'inventory': renderInventory(); break;
-    case 'shipping': renderShipRows(); renderShipList(); break;
-    case 'reports': setPeriod(currentPeriod,document.querySelector('#rep-seg .active')); break;
-    case 'settings': renderAccounts(); break;
-    case 'search': initSearchDates(); break;
-    case 'finance': renderFinance(); break;
-    case 'customers': renderCustomers(); break;
-    case 'today': renderToday(); break;
-    case 'dashboard': recomputeDashboard(); drawDashboardCharts(); renderToday(); break;
-    default: break;
-  }
-}
-/* 保存后增量刷新：仅刷新仪表盘统计 + 当前可见视图 + 许可/同步状态，
-   不再全量重绘所有（含不可见）视图，避免卡顿与输入焦点丢失。
-   仪表盘图表仅在仪表盘可见时重绘（SVG 重绘成本高）。 */
 function refreshAfterSave(){
-  recomputeDashboard();
-  const onDash=document.getElementById('view-dashboard') && document.getElementById('view-dashboard').classList.contains('active');
-  if(onDash) drawDashboardCharts();
-  renderCurrentView();
-  updateSyncUI();renderLan();
+  recomputeDashboard();drawDashboardCharts();
+  renderCustomers();runSearch();runChurn();renderToday();
+  renderInventory();renderProduce();renderSell();renderReceiveList();renderLogistics();renderShipList();renderFinance();
+  renderAudit();updateSyncUI();renderLan();
 }
 function refreshControls(){
   const show=(id,ok)=>{const e=document.getElementById(id);if(e)e.style.display=ok?'':'none';};
@@ -3667,18 +3420,14 @@ function refreshControls(){
   const cmf=document.getElementById('cm-factory'), cmfr=document.getElementById('cm-factory-readonly');
   if(cmf&&cmfr){ if(currentRole==='boss'&&currentFactory===ALL_VIEW){cmf.style.display='';cmfr.textContent='';} else {cmf.style.display='none';const f=FACTORIES[currentFactory];cmfr.textContent=f?(f.name+' · '+f.loc):'—';} }
 }
-function openForceChange(){showModal('pwd-modal');}
+function openForceChange(){const m=document.getElementById('pwd-modal');if(m)m.classList.remove('hidden');}
 function submitForceChange(){
   const nw=document.getElementById('pwd-new').value, cf=document.getElementById('pwd-confirm').value, err=document.getElementById('pwd-err');
   if(!passwordStrong(nw)){err.textContent=t('pwd_weak');return;}
   if(nw!==cf){err.textContent=t('pwd_mismatch');return;}
   currentUser.salt=genSalt();currentUser.passwordHash=hashPassword(nw,currentUser.salt);currentUser.mustChange=false;
-  currentUser.updatedTs=Date.now(); /* 关键：打时间戳，使 LWW 合并时新密码哈希在所有设备生效 */
-  settings.pending=(settings.pending||0)+1; /* 触发下一次自动同步将新哈希推送到服务器 */
   saveState();setSession(currentUser,currentFactory);err.textContent='';
-  hideModal('pwd-modal');
-  /* 修改密码后立即把新哈希推送到云端，确保其他设备拉取时已是新密码 */
-  if(SYNC.enabled()) syncPush().then(()=>syncPull());
+  const m=document.getElementById('pwd-modal');if(m)m.classList.add('hidden');
   enterApp();
 }
 function logout(){
@@ -3702,7 +3451,7 @@ function renderAccounts(){
 let editingAcct=null; /* 非空表示正在编辑已有账号（老板赋权） */
 function openAcctModal(presetUser){
   editingAcct = presetUser || null;
-  showModal('acct-modal');
+  const m=document.getElementById('acct-modal');if(m)m.classList.remove('hidden');
   const fc=document.getElementById('ac-factories');if(fc)fc.innerHTML=ALL_FACTORY_IDS.map(f=>`<label class="chk"><input type="checkbox" value="${f}" checked/> ${FACTORIES[f]?FACTORIES[f].name:f}</label>`).join(' ');
   const msg=document.getElementById('ac-msg');if(msg)msg.textContent='';
   const pw=document.getElementById('ac-pass');if(pw)pw.value=genPassword(16);
@@ -3721,7 +3470,7 @@ function openAcctModal(presetUser){
   }
 }
 function loadAcct(username){ openAcctModal(username); }
-function closeAcctModal(){hideModal('acct-modal');}
+function closeAcctModal(){const m=document.getElementById('acct-modal');if(m)m.classList.add('hidden');}
 function submitAcct(){
   if(!can('account.manage')){toast(lang==='zh'?'无账号管理权限（仅老板）':'No permission (boss only)');return;}
   const username=(document.getElementById('ac-user').value||'').trim();
@@ -3756,8 +3505,8 @@ function submitAcct(){
   closeAcctModal();
 }
 /* ===== 公告（老板/开发管理员可发布，首页置顶） ===== */
-function openAnnounceModal(){ showModal('ann-modal'); const t=document.getElementById('ann-title'); if(t)t.value=''; const b=document.getElementById('ann-body'); if(b)b.value=''; }
-function closeAnnounceModal(){ hideModal('ann-modal'); }
+function openAnnounceModal(){ const m=document.getElementById('ann-modal'); if(m)m.classList.remove('hidden'); const t=document.getElementById('ann-title'); if(t)t.value=''; const b=document.getElementById('ann-body'); if(b)b.value=''; }
+function closeAnnounceModal(){ const m=document.getElementById('ann-modal'); if(m)m.classList.add('hidden'); }
 function submitAnnounce(){
   if(!can('announce')){toast(lang==='zh'?'无发布公告权限（仅老板）':'No permission');return;}
   const title=(document.getElementById('ann-title').value||'').trim();
@@ -3833,14 +3582,6 @@ function resetSelectedData(cat){
   toast(lang==='zh'?'已归零：'+catName:'Reset: '+catName);
 }
 /* ===== init ===== */
-/* 全局错误兜底：单个模块运行时异常不应使整个应用静默卡死，
-   捕获后给出可见反馈并避免白屏（调试信息仍进 console）。 */
-window.addEventListener('error',function(e){
-  if(e&&e.message) console.error('[app] uncaught:', e.message, e.error||'');
-});
-window.addEventListener('unhandledrejection',function(e){
-  console.error('[app] unhandled rejection:', (e&&e.reason)||'');
-});
 loadState();
 autoDetectSync(); /* 若由一体化服务器托管且未配置同步地址，自动指向同源服务器 */
 reconcileAll(); /* 启动即校验发货/入库关联完整性 */
@@ -3880,12 +3621,11 @@ if(!loadSession()){
 /* 心跳同步：在线且有待上传时，最多 60s 内自动同步到云端（双重保障，满足 ≤1 分钟要求） */
 if(typeof setInterval==='function'){ setInterval(syncTick, 20000); /* 在线时每 20s 自动推送本地变更并拉取其他厂区数据，满足 ≤1 分钟联网要求 */ }
 
-
 </script>
 <!-- ===================== Account modal ===================== -->
-<div id="acct-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="acct-modal-title">
+<div id="acct-modal" class="modal hidden">
   <div class="modal-card">
-    <div class="panel-head"><h3 id="acct-modal-title" data-i18n="acct_new">新增 / 注册账号</h3>
+    <div class="panel-head"><h3 data-i18n="acct_new">新增 / 注册账号</h3>
       <button class="btn ghost sm" onclick="closeAcctModal()">✕</button></div>
     <div class="panel-body">
       <div class="field"><label data-i18n="acct_username">账号</label><input id="ac-user" placeholder="工号 / 手机号 / 任意标识"/></div>
@@ -3897,7 +3637,7 @@ if(typeof setInterval==='function'){ setInterval(syncTick, 20000); /* 在线时�
       </select></div>
       <div class="field"><label data-i18n="acct_factories">所属工厂</label><div id="ac-factories" class="row"></div></div>
       <div class="field"><label data-i18n="acct_password">登录密码</label>
-        <div class="row"><div class="pwd-wrap" style="flex:1"><input id="ac-pass" type="password" placeholder="••••••••" autocomplete="new-password" style="width:100%"/><button type="button" class="pwd-toggle" onclick="togglePwdById('ac-pass')" aria-label="显示密码">👁</button></div><button class="btn ghost sm" onclick="document.getElementById('ac-pass').value=genPassword(16)" data-i18n="acct_genpw">自动生成</button></div>
+        <div class="row"><input id="ac-pass" type="text" style="flex:1"/><button class="btn ghost sm" onclick="document.getElementById('ac-pass').value=genPassword(16)" data-i18n="acct_genpw">自动生成</button></div>
       </div>
       <div class="row">
         <button class="btn eco" onclick="submitAcct()" data-i18n="acct_save">保存账号</button>
@@ -3909,18 +3649,18 @@ if(typeof setInterval==='function'){ setInterval(syncTick, 20000); /* 在线时�
 </div>
 
 <!-- ===================== Record detail modal ===================== -->
-<div id="record-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="record-modal-title">
+<div id="record-modal" class="modal hidden">
   <div class="modal-card">
-    <div class="panel-head"><h3 id="record-modal-title" data-i18n="rec_detail">单据详情</h3>
+    <div class="panel-head"><h3 data-i18n="rec_detail">单据详情</h3>
       <button class="btn ghost sm" onclick="closeRecordModal()">✕</button></div>
     <div class="panel-body" id="record-detail-body"></div>
   </div>
 </div>
 
 <!-- ===================== Announcement modal ===================== -->
-<div id="ann-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="ann-modal-title">
+<div id="ann-modal" class="modal hidden">
   <div class="modal-card">
-    <div class="panel-head"><h3 id="ann-modal-title" data-i18n="ann_post">发布公告</h3>
+    <div class="panel-head"><h3 data-i18n="ann_post">发布公告</h3>
       <button class="btn ghost sm" onclick="closeAnnounceModal()">✕</button></div>
     <div class="panel-body">
       <div class="field"><label data-i18n="ann_title">公告标题</label><input id="ann-title" placeholder="例如：国庆放假安排"/></div>
