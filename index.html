@@ -490,7 +490,7 @@
           <div class="field" style="align-self:flex-end"><span class="pill" data-i18n="p_hint">按颜色查看 / 修改单价（₦/kg）</span></div>
         </div>
         <div class="panel">
-          <div class="panel-head"><h3 data-i18n="p_title">价格主数据（₦/kg）</h3></div>
+          <div class="panel-head"><h3 data-i18n="p_title">价格主数据（₦/kg）</h3><div class="right"><span class="pill" id="pf-fac"></span></div></div>
           <div class="panel-body" style="padding:0">
             <table><thead><tr>
               <th data-i18n="h_mat">材质</th><th data-i18n="h_form">形态</th><th data-i18n="h_color">颜色</th>
@@ -515,15 +515,16 @@
               <div class="field"><label data-i18n="s_dest">目的地（可编辑）</label><input id="s-dest" value="总厂造粒厂 · 拉各斯"/></div>
               <div class="field" id="s-factory-wrap" style="display:none"><label data-i18n="liFactory">来源工厂 / Plant</label><select id="s-factory"><option value="Sagamu">总厂 · Sagamu</option><option value="OPIC">OPIC工厂</option><option value="Ikeja">IKEJA工厂</option></select></div>
             </div>
-            <div class="panel-head" style="border:none;padding:6px 0"><h3 style="font-size:13px" data-i18n="s_pick">配送物料（统一为破碎料）</h3></div>
-            <div class="note" data-i18n="s_pick_note">配送物料统一为破碎料；配送量请按实际装车量填写，不与收购量挂钩。</div>
+            <div class="panel-head" style="border:none;padding:6px 0"><h3 style="font-size:13px" data-i18n="s_pick">配送物料（只按形态，可混装多品种）</h3></div>
+            <div class="note" data-i18n="s_pick_note">配送量按实际装车量填写，不与收购量挂钩；混装多品种/颜色请在备注说明，总厂确认收货后计入原料库存。</div>
             <div class="tbl-scroll">
             <table>
-              <thead><tr><th data-i18n="h_mat">材质</th><th data-i18n="h_form">形态</th><th data-i18n="s_avail">可用(kg)</th><th data-i18n="s_ship">发货(kg)</th></tr></thead>
+              <thead><tr><th data-i18n="h_mat">材质</th><th data-i18n="h_form">形态</th><th data-i18n="s_ship">发货(kg)</th><th data-i18n="s_note">备注(混装说明)</th></tr></thead>
               <tbody id="ship-rows"></tbody>
             </table>
             </div>
             <div class="row mt">
+              <div class="field" style="flex:1 1 260px"><label data-i18n="s_note">发货备注</label><input id="s-shipnote" placeholder="e.g. 含 PP/PE/PVC 混合破碎料"/></div>
               <div class="field"><label data-i18n="s_carrier">承运商</label><input id="s-carrier" value="GreenLine Logistics"/></div>
               <div class="field"><label data-i18n="s_vehicle">车牌</label><input id="s-vehicle" value="Lagos KN-2234"/></div>
               <div class="field"><label data-i18n="s_driver">司机</label><input id="s-driver" value="Emeka O."/></div>
@@ -698,6 +699,7 @@
               <div class="field"><label data-i18n="se_acct">银行卡号</label><input id="s-acct" placeholder="0123..." style="width:150px" oninput="runSearch()"/></div>
               <div class="field"><label data-i18n="se_from">起始</label><input id="s-from" type="date" value="" placeholder="不限" onchange="runSearch()"/></div>
               <div class="field"><label data-i18n="se_to">结束</label><input id="s-to" type="date" value="" placeholder="不限" onchange="runSearch()"/></div>
+              <div class="field"><label data-i18n="se_type">类型</label><select id="s-type" onchange="runSearch()"><option value="">全部类型</option></select></div>
               <div class="field"><label data-i18n="se_note">备注含</label><input id="s-note" placeholder="keyword" style="width:140px" oninput="runSearch()"/></div>
               <div class="field" style="align-self:flex-end"><button class="btn ghost sm" onclick="resetSearch()" data-i18n="se_reset">重置</button></div>
             </div>
@@ -1045,7 +1047,7 @@ const I18N = {
     p_title:"价格主数据（₦/kg）", p_cur:"当前 ₦/kg", p_apply2:"操作", p_status:"状态", p_hist:"调价历史", p_hint:"按颜色查看 / 修改单价（₦/kg）",
     pa_mat:"材质", pa_form:"形态",
     opt_bulk:"大料", opt_frag:"破碎料", opt_bulk2:"破碎后大料", opt_frag2:"收购破碎料",
-    s_title:"新建配送批次 → 总厂造粒", s_batch:"批次号（可手动输入）", s_date:"日期", s_dest:"目的地（可编辑）", s_pick:"选择配送库存（来自库存台账）",
+    s_title:"新建配送批次 → 总厂造粒", s_batch:"批次号（可手动输入）", s_date:"日期", s_dest:"目的地（可编辑）", s_pick:"选择配送库存（来自库存台账）", s_note:"发货备注",
     s_avail:"可用(kg)", s_ship:"配送(kg)", s_carrier:"承运商", s_vehicle:"车牌", s_driver:"司机", s_eta:"预计到厂", s_print:"🖨 打印配送单", s_save:"保存并同步至总厂", s_save_edit:"保存修改", s_recent:"近期发货记录",
     se_title:"组合检索与导出（含客户全字段）", se_name:"客户姓名", se_phone:"电话", se_acct:"银行卡号", se_from:"起始", se_to:"结束", se_note:"备注含", se_reset:"重置",
     se_csv:"⬇ CSV", se_xls:"⬇ Excel", se_pdf:"⬇ PDF", se_type:"类型", se_note2:"备注", se_count:"条记录", se_act:"操作",
@@ -1129,7 +1131,7 @@ const I18N = {
     p_title:"Price master (₦/kg)", p_cur:"Current ₦/kg", p_apply2:"Apply", p_status:"Status", p_hist:"Price change history", p_hint:"View / edit unit price by color (¥/kg)",
     pa_mat:"Material", pa_form:"Form",
     opt_bulk:"Bulk", opt_frag:"Crushed", opt_bulk2:"Crushed bulk", opt_frag2:"Purchased crushed",
-    s_title:"New dispatch batch → HQ Pelletizing", s_batch:"Batch # (editable)", s_date:"Date", s_dest:"Destination (editable)", s_pick:"Pick stock to dispatch (from inventory)",
+    s_title:"New dispatch batch → HQ Pelletizing", s_batch:"Batch # (editable)", s_date:"Date", s_dest:"Destination (editable)", s_pick:"Pick stock to dispatch (from inventory)", s_note:"Dispatch note",
     s_avail:"Available (kg)", s_ship:"Dispatch (kg)", s_carrier:"Carrier", s_vehicle:"Vehicle #", s_driver:"Driver", s_eta:"ETA at HQ", s_print:"🖨 Print dispatch manifest", s_save:"Save & sync to HQ", s_save_edit:"Save changes", s_recent:"Recent shipments",
     se_title:"Combined search & export (full customer info)", se_name:"Customer name", se_phone:"Phone", se_acct:"Bank account", se_from:"From", se_to:"To", se_note:"Note contains", se_reset:"Reset",
     se_csv:"⬇ CSV", se_xls:"⬇ Excel", se_pdf:"⬇ PDF", se_type:"Type", se_note2:"Note", se_count:"records", se_act:"Action",
@@ -1635,7 +1637,19 @@ records.forEach(recTotals);
 customers.forEach(c=>{if(c.id!=null)c.id=String(c.id);if(!c.factory)c.factory='Sagamu';});
 
 /* ============ Price lookup ============ */
-function rcPrice(m,f,c){const k=`${m}|${f}|${c}`;return priceMap[k]!==undefined?priceMap[k]:defaultPrice(m,f,c);}
+/* 价格主数据：各厂区独立（priceBy[factory][material|form|color]） */
+let priceBy = {Sagamu:{}, OPIC:{}, Ikeja:{}};
+function priceFactoryScope(){
+  const f=effectiveFactory();
+  return (priceBy[f]!==undefined)?f:'Sagamu';
+}
+function rcPrice(m,f,c){
+  const k=`${m}|${f}|${c}`;
+  const fac=priceFactoryScope();
+  if(priceBy[fac][k]!==undefined) return priceBy[fac][k];
+  if(fac!=='Sagamu' && priceBy['Sagamu'][k]!==undefined) return priceBy['Sagamu'][k]; /* 分厂缺价时回退总厂 */
+  return defaultPrice(m,f,c);
+}
 
 /* ============ Toast ============ */
 let toastTimer=null;
@@ -1646,7 +1660,7 @@ function toast(msg){
 
 /* ============ State persistence ============ */
 function saveState(){
-  Store.set(STATE_KEY,{customers,priceMap,records,priceHist,auditLog,settings,users,companyName:COMPANY.name,products,invAdjust,deletedGids,tombMeta,deletedUsers,deletedCustomers,finances,deletedFinances});
+  Store.set(STATE_KEY,{customers,priceBy,records,priceHist,auditLog,settings,users,companyName:COMPANY.name,products,invAdjust,deletedGids,tombMeta,deletedUsers,deletedCustomers,finances,deletedFinances});
   scheduleAutoSync();
 }
 function loadState(){
@@ -1659,7 +1673,13 @@ function loadState(){
   if(typeof s!=='object'||!s)return;
   if(typeof s.companyName==='string')COMPANY.name=s.companyName;
   if(Array.isArray(s.customers))customers=s.customers.map(c=>{if(c.id!=null)c.id=String(c.id);if(!c.factory)c.factory='Sagamu';if(!c.updatedTs)c.updatedTs=0;return c;});
-  if(s.priceMap&&typeof s.priceMap==='object')priceMap=s.priceMap;
+  if(s.priceBy&&typeof s.priceBy==='object'){
+    priceBy={Sagamu:{},OPIC:{},Ikeja:{}};
+    ['Sagamu','OPIC','Ikeja'].forEach(f=>{ if(s.priceBy[f]&&typeof s.priceBy[f]==='object')priceBy[f]=s.priceBy[f]; });
+  } else if(s.priceMap&&typeof s.priceMap==='object'){
+    /* 旧版本：平铺 priceMap 迁移到总厂价格 */
+    priceBy={Sagamu:Object.assign({},s.priceMap),OPIC:{},Ikeja:{}};
+  }
   if(s.products&&typeof s.products==='object')products=s.products;
   if(Array.isArray(s.records)){records=s.records.map(r=>{if(r.id!=null)r.id=String(r.id);if(!r.items)r.items=[];if(!r.factory)r.factory='Sagamu';if(!r.ts)r.ts=Date.parse((r.dt||'2026-01-01')+'T00:00:00')||Date.now();if(!r.rev)r.rev=1;recTotals(r);return r;});}
   if(Array.isArray(s.priceHist))priceHist=s.priceHist;
@@ -1698,7 +1718,7 @@ function setLang(l){
   const lo=document.getElementById('lo-lang');if(lo)lo.value=lang;
   const ph={ 'rc-name':t('rc_name_ph'), 'rc-bank':t('rc_bank_ph') };
   for(const id in ph){const el=document.getElementById(id);if(el)el.placeholder=ph[id];}
-  renderCustomers(); renderPricing(); runSearch(); runChurn(); renderReceivingIfNeeded(); renderAudit(); updateSyncUI(); renderToday();
+  renderCustomers(); renderPricing(); runSearch(); fillSearchType(); runChurn(); renderReceivingIfNeeded(); renderAudit(); updateSyncUI(); renderToday();
   setPeriod(currentPeriod,document.querySelector('#rep-seg .active'));
   recomputeDashboard(); drawDashboardCharts(); updateRoleBadge(); renderLan();
 }
@@ -2460,6 +2480,8 @@ function applyOcr(){
 /* ============ Pricing ============ */
 function renderPricing(){
   const m=document.getElementById('pf-mat').value,f=document.getElementById('pf-form').value;
+  const fac=priceFactoryScope();
+  const lb=document.getElementById('pf-fac');if(lb)lb.textContent=(lang==='zh'?'当前厂区价格：':'Prices for ')+(FACTORIES[fac]?FACTORIES[fac].name:fac);
   const cols = MAT_COLOR[`${m}|${f}`]||[];
   document.getElementById('price-body').innerHTML=cols.map(col=>{
     const p=rcPrice(m,f,col);
@@ -2472,12 +2494,13 @@ function renderPricing(){
 function applyPrice(m,f,c,btn){
   if(!can('pricing')){toast(lang==='zh'?'无调价权限':'No pricing permission');return;}
   const inp=btn.closest('tr').querySelector('.pp-i');const p=+inp.value||0;
-  priceMap[`${m}|${f}|${c}`]=p;
+  const fac=priceFactoryScope();
+  priceBy[fac][`${m}|${f}|${c}`]=p;
   const key=`${m}|${f}|${c}`;
-  priceHist.unshift({t:`${m} ${f} ${colorLabel(c)} → ¥${p}`,d:`${today()} · ${opName()}`, raw:key});
-  auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_price',target:`${m} ${f} ${colorLabel(c)}`,detail:`→ ¥${p}`});
+  priceHist.unshift({t:`${m} ${f} ${colorLabel(c)} → ¥${p}`,d:`${today()} · ${opName()} · ${FACTORIES[fac]?FACTORIES[fac].name:fac}`, raw:key});
+  auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_price',target:`${m} ${f} ${colorLabel(c)}`,detail:`→ ¥${p} · ${FACTORIES[fac]?FACTORIES[fac].name:fac}`});
   saveState();renderPricing();renderAudit();
-  toast(lang==='zh'?`价格已更新：${m} ${f} ${colorLabel(c)} = ¥${p}/kg`:`Price updated: ${m} ${f} ${colorLabel(c)} = ¥${p}/kg`);
+  toast(lang==='zh'?`价格已更新（${FACTORIES[fac]?FACTORIES[fac].name:fac}）：${m} ${f} ${colorLabel(c)} = ¥${p}/kg`:`Price updated (${fac}): ${m} ${f} ${colorLabel(c)} = ¥${p}/kg`);
 }
 
 /* ============ Shipping ============ */
@@ -2499,18 +2522,21 @@ function saveShipping(view){
   const driver=document.getElementById('s-driver').value.trim()||'';
   const eta=document.getElementById('s-eta').value||'';
   const cost=parseFloat(document.getElementById('s-cost').value)||0;
+  const shipNote=(document.getElementById('s-shipnote')||{}).value||'';
+  /* 配送总厂逻辑：不与分厂收购量挂钩，只按形态(破碎料)录入装车量；可混合多品种颜色，用备注说明 */
   const items=[];let tot=0;
   document.querySelectorAll('#ship-rows tr').forEach(tr=>{
-    const m=tr.dataset.m,f=tr.dataset.f,w=+tr.querySelector('.ship-w').value||0;
-    if(w>0){items.push({m,f,c:'',w,p:0});tot+=w;}
+    const f=tr.dataset.f, w=+tr.querySelector('.ship-w').value||0, rn=(tr.querySelector('.ship-note')||{}).value||'';
+    if(w>0){items.push({m:'混装',f,c:'',w,p:0,note:rn});tot+=w;}
   });
   if(tot===0){toast(lang==='zh'?'请填写发货重量':'Enter ship weight');return;}
+  const noteAll=(shipNote?shipNote+' · ':'')+'batch '+batch;
   if(editingShipId){
     const ship=records.find(r=>r.id===editingShipId&&r.ty==='Ship');if(!ship)return;
     const inb=records.find(r=>r.ty==='Inbound'&&r.linkId===editingShipId);
     const fromFac=ship.factory;
-    ship.dt=date;ship.dest=dest;ship.items=items;ship.tw=tot;ship.ta=0;ship.factory=fromFac;ship.fromFac=fromFac;ship.note='batch '+ship.batch;ship.custName='→ 总厂';ship.ts=Date.now();
-    if(inb){inb.dt=date;inb.dest=dest;inb.items=items.map(it=>({m:it.m,f:it.f,c:'',w:it.w}));inb.tw=tot;inb.fromFac=fromFac;inb.note='from '+fromFac+' · batch '+ship.batch;inb.ts=Date.now();}
+    ship.dt=date;ship.dest=dest;ship.items=items;ship.tw=tot;ship.ta=0;ship.factory=fromFac;ship.fromFac=fromFac;ship.note=noteAll;ship.custName='→ 总厂';ship.ts=Date.now();
+    if(inb){inb.dt=date;inb.dest=dest;inb.items=items.map(it=>({m:'混装',f:it.f,c:'',w:it.w,note:it.note}));inb.tw=tot;inb.fromFac=fromFac;inb.note='from '+fromFac+' · '+(shipNote?shipNote+' · ':'')+'batch '+ship.batch;inb.ts=Date.now();}
     ship.carrier=carrier;ship.vehicle=vehicle;ship.driver=driver;ship.eta=eta;ship.shipCost=cost;
     auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_ship',target:ship.batch,detail:(lang==='zh'?'修改 · ':'edited · ')+tot.toLocaleString()+' kg · '+FACTORIES[fromFac].name});
     editingShipId=null;
@@ -2523,9 +2549,9 @@ function saveShipping(view){
     return;
   }
   const fromFac=effectiveFactory();
-  const ship=pushRec({id:genGid(),dt:date,ty:'Ship',custId:0,custName:'→ 总厂',items,tw:tot,ta:0,ticket:'',op:opName(),batch,dest,note:'batch '+batch,factory:fromFac,status:'在途',fromFac,carrier,vehicle,driver,eta,shipCost:cost});
-  /* 数据互通：分厂发货同步在总厂生成「待入库」来料记录，总厂确认收货后计入原料库存 */
-  pushRec({id:genGid(),dt:date,ty:'Inbound',custId:0,custName:'来料入库',items:items.map(it=>({m:it.m,f:it.f,c:'',w:it.w})),tw:tot,ta:0,ticket:'',op:opName(),batch,dest,note:'from '+fromFac+' · batch '+batch,factory:'Sagamu',status:'待入库',linkId:ship.id,fromFac});
+  const ship=pushRec({id:genGid(),dt:date,ty:'Ship',custId:0,custName:'→ 总厂',items,tw:tot,ta:0,ticket:'',op:opName(),batch,dest,note:noteAll,factory:fromFac,status:'在途',fromFac,carrier,vehicle,driver,eta,shipCost:cost});
+  /* 数据互通：分厂发货同步在总厂生成「待入库」来料记录（仅形态，混装），总厂确认收货后计入原料库存 */
+  pushRec({id:genGid(),dt:date,ty:'Inbound',custId:0,custName:'来料入库',items:items.map(it=>({m:'混装',f:it.f,c:'',w:it.w,note:it.note})),tw:tot,ta:0,ticket:'',op:opName(),batch,dest,note:'from '+fromFac+' · '+(shipNote?shipNote+' · ':'')+'batch '+batch,factory:'Sagamu',status:'待入库',linkId:ship.id,fromFac});
   settings.pending=(settings.pending||0)+1;
   auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_ship',target:batch,detail:`${tot.toLocaleString()} kg · ${FACTORIES[fromFac].name} → 总厂`});
   saveState();refreshAfterSave();
@@ -2542,13 +2568,10 @@ function renderShipRows(){
   const el=document.getElementById('ship-rows');if(!el)return;
   /* 新建发货单时默认日期为当天，编辑态由 editShip 回显，不覆盖 */
   if(!editingShipId){const sd=document.getElementById('s-date');if(sd&&!sd.value)sd.value=today();}
-  const fac=effectiveFactory();
-  const inv=computeInventory(fac);
-  const flat=flattenRaw(inv);
-  const mats=['PP','PE','PVC'];
-  el.innerHTML=mats.map(m=>{
-    const avail=Math.max(0,Math.round(flat[m+'|破碎料']||0));
-    return `<tr data-m="${m}" data-f="破碎料"><td><b>${m}</b></td><td>${t('opt_frag')}</td><td class="num avail-w">${avail.toLocaleString()}</td><td><input class="ship-w" type="number" value="0" min="0" style="width:110px" placeholder="0"/></td></tr>`;
+  /* 配送总厂逻辑：不与分厂收购量挂钩，只按形态(破碎料)录入装车量；可混合多品种颜色，用备注说明 */
+  const forms=['破碎料'];
+  el.innerHTML=forms.map(f=>{
+    return `<tr data-f="${f}"><td class="muted">—</td><td>${t('opt_frag')}</td><td class="num">—</td><td><input class="ship-w" type="number" value="0" min="0" style="width:110px" placeholder="0"/></td><td><input class="ship-note" style="width:150px" placeholder="${lang==='zh'?'混装说明':'mixed note'}"/></td></tr>`;
   }).join('');
 }
 
@@ -2574,8 +2597,8 @@ function editShip(id){
   if(b1)b1.textContent=t('s_save_edit');if(b2)b2.textContent=t('s_save_edit');
   go('shipping'); /* 触发 renderShipRows 重建库存行 */
   (r.items||[]).forEach(it=>{
-    const tr=document.querySelector(`#ship-rows tr[data-m="${it.m}"][data-f="${it.f}"]`);
-    if(tr){const inp=tr.querySelector('.ship-w');if(inp)inp.value=it.w;}
+    const tr=document.querySelector(`#ship-rows tr[data-f="${it.f}"]`);
+    if(tr){const inp=tr.querySelector('.ship-w');if(inp)inp.value=it.w; const nn=tr.querySelector('.ship-note'); if(nn&&it.note)nn.value=it.note;}
   });
   toast(lang==='zh'?'已载入待修改发货单':'Loaded for editing');
 }
@@ -2684,15 +2707,24 @@ function saveProduce(){
   const macNames=items.map(it=>machineName(it.machine)).join('、');
   if(editingProduceId){
     const r=records.find(x=>x.id===editingProduceId);if(!r)return;
-    r.dt=date;r.op=op;r.shift=shift;r.items=items;r.tw=totOut;r.custName=macNames;r.note=macNames;r.ts=Date.now();
+    r.dt=date;r.op=op;r.shift=shift;r.items=items;r.tw=totOut;r.custName=macNames;r.note=macNames;r.ts=Date.now();r.rev=(r.rev||0)+1;
     auditLog.unshift({time:nowHMS(),actor:op,action:'ac_produce',target:r.batch,detail:(lang==='zh'?'修改 · ':'edited · ')+macNames+' · '+items.reduce((s,it)=>s+it.bags,0)+unitBag()});
     toast(lang==='zh'?'生产单已修改':'Produce updated');
   }else{
-    const batch='PR-'+nextBatchNum('PR-');
-    pushRec({id:genGid(),dt:date,ty:'Produce',shift,custId:0,custName:macNames,items,tw:totOut,ta:0,ticket:'',op,batch,note:macNames,factory:fac});
-    auditLog.unshift({time:nowHMS(),actor:op,action:'ac_produce',target:batch,detail:macNames+' · '+items.reduce((s,it)=>s+it.bags,0)+unitBag()});
-    toast(lang==='zh'?`生产单 ${batch} 已保存`:`Produce ${batch} saved`);
+    /* 造粒记录：每天每厂只保留一条（同一天同厂合并更新，不重复新建） */
+    const exist=records.find(x=>x.ty==='Produce'&&x.factory===fac&&x.dt===date);
+    if(exist){
+      exist.op=op;exist.shift=shift;exist.items=items;exist.tw=totOut;exist.custName=macNames;exist.note=macNames;exist.ts=Date.now();exist.rev=(exist.rev||0)+1;
+      auditLog.unshift({time:nowHMS(),actor:op,action:'ac_produce',target:exist.batch,detail:(lang==='zh'?'当日合并 · ':'merged today · ')+macNames+' · '+items.reduce((s,it)=>s+it.bags,0)+unitBag()});
+      toast(lang==='zh'?`已更新当日生产单 ${exist.batch}`:`Updated today's produce ${exist.batch}`);
+    }else{
+      const batch='PR-'+nextBatchNum('PR-');
+      pushRec({id:genGid(),dt:date,ty:'Produce',shift,custId:0,custName:macNames,items,tw:totOut,ta:0,ticket:'',op,batch,note:macNames,factory:fac});
+      auditLog.unshift({time:nowHMS(),actor:op,action:'ac_produce',target:batch,detail:macNames+' · '+items.reduce((s,it)=>s+it.bags,0)+unitBag()});
+      toast(lang==='zh'?`生产单 ${batch} 已保存`:`Produce ${batch} saved`);
+    }
   }
+  purgeProduce(14); /* 造粒记录只保留最近 2 周 */
   settings.pending=(settings.pending||0)+1;
   saveState();refreshAfterSave();
   resetProduce();
@@ -2721,16 +2753,23 @@ function deleteProduce(id){
   saveState();refreshAfterSave();
   toast(lang==='zh'?'已删除生产单':'Produce deleted');
 }
+function purgeProduce(days){
+  const cut=Date.now()-days*86400000;
+  const before=records.length;
+  records=records.filter(r=>!(r.ty==='Produce'&&(r.ts||0)<cut));
+  if(records.length<before){settings.pending=(settings.pending||0)+1;saveState();}
+}
 function renderProduce(){
   const fac=effectiveFactory();
   const sh=document.getElementById('pr-shift');if(sh&&!sh.options.length)sh.innerHTML=shiftOptions('白班');
   if(!editingProduceId && !document.querySelectorAll('#pr-body tr').length)addProduceRow();
+  purgeProduce(14); /* 造粒记录只保留最近 2 周 */
   const inv=computeInventory(fac);const pel=flattenPellet(inv);
   const invRows=Object.keys(pel).filter(k=>pel[k]>0.0001).sort().map(k=>{const [m,c]=k.split('|');return `<tr><td><b>${m}</b></td><td>${c?esc(colorLabel(c)):'—'}</td><td class="num">${Math.round(pel[k]/BAG_KG).toLocaleString()} <span class="muted">${unitBag()}</span></td></tr>`;}).join('');
   setHTML('pr-inv', invRows||`<tr><td colspan="3" class="muted">—</td></tr>`);
   const list=records.filter(r=>r.ty==='Produce'&&(fac==='Sagamu'||r.factory===fac));
   let rows='';
-  list.forEach(r=>(r.items||[]).forEach(it=>{rows+=`<tr><td>${r.dt}</td><td>${r.batch}</td><td>${r.shift||''}</td><td>${esc(machineName(it.machine))}</td><td><b>${it.m}</b></td><td>${esc(colorLabel(it.c))}</td><td class="num">${it.bags+" "+unitBag()}</td><td>${esc(r.op)}</td><td><span class="link" onclick="editProduce('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteProduce('${r.id}')">${t('delete')}</span></td></tr>`;}));
+  list.forEach(r=>(r.items||[]).forEach(it=>{rows+=`<tr><td style="cursor:pointer" class="link" onclick="viewProduceDetail('${r.id}')">${r.dt}</td><td>${r.batch}</td><td>${r.shift||''}</td><td>${esc(machineName(it.machine))}</td><td><b>${it.m}</b></td><td>${esc(colorLabel(it.c))}</td><td class="num">${it.bags+" "+unitBag()}</td><td>${esc(r.op)}</td><td><span class="link" onclick="editProduce('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteProduce('${r.id}')">${t('delete')}</span></td></tr>`;}));
   setHTML('pr-list', rows||`<tr><td colspan="9" class="muted">${lang==='zh'?'暂无记录':'No records'}</td></tr>`);
 }
 
@@ -2921,9 +2960,11 @@ function runSearch(){
       acct:(document.getElementById('s-acct')||{}).value||'',
       from:(document.getElementById('s-from')||{}).value||'',
       to:(document.getElementById('s-to')||{}).value||'',
-      note:(document.getElementById('s-note')||{}).value||''
+      note:(document.getElementById('s-note')||{}).value||'',
+      type:(document.getElementById('s-type')||{}).value||''
     };
     const recs=visibleRecords().filter(r=>{
+      if(q.type&&r.ty!==q.type)return false;
       if(q.from&&r.dt&&r.dt<q.from)return false;
       if(q.to&&r.dt&&r.dt>q.to)return false;
       if(q.note&&!(r.note||'').toLowerCase().includes(q.note.toLowerCase()))return false;
@@ -2944,7 +2985,14 @@ function runSearch(){
     const cnt=document.getElementById('s-count');if(cnt)cnt.textContent=recs.length+(lang==='zh'?' 条记录':' records');
   }catch(e){}
 }
-function resetSearch(){['s-name','s-phone','s-acct','s-note'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});runSearch();}
+function resetSearch(){['s-name','s-phone','s-acct','s-note','s-type'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});runSearch();}
+function fillSearchType(){
+  const sel=document.getElementById('s-type');if(!sel)return;
+  const cur=sel.value;
+  const types=['Receive','Ship','Inbound','Crush','Produce','Sale'];
+  sel.innerHTML='<option value="">'+(lang==='zh'?'全部类型':'All types')+'</option>'+types.map(ty=>`<option value="${ty}">${t('ty_'+ty)||ty}</option>`).join('');
+  if(types.indexOf(cur)>=0)sel.value=cur;
+}
 function runChurn(){
   try{
     const single=+((document.getElementById('churn-single')||{}).value||0);
@@ -3040,7 +3088,7 @@ function reconcileAll(){
   records.filter(r=>r.ty==='Ship').forEach(function(ship){
     const inb=records.find(r=>r.ty==='Inbound'&&r.linkId===ship.id);
     if(!inb){
-      pushRec({id:genGid(),dt:ship.dt,ty:'Inbound',custId:0,custName:'来料入库',items:(ship.items||[]).map(it=>({m:it.m,f:it.f,c:'',w:it.w})),tw:ship.tw,ta:0,ticket:'',op:'auto',batch:ship.batch,dest:'',note:'from '+(ship.fromFac||ship.factory)+' · batch '+ship.batch,factory:'Sagamu',status:ship.status==='已入库'?'已入库':'待入库',linkId:ship.id,fromFac:ship.fromFac||ship.factory});
+      pushRec({id:genGid(),dt:ship.dt,ty:'Inbound',custId:0,custName:'来料入库',items:(ship.items||[]).map(it=>({m:'混装',f:it.f,c:'',w:it.w,note:it.note})),tw:ship.tw,ta:0,ticket:'',op:'auto',batch:ship.batch,dest:'',note:'from '+(ship.fromFac||ship.factory)+' · batch '+ship.batch,factory:'Sagamu',status:ship.status==='已入库'?'已入库':'待入库',linkId:ship.id,fromFac:ship.fromFac||ship.factory});
       fixed++;
     } else if(ship.status==='已入库'&&inb.status!=='已入库'){ inb.status='已入库'; fixed++; }
   });
@@ -3622,6 +3670,26 @@ if(!loadSession()){
 })();
 /* 心跳同步：在线且有待上传时，最多 60s 内自动同步到云端（双重保障，满足 ≤1 分钟要求） */
 if(typeof setInterval==='function'){ setInterval(syncTick, 20000); /* 在线时每 20s 自动推送本地变更并拉取其他厂区数据，满足 ≤1 分钟联网要求 */ }
+
+/* 造粒记录详情：点击列表日期查看当日各机台产出（每天每厂一条） */
+function viewProduceDetail(id){
+  const r=records.find(x=>x.id===id);if(!r){toast(lang==='zh'?'单据不存在':'Record not found');return;}
+  const m=document.getElementById('record-modal');if(!m)return;
+  const mat=(r.items||[]).map(it=>`<tr><td>${esc(machineName(it.machine))}</td><td><b>${esc(it.m||'')}</b></td><td>${esc(colorLabel(it.c))}</td><td class="num">${it.bags} ${unitBag()}</td><td class="num">${Math.round(it.outW||0).toLocaleString()} kg</td></tr>`).join('');
+  document.getElementById('record-detail-body').innerHTML=`
+    <div class="rec-kv">
+      <div class="k">${lang==='zh'?'单据类型':'Type'}</div><div>${lang==='zh'?'生产造粒单':'Produce'}</div>
+      <div class="k">${lang==='zh'?'日期':'Date'}</div><div>${esc(r.dt||'—')}</div>
+      <div class="k">${lang==='zh'?'工厂':'Plant'}</div><div>${FACTORIES[r.factory]?FACTORIES[r.factory].name:esc(r.factory||'—')}</div>
+      <div class="k">${lang==='zh'?'班次':'Shift'}</div><div>${esc(r.shift||'—')}</div>
+      <div class="k">${lang==='zh'?'操作员':'Operator'}</div><div>${esc(r.op||'—')}</div>
+      <div class="k">${lang==='zh'?'合计重量':'Total weight'}</div><div class="num">${(+r.tw||0).toLocaleString()} kg</div>
+      <div class="k">${lang==='zh'?'备注':'Note'}</div><div>${esc(r.note||'—')}</div>
+    </div>
+    <table class="tbl"><thead><tr><th>${lang==='zh'?'机台':'Machine'}</th><th>${lang==='zh'?'材质':'Material'}</th><th>${lang==='zh'?'颜色':'Color'}</th><th class="num">${lang==='zh'?'袋数':'Bags'}</th><th class="num">${lang==='zh'?'产出':'Output'}</th></tr></thead><tbody>${mat}</tbody></table>
+  `;
+  showModal('record-modal');
+}
 
 </script>
 <!-- ===================== Account modal ===================== -->
