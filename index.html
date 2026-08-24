@@ -314,7 +314,7 @@ th{color:#64748b;}
     <select id="li-factory"><option value="">—</option></select>
     <div class="li-err" id="li-err"></div>
     <button class="btn" onclick="signIn()" data-i18n="liSign">登录</button>
-    <button class="btn ghost sm mt" onclick="openAcctModal()" data-i18n="register">注册新账号</button>
+    <button class="btn ghost sm mt" onclick="openAcctModal(null,true)" data-i18n="register">注册新账号</button>
     <div class="login-foot">
       <span class="small muted" data-i18n="liNote">演示原型 · 支持离线 · ¥ 计价</span>
       <div class="lang-seg" id="login-seg">
@@ -955,7 +955,7 @@ th{color:#64748b;}
             </div></div>
           <div class="panel-body">
             <div class="small muted mb" data-i18n="reg_note">老板可在此新增分厂账号、分配密码与工厂；注册入口同时开放于登录页。</div>
-            <table><thead><tr><th data-i18n="acct_username">账号</th><th data-i18n="acct_name">姓名</th><th data-i18n="acct_role">角色</th><th data-i18n="acct_factories">工厂</th><th></th></tr></thead>
+            <table><thead><tr><th data-i18n="acct_username">账号</th><th data-i18n="acct_name">姓名</th><th data-i18n="acct_role">角色</th><th data-i18n="acct_factories">工厂</th><th data-i18n="acct_status">状态</th><th data-i18n="acct_ops">操作</th></tr></thead>
             <tbody id="accounts-body"></tbody></table>
           </div></div>
         <div id="tab-rate" class="panel hidden"><div class="panel-head"><h3 data-i18n="set_rate">汇率兑换（人民币 / 奈拉）</h3></div>
@@ -1158,7 +1158,7 @@ const I18N = {
     ocr_code:"代码(如 PP.l)", ocr_parsed:"解析(材质/颜色)", ocr_codehint:"票据按「材质.颜色代码」分行（如 PP.l=透明、PP.b=黑色、PP.c=单色；总重为过磅总重，按卸货种类分行）。系统自动解析为回收单行，请核对。",
     ac_cust:"客户",
     repLabels:{day:["周一","周二","周三","周四","周五","周六","周日"],month:["3月","4月","5月","6月","7月","8月"],quarter:["Q1","Q2","Q3","Q4"],year:["2023","2024","2025","2026*"]},
-    liFactory:"工厂 / Plant", login_bad:"账号或密码错误", login_badfac:"您无权进入该工厂", pwd_title:"首次登录 · 请设置新密码", pwd_new:"新密码（可设置简单密码）", pwd_confirm:"确认新密码", pwd_weak:"请输入新密码", pwd_mismatch:"两次输入的密码不一致", pwd_ok:"确定", liLogout:"退出", opic_bulk_only:"OPIC工厂仅接收大料，不可接收破碎料",
+    liFactory:"工厂 / Plant", login_bad:"账号或密码错误", login_badfac:"您无权进入该工厂", login_required:"请输入账号和密码", login_disabled:"该账号已被禁用，请联系管理员", login_pending:"该账号待管理员审核启用", pwd_title:"首次登录 · 请设置新密码", pwd_new:"新密码（可设置简单密码）", pwd_confirm:"确认新密码", pwd_weak:"请输入新密码", pwd_mismatch:"两次输入的密码不一致", pwd_ok:"确定", liLogout:"退出", opic_bulk_only:"OPIC工厂仅接收大料，不可接收破碎料",
     g_core:"核心业务", g_prod:"生产加工", g_logi:"物流协同",
     nav_crush:"破碎清洗", nav_produce:"生产造粒", nav_sell:"成品出售", nav_logistics:"物流协同", nav_inventory:"库存管理", nav_receiving:"回收分拣", nav_today:"当日回收", nav_shipping:"配送总厂",
     hero_title:"综合作业台", hero_sub:"本厂以废旧塑料回收加工为核心，覆盖回收、破碎、造粒与销售全流程",
@@ -1211,7 +1211,7 @@ const I18N = {
     r_trend:"Receive vs outbound trend", r_trend_hq:"Receive vs Inbound trend", r_trend_br:"Receive vs Ship trend", r_by_mat:"By material (kg)", r_by_form:"By form",
     rk_recv:"Received", rk_ship:"Shipped", rk_inbound:"Inbound", rk_amt:"Amount", rk_diff:"Difference (incl. loss)",
     r_note:"Difference = Received − Shipped/Inbound − pelletizing consumption − crushing loss (大料→破碎料 loss, ~8%). Eco-compliance export includes material volumes & supplier registry for the environmental registry.",
-    set_roles:"Roles & Permissions", set_sync:"Sync & Offline", set_backup:"Backup", set_audit:"Audit log", set_local:"Localization", set_accounts:"Account Management", acct_new:"New / Register Account", acct_username:"Account (email)", acct_name:"Name", acct_role:"Role", acct_factories:"Plants", acct_password:"Password", acct_save:"Save Account", acct_delete:"Delete Account", acct_genpw:"Auto-generate", acct_reset:"Reset All Business Data", reset_title:"Reset All Business Data", register:"Register Account", reg_note:"Submits a local account (boss approval to enable)", au_clear_all:"Clear",
+    set_roles:"Roles & Permissions", set_sync:"Sync & Offline", set_backup:"Backup", set_audit:"Audit log", set_local:"Localization", set_accounts:"Account Management", acct_new:"New / Register Account", acct_username:"Account (email)", acct_name:"Name", acct_role:"Role", acct_factories:"Plants", acct_password:"Password", acct_save:"Save Account", acct_delete:"Delete Account", acct_edit:"Edit", acct_approve:"Enable", acct_disable:"Disable", acct_enable:"Enable", acct_status:"Status", acct_ops:"Actions", acct_genpw:"Auto-generate", acct_reset:"Reset All Business Data", reset_title:"Reset All Business Data", register:"Register Account", reg_note:"Submits a local account (boss approval to enable)", au_clear_all:"Clear",
     set_role_col:"Role", set_audit_col:"Audit",
     role_owner_s:"Owner / Manager", role_receiving_s:"Recovery Clerk", role_shipping_s:"Dispatch Clerk", role_auditor_s:"Auditor",
     sync_now:"Sync now", sy_conn:"Connection", sy_online:"Online (4G)", sy_local:"Local DB", sy_pending:"Pending upload", sy_last:"Last sync", sy_conflict:"Conflict policy", sy_lww:"Last-write-wins + version vector", sy_nokey:"Sync unencrypted",
@@ -1241,7 +1241,7 @@ const I18N = {
     ocr_file:"Ticket image (camera / upload)", ocr_run:"Recognize", ocr_confirm:"Confirm & fill form", rc_ocr:"📷 Scan ticket",
     ocr_code:"Code (e.g. PP.l)", ocr_parsed:"Parsed (mat/color)", ocr_codehint:"Tickets list goods as 'material.colorcode' per line (e.g. PP.l=Clear, PP.b=Black, PP.c=Single; total = weighbridge weight, split by unloading category). Auto-parsed into recovery lines — please verify.",
     ac_cust:"Customer",
-    liFactory:"Plant", login_bad:"Wrong account or password", login_badfac:"You are not authorized for this plant", pwd_title:"First login — set a new password", pwd_new:"New password (simple passwords allowed)", pwd_confirm:"Confirm password", pwd_weak:"Please enter a new password", pwd_mismatch:"Passwords do not match", pwd_ok:"Confirm",     liLogout:"Logout", opic_bulk_only:"OPIC plant accepts bulk only — crushed material not allowed",
+    liFactory:"Plant", login_bad:"Wrong account or password", login_badfac:"You are not authorized for this plant", login_required:"Enter account and password", login_disabled:"This account is disabled, contact admin", login_pending:"This account is pending admin approval", pwd_title:"First login — set a new password", pwd_new:"New password (simple passwords allowed)", pwd_confirm:"Confirm password", pwd_weak:"Please enter a new password", pwd_mismatch:"Passwords do not match", pwd_ok:"Confirm",     liLogout:"Logout", opic_bulk_only:"OPIC plant accepts bulk only — crushed material not allowed",
     g_core:"CORE", g_prod:"PRODUCTION", g_logi:"LOGISTICS",
     nav_crush:"Crushing", nav_produce:"Pelletizing", nav_sell:"Sales", nav_logistics:"Logistics", nav_inventory:"Inventory", nav_receiving:"Receiving", nav_today:"Today", nav_shipping:"Ship to HQ",
     hero_title:"Operations Console", hero_sub:"Plastic recovery & processing — receiving, crushing, pelletizing and sales.",
@@ -1369,8 +1369,30 @@ function _pbkdf2_legacy(pw, saltHex, iter){
 function concatBytes(a,b){const c=new Uint8Array(a.length+b.length);c.set(a);c.set(b,a.length);return c;}
 /* Salt / password helpers */
 function genSalt(){const u=new Uint8Array(16);(crypto.getRandomValues?crypto.getRandomValues(u):(function(){for(let i=0;i<16;i++)u[i]=(Math.random()*256)|0;})());return _bytesToHex(u);}
-function hashPassword(pw, saltHex){ return jsSha256(String(pw==null?'':pw)); } /* 改用环境无关 jsSha256，保证 file:// 与 http(s) 哈希一致 */
-function verifyPassword(pw, saltHex, hashHex){ return ctEqual(jsSha256(String(pw==null?'':pw)), String(hashHex==null?'':hashHex)); }
+/* 大厂级密码哈希：PBKDF2-style 迭代（jsSha256 为底，盐真正参与），抗彩虹表/撞库。
+   存储格式 hash = iterations:salt:hex(sha256^k(pw|salt))，verify 时按迭代次数复算。 */
+const PW_ITER = 60000;
+function hashPassword(pw, saltHex){
+  const pw0 = String(pw==null?'':pw);
+  const salt = String(saltHex==null?'':saltHex);
+  let h = jsSha256(pw0 + '|' + salt);
+  for(let i=1;i<PW_ITER;i++){ h = jsSha256(h + '|' + salt); }
+  return PW_ITER + ':' + salt + ':' + h;
+}
+function verifyPassword(pw, storedHash){
+  if(!storedHash) return false;
+  const str=String(storedHash);
+  /* 兼容旧版存储（纯 sha256(pw) 无盐）：迁移期可平滑登录，新密码写入后将变为新格式 */
+  if(str.indexOf(':')<0){ return ctEqual(jsSha256(String(pw==null?'':pw)), str); }
+  const parts = str.split(':');
+  if(parts.length!==3) return false;
+  const iter = parseInt(parts[0],10), salt = parts[1], target = parts[2];
+  if(!(iter>0) || !salt || !target) return false;
+  const pw0 = String(pw==null?'':pw);
+  let h = jsSha256(pw0 + '|' + salt);
+  for(let i=1;i<iter;i++){ h = jsSha256(h + '|' + salt); }
+  return ctEqual(h, target);
+}
 function ctEqual(a,b){const ab=_utf8(a), bb=_utf8(b);if(ab.length!==bb.length)return false;let r=0;for(let i=0;i<ab.length;i++)r|=ab[i]^bb[i];return r===0;}
 function genPassword(len){len=len||16;const L='ABCDEFGHJKLMNPQRSTUVWXYZ',l='abcdefghijkmnpqrstuvwxyz',d='23456789',s='!@#$%^&*';const all=L+l+d+s;let p='';const rnd=()=>{const a=new Uint8Array(1);(crypto.getRandomValues?crypto.getRandomValues(a):(a[0]=(Math.random()*256)|0));return a[0];};
   p+=L[rnd()%L.length];p+=l[rnd()%l.length];p+=d[rnd()%d.length];p+=s[rnd()%s.length];
@@ -1415,18 +1437,18 @@ const ALL_VIEW='ALL'; // 老板全局视图哨兵
 /* 种子账号：前 4 个为已交付给用户、可连续登录的账号（mustChange:false）；
    其余补全原版的工厂管理员 / 登记员 / 审计员角色矩阵，便于演示多厂 RBAC 与隔离。 */
 const SEED_USERS=[
-  {username:'boss@recycleflow.ng',   name:'老板（全局）',  role:'boss',          factories:ALL_FACTORY_IDS, pw:'Boss@2024', mustChange:false},
-  {username:'admin@recycleflow.ng',  name:'Sagamu 管理员', role:'factoryAdmin', factories:['Sagamu'],     pw:'Admin@2024', mustChange:false},
-  {username:'op@recycleflow.ng',     name:'Sagamu 登记员', role:'registrar',    factories:['Sagamu'],     pw:'Op@2024', mustChange:false},
-  {username:'ship@recycleflow.ng',   name:'OPIC/Ikeja 调度', role:'factoryAdmin', factories:['OPIC','Ikeja'], pw:'Ship@2024', mustChange:false},
-  {username:'admin.opic@recycleflow.ng',  name:'OPIC 管理员',  role:'factoryAdmin', factories:['OPIC'],  pw:'Opik@2024', mustChange:true},
-  {username:'admin.ikeja@recycleflow.ng', name:'Ikeja 管理员', role:'factoryAdmin', factories:['Ikeja'], pw:'Ikeja@2024', mustChange:true},
-  {username:'reg.sagamu@recycleflow.ng',  name:'Sagamu 登记员B', role:'registrar', factories:['Sagamu'], pw:'Reg@2024', mustChange:true},
-  {username:'auditor@recycleflow.ng',     name:'审计员',       role:'auditor',      factories:ALL_FACTORY_IDS, pw:'Audit@2024', mustChange:true}
+  {username:'boss@recycleflow.ng',   name:'老板（全局）',  role:'boss',          factories:ALL_FACTORY_IDS, pw:'Boss@2024', mustChange:false, status:'active'},
+  {username:'admin@recycleflow.ng',  name:'Sagamu 管理员', role:'factoryAdmin', factories:['Sagamu'],     pw:'Admin@2024', mustChange:false, status:'active'},
+  {username:'op@recycleflow.ng',     name:'Sagamu 登记员', role:'registrar',    factories:['Sagamu'],     pw:'Op@2024', mustChange:false, status:'active'},
+  {username:'ship@recycleflow.ng',   name:'OPIC/Ikeja 调度', role:'factoryAdmin', factories:['OPIC','Ikeja'], pw:'Ship@2024', mustChange:false, status:'active'},
+  {username:'admin.opic@recycleflow.ng',  name:'OPIC 管理员',  role:'factoryAdmin', factories:['OPIC'],  pw:'Opik@2024', mustChange:true, status:'active'},
+  {username:'admin.ikeja@recycleflow.ng', name:'Ikeja 管理员', role:'factoryAdmin', factories:['Ikeja'], pw:'Ikeja@2024', mustChange:true, status:'active'},
+  {username:'reg.sagamu@recycleflow.ng',  name:'Sagamu 登记员B', role:'registrar', factories:['Sagamu'], pw:'Reg@2024', mustChange:true, status:'active'},
+  {username:'auditor@recycleflow.ng',     name:'审计员',       role:'auditor',      factories:ALL_FACTORY_IDS, pw:'Audit@2024', mustChange:true, status:'active'}
 ];
 let users=[];
 function buildSeedUsers(){
-  users=SEED_USERS.map(u=>{const salt=genSalt();return {username:u.username,name:u.name,role:u.role,factories:u.factories.slice(),salt,passwordHash:hashPassword(u.pw,salt),mustChange:u.mustChange};});
+  users=SEED_USERS.map(u=>{const salt=genSalt();return {username:u.username,name:u.name,role:u.role,factories:u.factories.slice(),salt,passwordHash:hashPassword(u.pw,salt),mustChange:u.mustChange,status:u.status||'active',createdTs:Date.now()};});
 }
 
 /* —— RBAC 权限矩阵 —— */
@@ -1482,17 +1504,36 @@ function validateReceivingItems(items, factory){
 }
 
 /* —— 会话持久化 —— */
-const SESSION_KEY='rf_session_v1';
+const SESSION_KEY='rf_session_v2';
+/* 设备级派生密钥（用于会话签名/防篡改），从 localStorage 获取或随机生成并固化 */
+function getDeviceKey(){
+  try{
+    let k=localStorage.getItem('rf_device_key_v2');
+    if(!k){ const u=new Uint8Array(32); (crypto.getRandomValues?crypto.getRandomValues(u):(()=>{for(let i=0;i<32;i++)u[i]=(Math.random()*256)|0;})()); k=_bytesToHex(u); localStorage.setItem('rf_device_key_v2',k); }
+    return k;
+  }catch(e){ return 'dev-fallback'; }
+}
+function sessionSign(payloadStr){ return jsSha256(payloadStr + '|' + getDeviceKey()); }
 function setSession(user, fac){
   currentUser=user; currentRole=user.role;
   currentFactory=(fac===ALL_VIEW?ALL_VIEW:fac);
-  try{localStorage.setItem(SESSION_KEY, JSON.stringify({username:user.username, role:user.role, factory:currentFactory, name:user.name, ts:Date.now()}));}catch(e){}
+  /* 大厂级会话：签名 + 过期，避免明文篡改/重放 */
+  const payload={username:user.username, role:user.role, factory:currentFactory, name:user.name, exp:Date.now()+1000*60*60*12};
+  const raw=JSON.stringify(payload);
+  const sig=sessionSign(raw).slice(0,16);
+  try{localStorage.setItem(SESSION_KEY, JSON.stringify({p:payload, s:sig}));}catch(e){}
 }
 function loadSession(){
-  try{const s=JSON.parse(localStorage.getItem(SESSION_KEY));if(!s)return null;
-    const u=users.find(x=>x.username===s.username);if(!u)return null;
-    currentUser=u;currentRole=u.role;currentFactory=s.factory||u.factories[0];
-    return s;}catch(e){return null;}
+  try{
+    const s=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');if(!s||!s.p)return null;
+    const expect=sessionSign(JSON.stringify(s.p)).slice(0,16);
+    if(expect!==s.s) return null;
+    if((s.p.exp||0) < Date.now()) return null; /* 会话过期需重新登录 */
+    const u=users.find(x=>x.username===s.p.username);if(!u)return null;
+    if(u.status==='disabled') return null; /* 账号被禁用后旧会话失效 */
+    currentUser=u;currentRole=u.role;currentFactory=s.p.factory||u.factories[0];
+    return s;
+  }catch(e){return null;}
 }
 function clearSession(){try{localStorage.removeItem(SESSION_KEY);}catch(e){} currentUser=null;currentRole=null;currentFactory=null;}
 
@@ -1770,7 +1811,9 @@ function loadState(){
   else buildSeedUsers();
   /* 重新部署后，把缺失的种子账号（如新增的"管理员"开发管理员）并入已有用户，
      避免老用户数据里没有该账号而登录失败、又不必清空业务数据。 */
-  SEED_USERS.forEach(su=>{ if(!users.some(u=>u.username===su.username)){ const salt=genSalt(); users.push({username:su.username,name:su.name,role:su.role,factories:su.factories.slice(),salt,passwordHash:hashPassword(su.pw,salt),mustChange:su.mustChange}); } });
+  SEED_USERS.forEach(su=>{ if(!users.some(u=>u.username===su.username)){ const salt=genSalt(); users.push({username:su.username,name:su.name,role:su.role,factories:su.factories.slice(),salt,passwordHash:hashPassword(su.pw,salt),mustChange:su.mustChange,status:su.status||'active',createdTs:Date.now()}); } });
+  /* 兼容老数据：补齐 status 字段 */
+  users.forEach(u=>{ if(!u.status)u.status='active'; });
   if(typeof s!=='object'||!s)return;
   if(typeof s.companyName==='string')COMPANY.name=s.companyName;
   if(Array.isArray(s.customers))customers=s.customers.map(c=>{if(c.id!=null)c.id=String(c.id);if(!c.factory)c.factory='Sagamu';if(!c.updatedTs)c.updatedTs=0;return c;});
@@ -3473,21 +3516,47 @@ function loadRemembered(){
     if(rem)rem.checked=true;
   }
 }
+/* —— 登录失败锁定（大厂级暴力破解防护） —— */
+const LOCK_KEY='rf_login_lock_v1', LOCK_MAX=5, LOCK_WINDOW=5*60*1000;
+function loginFailures(){ try{return JSON.parse(localStorage.getItem(LOCK_KEY)||'{}');}catch(e){return {};} }
+function recordFailure(u){
+  const m=loginFailures(); const now=Date.now();
+  const e=m[u]||{count:0,first:now};
+  e.count++; e.first=now; m[u]=e;
+  try{localStorage.setItem(LOCK_KEY,JSON.stringify(m));}catch(e){}
+  return e;
+}
+function clearFailure(u){ const m=loginFailures(); if(m[u]){delete m[u]; try{localStorage.setItem(LOCK_KEY,JSON.stringify(m));}catch(e){}} }
+function isLocked(u){
+  const m=loginFailures(); const e=m[u]; if(!e)return false;
+  if(Date.now()-e.first > LOCK_WINDOW){ delete m[u]; try{localStorage.setItem(LOCK_KEY,JSON.stringify(m));}catch(e){} return false; }
+  return e.count>=LOCK_MAX;
+}
+function lockRetryAfter(u){
+  const m=loginFailures(); const e=m[u]; if(!e)return 0;
+  return Math.max(0, LOCK_WINDOW-(Date.now()-e.first));
+}
 function signIn(){
   const u=document.getElementById('li-user').value.trim();
   const pw=document.getElementById('li-pass').value;
   const fac=document.getElementById('li-factory').value;
   const err=document.getElementById('li-err'); err.textContent='';
-  const user=users.find(x=>x.username===u);
+  if(!u||!pw){ err.textContent=t('login_required'); return; }
+  if(isLocked(u)){
+    const sec=Math.ceil(lockRetryAfter(u)/1000);
+    err.textContent=(lang==='zh'?'尝试次数过多，请 '+sec+' 秒后再试':'Too many attempts, retry in '+sec+'s');
+    return;
+  }
+  let user=users.find(x=>x.username===u);
   if(!user){
-    /* 本地无此账号：很可能是在其他设备创建的。先尝试从同步服务器拉取账号再登录，
-       直接解开"新设备登录前本地无账号"的死锁（登录校验逻辑本身保持不变）。 */
+    /* 本地无此账号：很可能是在其他设备/总厂创建的。先尝试从同步服务器拉取账号，
+       解开"新设备登录前本地无账号"的死锁。 */
     if(SYNC.enabled()){
       err.textContent=lang==='zh'?'正在从服务器获取账号…':'Fetching account…';
       syncPull().then(()=>{
         const u2=users.find(x=>x.username===u);
         if(u2) finishSignIn(u2, pw, fac, err);
-        else err.textContent=t('login_bad');
+        else { recordFailure(u); err.textContent=t('login_bad'); }
       }).catch(()=>{ err.textContent=t('login_bad'); });
       return;
     }
@@ -3496,8 +3565,12 @@ function signIn(){
   finishSignIn(user, pw, fac, err);
 }
 function finishSignIn(user, pw, fac, err){
-  if(!verifyPassword(pw,user.salt,user.passwordHash)){err.textContent=t('login_bad');return;}
-  if(fac!==ALL_VIEW && !user.factories.includes(fac)){err.textContent=t('login_badfac');return;}
+  /* 账号被禁用：不可登录（大厂级账号生命周期） */
+  if(user.status==='disabled'){ err.textContent=t('login_disabled'); recordFailure(user.username); return; }
+  if(user.status==='pending'){ err.textContent=t('login_pending'); recordFailure(user.username); return; }
+  if(!verifyPassword(pw, user.passwordHash)){ recordFailure(user.username); err.textContent=t('login_bad'); return; }
+  if(fac!==ALL_VIEW && !user.factories.includes(fac)){ err.textContent=t('login_badfac'); return; }
+  clearFailure(user.username);
   setSession(user,fac);
   saveRemembered();
   if(user.mustChange){ openForceChange(); return; }
@@ -3589,19 +3662,30 @@ function logout(){
 }
 
 /* ===== Account management (boss only) ===== */
+const STATUS_BADGE={active:{zh:'启用',en:'Active'},pending:{zh:'待审核',en:'Pending'},disabled:{zh:'已禁用',en:'Disabled'}};
 function renderAccounts(){
   const el=document.getElementById('accounts-body');if(!el)return;
   const canEdit=can('account.manage');
   const rows=users.map(u=>{
-    const grant = canEdit&&u.username!==(currentUser&&currentUser.username) ? `<span class="link" onclick="loadAcct('${esc(u.username)}')">${t('acct_grant')}</span>` : '—';
-    const del = (canEdit&&u.role!=='boss'&&u.role!=='devAdmin') ? `<span class="link" style="color:var(--danger)" onclick="deleteAccount('${esc(u.username)}')">${t('acct_delete')}</span>` : '—';
-    return `<tr><td><b>${esc(u.username)}</b></td><td>${esc(u.name||'')}</td><td>${roleBadgeMap[u.role]?roleBadgeMap[u.role][lang]:u.role}</td><td>${u.factories.map(f=>FACTORIES[f]?FACTORIES[f].name:f).join('、')}</td><td>${grant} &nbsp; ${del}</td></tr>`;
+    const badge=STATUS_BADGE[u.status]?STATUS_BADGE[u.status][lang]:u.status;
+    const isSelf = u.username===(currentUser&&currentUser.username);
+    const edit = (canEdit && !isSelf && u.role!=='boss') ? `<span class="link" onclick="loadAcct('${esc(u.username)}')">${t('acct_edit')}</span>` : (isSelf?'—':'—');
+    const ops=[];
+    if(canEdit && !isSelf && u.role!=='boss'){
+      if(u.status==='pending') ops.push(`<span class="link" style="color:var(--ok)" onclick="approveAccount('${esc(u.username)}')">${t('acct_approve')}</span>`);
+      if(u.status==='active') ops.push(`<span class="link" style="color:var(--danger)" onclick="disableAccount('${esc(u.username)}')">${t('acct_disable')}</span>`);
+      if(u.status==='disabled') ops.push(`<span class="link" style="color:var(--ok)" onclick="enableAccount('${esc(u.username)}')">${t('acct_enable')}</span>`);
+      ops.push(`<span class="link" style="color:var(--danger)" onclick="deleteAccount('${esc(u.username)}')">${t('acct_delete')}</span>`);
+    }
+    return `<tr><td><b>${esc(u.username)}</b></td><td>${esc(u.name||'')}</td><td>${roleBadgeMap[u.role]?roleBadgeMap[u.role][lang]:u.role}</td><td>${u.factories.map(f=>FACTORIES[f]?FACTORIES[f].name:f).join('、')}</td><td>${badge}</td><td>${ops.join(' &nbsp; ')||'—'}</td></tr>`;
   }).join('');
-  el.innerHTML=rows||`<tr><td colspan="5" class="muted">—</td></tr>`;
+  el.innerHTML=rows||`<tr><td colspan="6" class="muted">—</td></tr>`;
 }
 let editingAcct=null; /* 非空表示正在编辑已有账号（老板赋权） */
-function openAcctModal(presetUser){
+let acctFromRegister=false; /* 新增账号是否来自登录页「注册」（需老板审核启用）；老板在设置页直接创建则直接启用 */
+function openAcctModal(presetUser, fromRegister){
   editingAcct = presetUser || null;
+  acctFromRegister = !!fromRegister && !presetUser;
   const m=document.getElementById('acct-modal');if(m)m.classList.remove('hidden');
   const fc=document.getElementById('ac-factories');if(fc)fc.innerHTML=ALL_FACTORY_IDS.map(f=>`<label class="chk"><input type="checkbox" value="${f}" checked/> ${FACTORIES[f]?FACTORIES[f].name:f}</label>`).join(' ');
   const msg=document.getElementById('ac-msg');if(msg)msg.textContent='';
@@ -3610,14 +3694,15 @@ function openAcctModal(presetUser){
     const u=users.find(x=>x.username===editingAcct);
     if(u){
       const eu=document.getElementById('ac-user');if(eu){eu.value=u.username;eu.readOnly=true;}
-      const en=document.getElementById('ac-name');if(en)en.value=u.name||'';
+      const en2=document.getElementById('ac-name');if(en2)en2.value=u.name||'';
       const er=document.getElementById('ac-role');if(er)er.value=u.role;
       const ef=document.getElementById('ac-factories');if(ef)ef.innerHTML=ALL_FACTORY_IDS.map(f=>`<label class="chk"><input type="checkbox" value="${f}" ${u.factories.includes(f)?'checked':''}/> ${FACTORIES[f]?FACTORIES[f].name:f}</label>`).join(' ');
       const ep=document.getElementById('ac-pass');if(ep)ep.value=''; /* 留空表示不修改密码 */
-      if(msg)msg.textContent=lang==='zh'?'正在为「'+u.username+'」赋权：修改角色与工厂，密码留空则不变':'Granting perms to '+u.username;
+      if(msg)msg.textContent=lang==='zh'?'正在为「'+u.username+'」赋权：修改角色、工厂与状态，密码留空则不变':'Granting perms to '+u.username;
     }
   } else {
     const eu=document.getElementById('ac-user');if(eu){eu.value='';eu.readOnly=false;}
+    if(acctFromRegister && msg)msg.textContent=lang==='zh'?'注册后账号处于「待审核」，需老板在设置页启用后方可登录':'Account is pending; boss must enable it in Settings';
   }
 }
 function loadAcct(username){ openAcctModal(username); }
@@ -3634,7 +3719,7 @@ function submitAcct(){
   if(factories.length===0){if(msg)msg.textContent=lang==='zh'?'请至少选择一个工厂':'Pick at least one plant';return;}
   if(editingAcct && editingAcct===username){
     /* 老板赋权：更新已有账号角色/工厂，密码留空则不变 */
-    const u=users.find(x=>x.username===username);if(!u){if(msg)msg.textContent=lang==='zh'?'账号不存在':'Account not found';return;}
+    const u=users.find(x=>x.username===username);if(!u){if(msg)msg.textContent=lang==='zh'?'账号不存在':'Account not found';  return;}
     if(pass){ if(!passwordStrong(pass)){if(msg)msg.textContent=lang==='zh'?'密码需≥8位且含字母与数字':'Password >=8 chars with letters & digits';return;} const salt=genSalt(); u.salt=salt; u.passwordHash=hashPassword(pass,salt); u.mustChange=true; }
     u.name=name; u.role=role; u.factories=factories.slice(); u.updatedTs=Date.now();
     settings.pending=(settings.pending||0)+1;
@@ -3648,13 +3733,29 @@ function submitAcct(){
   if(!pass||!passwordStrong(pass)){if(msg)msg.textContent=lang==='zh'?'密码需≥8位且含字母与数字':'Password >=8 chars with letters & digits';return;}
   const di=deletedUsers.indexOf(username); if(di>=0)deletedUsers.splice(di,1); /* 重新创建同名账号时清除旧墓碑，避免下次同步又被删 */
   const salt=genSalt();
-  users.push({username,name,role,factories:factories.slice(),salt,passwordHash:hashPassword(pass,salt),mustChange:true,updatedTs:Date.now()});
+  const initialStatus = acctFromRegister ? 'pending' : 'active';
+  users.push({username,name,  role,factories:factories.slice(),salt,passwordHash:hashPassword(pass,salt),mustChange:true,status:initialStatus,createdTs:Date.now(),updatedTs:Date.now()});
   settings.pending=(settings.pending||0)+1;
-  auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_create',target:username,detail:lang==='zh'?'新增账号 · '+name+' · '+role:'new account · '+name+' · '+role});
+  auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_create',target:username,detail:(initialStatus==='pending'?('注册待审核 · '):('新增账号 · '))+name+' · '+role});
   saveState();renderAccounts();updateSyncUI();
-  toast(lang==='zh'?'账号已创建（初始密码需首次登录修改）':'Account created');
+  toast(initialStatus==='pending'? (lang==='zh'?'账号已提交，待老板审核启用':'Submitted — pending boss approval') : (lang==='zh'?'账号已创建（初始密码需首次登录修改）':'Account created'));
   closeAcctModal();
 }
+
+/* —— 账号审批 / 禁用 / 启用（大厂级生命周期） —— */
+function accountAction(username, action, okMsg){
+  const u=users.find(x=>x.username===username);if(!u)return;
+  if(u.role==='boss'){toast(lang==='zh'?'不能操作老板账号':'Cannot modify boss');return;}
+  if(action==='disable'){ u.status='disabled'; u.updatedTs=Date.now(); if(currentUser&&currentUser.username===username) logout(); }
+  else if(action==='enable'){ u.status='active'; u.updatedTs=Date.now(); }
+  settings.pending=(settings.pending||0)+1;
+  auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_'+action,target:username,detail:okMsg});
+  saveState();renderAccounts();updateSyncUI();
+  toast(okMsg);
+}
+function approveAccount(username){ accountAction(username,'enable', lang==='zh'?'已启用账号':'Account enabled'); }
+function disableAccount(username){ accountAction(username,'disable', lang==='zh'?'已禁用账号':'Account disabled'); }
+function enableAccount(username){ accountAction(username,'enable', lang==='zh'?'已启用账号':'Account enabled'); }
 /* ===== 公告（老板/开发管理员可发布，首页置顶） ===== */
 function openAnnounceModal(){ const m=document.getElementById('ann-modal'); if(m)m.classList.remove('hidden'); const t=document.getElementById('ann-title'); if(t)t.value=''; const b=document.getElementById('ann-body'); if(b)b.value=''; }
 function closeAnnounceModal(){ const m=document.getElementById('ann-modal'); if(m)m.classList.add('hidden'); }
