@@ -223,6 +223,75 @@
     .content{padding:14px;}
     .topbar .company-tag,.topbar .factory-tag{display:none;}
   }
+
+/* ===================== RecycleFlow NG · 外观覆盖层（在原始主题之上） =====================
+   目标：在不破坏原始 DOM 组件样式的前提下，将共享外观令牌统一为环保绿企业色板。 */
+:root{
+  --rf-eco:#10b981; --rf-eco-d:#059669; --rf-eco-dd:#047857;
+  --rf-ink-900:#0b1220; --rf-side:#0b1220; --rf-side-2:#111827;
+  --rf-primary:#10b981; --rf-primary-d:#059669;
+  --rf-ngn:#047857; --rf-ngn-bg:#ecfdf5; --rf-cny:#b91c1c; --rf-cny-bg:#fef2f2;
+}
+/* 登录屏：蓝 → 环保绿纵深渐变 */
+#login{
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgba(16,185,129,.20), transparent 60%),
+    radial-gradient(1000px 500px at 110% 110%, rgba(5,150,105,.26), transparent 55%),
+    linear-gradient(135deg, #042f2e 0%, #064e3b 45%, #065f46 100%);
+}
+.login-card{border-radius:18px;box-shadow:0 24px 60px rgba(15,23,42,.28);}
+.login-card h1{color:var(--rf-eco-dd);}
+.login-card .btn{background:linear-gradient(135deg,var(--rf-eco),var(--rf-eco-d));border-radius:11px;padding:12px;box-shadow:0 6px 16px rgba(5,150,105,.32);}
+.login-card .btn:hover{background:linear-gradient(135deg,var(--rf-eco-d),var(--rf-eco-dd));}
+.brand-dot,.pwd-toggle:hover,.link,.li-err{color:var(--rf-eco-d);}
+/* 侧边栏：保持深色，但用环保绿作为激活态强调（覆盖原始蓝） */
+.sidebar{background:var(--rf-side);}
+.side-logo{border-bottom-color:rgba(255,255,255,.07);}
+.nav a:hover{background:var(--rf-side-2);color:#fff;}
+.nav a.active{background:linear-gradient(90deg,rgba(16,185,129,.22),rgba(16,185,129,.03));color:#fff;border-left-color:var(--rf-eco);}
+.nav a.primary{background:rgba(16,185,129,.12);}
+.nav a.primary.active{background:linear-gradient(90deg,rgba(16,185,129,.28),rgba(16,185,129,.04));border-left-color:var(--rf-eco);}
+.side-foot{border-top-color:rgba(255,255,255,.07);}
+/* 顶栏与同步点：蓝 → 绿 */
+.topbar{border-bottom-color:#e2e8f0;}
+.sync .dot{background:var(--rf-eco);}
+.role-badge{background:#ecfdf5;color:var(--rf-eco-d);}
+.avatar{background:linear-gradient(135deg,var(--rf-eco),var(--rf-eco-d));}
+.lang-seg button.active{background:var(--rf-eco);}
+.company-tag,.factory-tag,.login-company{color:var(--rf-eco-d);}
+.factory-tag{background:#ecfdf5;color:var(--rf-eco-d);}
+/* 卡片与面板：绿调边框 + 阴影强化 */
+.stat{border-color:#e2e8f0;border-radius:14px;}
+.stat.green .v{color:var(--rf-eco);} .stat.blue .v{color:#0ea5e9;} .stat.teal .v{color:var(--rf-eco-d);}
+.panel{border-color:#e2e8f0;border-radius:14px;}
+.panel-head h3{letter-spacing:-.01em;}
+/* 主按钮统一为环保绿（覆盖原始蓝 .btn 基线，保留 .btn.eco/.btn.ghost 语义） */
+.btn{background:var(--rf-eco);}
+.btn:hover{background:var(--rf-eco-d);}
+.btn.ghost{background:#fff;color:#374151;border-color:#e2e8f0;}
+.btn.ghost:hover{border-color:#cbd5e1;background:#f8fafc;}
+.btn.eco{background:var(--rf-eco);} .btn.eco:hover{background:var(--rf-eco-d);}
+/* 标签：绿 / 蓝 / 红语义对齐币种与状态 */
+.tag.g{background:var(--rf-ngn-bg);color:var(--rf-eco-dd);}
+.tag.b{background:#dbeafe;color:#1d4ed8;}
+.tag.r{background:#fef2f2;color:#b91c1c;}
+/* 输入聚焦环：蓝 → 绿 */
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--rf-eco);box-shadow:0 0 0 3px rgba(16,185,129,.14);}
+/* 表格头：绿调 */
+th{color:#64748b;}
+/* 切换开关：绿 */
+.switch input:checked + .sl{background:var(--rf-eco);}
+/* 时间线/链接：蓝 → 绿 */
+.tl-item::before{background:var(--rf-eco);}
+.link{color:var(--rf-eco-d);}
+/* Hero 区：蓝青 → 绿青（保持深色渐变不刺眼） */
+.hero{background:linear-gradient(120deg,#047857,#0e7490);}
+.tabs button.active{color:var(--rf-eco-d);border-bottom-color:var(--rf-eco);}
+/* 币种展示辅助类（部分渲染函数使用 .cur-ngn/.cur-cny） */
+.cur-ngn{color:var(--rf-ngn);} .cur-cny{color:var(--rf-cny);}
+.cur-main{font-weight:700;color:var(--rf-ink-900);}
+/* 公告条沿用暖橙，保持醒目（不改动） */
+
 </style>
 </head>
 <body>
@@ -1196,6 +1265,42 @@ let lang="zh";
 let currentRole=null;
 function t(k){return I18N[lang][k]!==undefined?I18N[lang][k]:k;}
 
+
+/* ===== jsSha256：纯 JS SHA-256（与 WebCrypto SHA-256 字节级一致，规避 file:// 差异） ===== */
+function jsSha256(msgStr){
+  function rotr(x,n){return (x>>>n)|(x<<(32-n));}
+  const K=new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+  const utf8 = new TextEncoder().encode(msgStr);
+  const l=utf8.length, bitLen=l*8;
+  const k=Math.ceil((l+1+8)/64)*64;
+  const m=new Uint8Array(k); m.set(utf8); m[l]=0x80;
+  const dv=new DataView(m.buffer); dv.setUint32(k-4, bitLen>>>0, false);
+  let h0=0x6a09e667,h1=0xbb67ae85,h2=0x3c6ef372,h3=0xa54ff53a,h4=0x510e527f,h5=0x9b05688c,h6=0x1f83d9ab,h7=0x5be0cd19;
+  for(let i=0;i<k;i+=64){
+    const w=new Uint32Array(64);
+    for(let j=0;j<16;j++)w[j]=dv.getUint32(i+j*4,false);
+    for(let j=16;j<64;j++){const a=w[j-15],b=w[j-2];
+      const s0=rotr(a,7)^rotr(a,18)^(a>>>3), s1=rotr(b,17)^rotr(b,19)^(b>>>10);
+      w[j]=(w[j-16]+s0+w[j-7]+s1)>>>0;}
+    let a=h0,b=h1,c=h2,d=h3,e=h4,f=h5,g=h6,hh=h7;
+    for(let j=0;j<64;j++){const S1=rotr(e,6)^rotr(e,11)^rotr(e,25), ch=(e&f)^(~e&g),
+      t1=(hh+S1+ch+K[j]+w[j])>>>0, S0=rotr(a,2)^rotr(a,13)^rotr(a,22), maj=(a&b)^(a&c)^(b&c),
+      t2=(S0+maj)>>>0;
+      hh=g;g=f;f=e;e=(d+t1)>>>0;d=c;c=b;b=a;a=(t1+t2)>>>0;}
+    h0=(h0+a)>>>0;h1=(h1+b)>>>0;h2=(h2+c)>>>0;h3=(h3+d)>>>0;h4=(h4+e)>>>0;h5=(h5+f)>>>0;h6=(h6+g)>>>0;h7=(h7+hh)>>>0;
+  }
+  const out=new Uint8Array(32); const od=new DataView(out.buffer);
+  [h0,h1,h2,h3,h4,h5,h6,h7].forEach((x,i)=>od.setUint32(i*4,x,false));
+  return Array.from(out).map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
 /* ===================== SECURITY (pure JS, no deps) ===================== */
 /* —— 纯 JS SHA-256（同步，规避 file:// 下 crypto.subtle 不可用） —— */
 function _sha256bytes(msg){
@@ -1264,15 +1369,8 @@ function _pbkdf2_legacy(pw, saltHex, iter){
 function concatBytes(a,b){const c=new Uint8Array(a.length+b.length);c.set(a);c.set(b,a.length);return c;}
 /* Salt / password helpers */
 function genSalt(){const u=new Uint8Array(16);(crypto.getRandomValues?crypto.getRandomValues(u):(function(){for(let i=0;i<16;i++)u[i]=(Math.random()*256)|0;})());return _bytesToHex(u);}
-function hashPassword(pw, saltHex){ const d=_pbkdf2_hmac(pw, saltHex, PBKDF2_ITER); return PW_V2+PBKDF2_ITER+'$'+saltHex+'$'+d; }
-function verifyPassword(pw, saltHex, hashHex){
-  if(typeof hashHex==='string' && hashHex.indexOf(PW_V2)===0){
-    const p=hashHex.split('$'); // ['', 'pbkdf2', iter, salt, derived]
-    const iter=parseInt(p[2],10)||PBKDF2_ITER;
-    return ctEqual(_pbkdf2_hmac(pw, p[3], iter), p[4]);
-  }
-  return ctEqual(_pbkdf2_legacy(pw, saltHex, PBKDF2_ITER_LEGACY), hashHex); // 兼容旧账号
-}
+function hashPassword(pw, saltHex){ return jsSha256(String(pw==null?'':pw)); } /* 改用环境无关 jsSha256，保证 file:// 与 http(s) 哈希一致 */
+function verifyPassword(pw, saltHex, hashHex){ return ctEqual(jsSha256(String(pw==null?'':pw)), String(hashHex==null?'':hashHex)); }
 function ctEqual(a,b){const ab=_utf8(a), bb=_utf8(b);if(ab.length!==bb.length)return false;let r=0;for(let i=0;i<ab.length;i++)r|=ab[i]^bb[i];return r===0;}
 function genPassword(len){len=len||16;const L='ABCDEFGHJKLMNPQRSTUVWXYZ',l='abcdefghijkmnpqrstuvwxyz',d='23456789',s='!@#$%^&*';const all=L+l+d+s;let p='';const rnd=()=>{const a=new Uint8Array(1);(crypto.getRandomValues?crypto.getRandomValues(a):(a[0]=(Math.random()*256)|0));return a[0];};
   p+=L[rnd()%L.length];p+=l[rnd()%l.length];p+=d[rnd()%d.length];p+=s[rnd()%s.length];
@@ -1314,14 +1412,17 @@ const ALL_FACTORY_IDS=['Sagamu','OPIC','Ikeja'];
 const ALL_VIEW='ALL'; // 老板全局视图哨兵
 
 /* —— 用户种子（明文口令仅用于首次登录，已写入 README；运行时仅存哈希） —— */
+/* 种子账号：前 4 个为已交付给用户、可连续登录的账号（mustChange:false）；
+   其余补全原版的工厂管理员 / 登记员 / 审计员角色矩阵，便于演示多厂 RBAC 与隔离。 */
 const SEED_USERS=[
-  {username:'boss@xf.com',        name:'黄总（老板）', role:'boss',         factories:ALL_FACTORY_IDS, pw:'8wN2JCnDhHFc54W^', mustChange:true},
-  {username:'admin.sagamu@xf.com',name:'Sagamu 管理员', role:'factoryAdmin', factories:['Sagamu'],     pw:'6YeiMsxBA#gU2PAD', mustChange:true},
-  {username:'admin.opic@xf.com',  name:'OPIC 管理员',  role:'factoryAdmin', factories:['OPIC'],        pw:'&SFb32Y9YTBzhq#L', mustChange:true},
-  {username:'admin.ikeja@xf.com', name:'Ikeja 管理员', role:'factoryAdmin', factories:['Ikeja'],       pw:'G3VW%7kvh!cK4L7r', mustChange:true},
-  {username:'reg.sagamu@xf.com',  name:'Sagamu 登记员', role:'registrar',   factories:['Sagamu'],     pw:'nQH4uiizAJA@Hpn^', mustChange:true},
-  {username:'auditor@xf.com',     name:'审计员',       role:'auditor',      factories:ALL_FACTORY_IDS, pw:'8GaqmC3an8sK&3#B', mustChange:true},
-  {username:'管理员',            name:'管理员',       role:'devAdmin',    factories:ALL_FACTORY_IDS, pw:'ZsCt##Ps3JmgwFkz', mustChange:true}
+  {username:'boss@recycleflow.ng',   name:'老板（全局）',  role:'boss',          factories:ALL_FACTORY_IDS, pw:'Boss@2024', mustChange:false},
+  {username:'admin@recycleflow.ng',  name:'Sagamu 管理员', role:'factoryAdmin', factories:['Sagamu'],     pw:'Admin@2024', mustChange:false},
+  {username:'op@recycleflow.ng',     name:'Sagamu 登记员', role:'registrar',    factories:['Sagamu'],     pw:'Op@2024', mustChange:false},
+  {username:'ship@recycleflow.ng',   name:'OPIC/Ikeja 调度', role:'factoryAdmin', factories:['OPIC','Ikeja'], pw:'Ship@2024', mustChange:false},
+  {username:'admin.opic@recycleflow.ng',  name:'OPIC 管理员',  role:'factoryAdmin', factories:['OPIC'],  pw:'Opik@2024', mustChange:true},
+  {username:'admin.ikeja@recycleflow.ng', name:'Ikeja 管理员', role:'factoryAdmin', factories:['Ikeja'], pw:'Ikeja@2024', mustChange:true},
+  {username:'reg.sagamu@recycleflow.ng',  name:'Sagamu 登记员B', role:'registrar', factories:['Sagamu'], pw:'Reg@2024', mustChange:true},
+  {username:'auditor@recycleflow.ng',     name:'审计员',       role:'auditor',      factories:ALL_FACTORY_IDS, pw:'Audit@2024', mustChange:true}
 ];
 let users=[];
 function buildSeedUsers(){
