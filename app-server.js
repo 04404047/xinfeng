@@ -39,6 +39,13 @@ let deletedUsers = [];  // 已删除账号 {username, ts}（墓碑）
 let deletedCustomers = []; // 已删除客户 {id, ts}（墓碑）
 let financesById = {};  // id -> finance（财务主数据，跨厂区同步，支持老板全局汇总）
 let deletedFinances = []; // 已删除财务 {id, ts}（墓碑）
+/* 库存校正覆盖（与 recycleflow-server 后端保持一致的持久化 + 删除墓碑）：
+   invAdjust/invAdjustRaw/invRawEdit/invPelletEdit + invDeleted（kind->{key:ts}）。 */
+let invAdjust = {};
+let invAdjustRaw = {};
+let invRawEdit = {};
+let invPelletEdit = {};
+let invDeleted = { raw: {}, pellet: {} };
 
 /* 墓碑归一化：兼容旧版 ['id1','id2'] 与新版 [{id,ts}] 两种格式，统一为对象数组 */
 function normTomb(arr) {
@@ -58,6 +65,11 @@ try {
     deletedCustomers = normTomb(d.deletedCustomers);
     financesById = d.financesById || {};
     deletedFinances = normTomb(d.deletedFinances);
+    if (d.invAdjust && typeof d.invAdjust === 'object') invAdjust = d.invAdjust;
+    if (d.invAdjustRaw && typeof d.invAdjustRaw === 'object') invAdjustRaw = d.invAdjustRaw;
+    if (d.invRawEdit && typeof d.invRawEdit === 'object') invRawEdit = d.invRawEdit;
+    if (d.invPelletEdit && typeof d.invPelletEdit === 'object') invPelletEdit = d.invPelletEdit;
+    if (d.invDeleted && typeof d.invDeleted === 'object') invDeleted = { raw: (d.invDeleted.raw || {}), pellet: (d.invDeleted.pellet || {}) };
     console.log('[sync] 已载入本地账本：%d 条记录，%d 条删除墓碑；账号 %d；客户 %d；财务 %d',
       Object.keys(ledger).length, deleted.length, Object.keys(usersById).length, Object.keys(customersById).length, Object.keys(financesById).length);
   }
@@ -97,7 +109,7 @@ function persist() {
   if (saveTimer) return;
   saveTimer = setTimeout(() => {
     saveTimer = null;
-    const plain = JSON.stringify({ ledger, deleted, usersById, customersById, deletedUsers, deletedCustomers, financesById, deletedFinances }, null, 0);
+    const plain = JSON.stringify({ ledger, deleted, usersById, customersById, deletedUsers, deletedCustomers, financesById, deletedFinances, invAdjust, invAdjustRaw, invRawEdit, invPelletEdit, invDeleted }, null, 0);
     const packed = encryptData(plain);
     const tmp = DATA_FILE + '.tmp';
     /* 先写临时文件再原子 rename，避免进程崩溃/断电时损坏数据文件 */
@@ -128,7 +140,8 @@ function sendJSON(res, code, obj, req) {
   const body = JSON.stringify(obj);
   const headers = {
     'Content-Type': 'application/json; charset=utf-8',
-    'Vary': 'Origin'
+    'Vary': 'Origin',
+    'Cache-Control': 'no-store' // 禁止缓存同步 API 响应，避免 /sync/pull 返回陈旧数据导致"清缓存前数据不同步"
   };
   // 同源/白名单来源才回显；否则置 'null' 由浏览器拒绝跨站访问
   headers['Access-Control-Allow-Origin'] = origin || 'null';
@@ -158,7 +171,7 @@ const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; cha
    不得将其复活——这是修复「老板删除后被同步复原」的关键。 */
 function mergeRecord(rec) {
   if (!rec || rec.id == null) return;
-  if (deleted.indexOf(rec.id) >= 0) return; // 墓碑中的记录永不复活
+  if (deleted.some(t => t.id === rec.id)) return; // 墓碑中的记录永不复活
   const cur = ledger[rec.id];
   const ts = rec.ts || 0, rev = rec.rev || 0;
   const cts = cur ? (cur.ts || 0) : -1, crev = cur ? (cur.rev || 0) : -1;
@@ -169,23 +182,32 @@ function mergeRecord(rec) {
 /* 账号合并：按 username 做 LWW（updatedTs 大者胜），使新账号可在任意设备登录 */
 function mergeUser(u) {
   if (!u || u.username == null) return;
-  if (deletedUsers.indexOf(u.username) >= 0) return;
+  if (deletedUsers.some(t => t.id === u.username)) return;
   const cur = usersById[u.username];
   if (!cur || (u.updatedTs || 0) > (cur.updatedTs || 0)) usersById[u.username] = u;
 }
 /* 客户合并：按 id 做 LWW（updatedTs 大者胜），使分厂客户可在老板账号查看 */
 function mergeCustomer(c) {
   if (!c || c.id == null) return;
-  if (deletedCustomers.indexOf(c.id) >= 0) return;
+  if (deletedCustomers.some(t => t.id === c.id)) return;
   const cur = customersById[c.id];
   if (!cur || (c.updatedTs || 0) > (cur.updatedTs || 0)) customersById[c.id] = c;
 }
 /* 财务合并：按 id 做 LWW（ts 大者胜），使三厂财务可在老板账号全局汇总 */
 function mergeFinance(f) {
   if (!f || f.id == null) return;
-  if (deletedFinances.indexOf(f.id) >= 0) return;
+  if (deletedFinances.some(t => t.id === f.id)) return;
   const cur = financesById[f.id];
   if (!cur || (f.ts || 0) > (cur.ts || 0)) financesById[f.id] = f;
+}
+/* 库存合并（带删除墓碑拦截）：等价于 Object.assign 的"加/覆盖"，但跳过已被 invDeleted 标记删除的键，
+   确保某设备在被删后、尚未拉取墓碑前再次 push 旧键时，服务端不会将其复活。 */
+function mergeInv(target, src, kind) {
+  if (!src || typeof src !== 'object') return;
+  Object.keys(src).forEach(function (k) {
+    if (invDeleted[kind] && (invDeleted[kind][k] || 0) > 0) return;
+    target[k] = src[k];
+  });
 }
 
 /* ---------- 路由 ---------- */
@@ -237,6 +259,31 @@ const server = http.createServer(async (req, res) => {
       delete financesById[fid];
       if (deletedFinances.findIndex(t => t.id === fid) < 0) deletedFinances.push({ id: fid, ts: now });
     });
+    /* 库存校正覆盖：合并存储（多设备各自校正累计）；删除墓碑让"删除库存条目"跨设备生效且不被复活 */
+    const incInvDeleted = (body.invDeleted && typeof body.invDeleted === 'object') ? body.invDeleted : {};
+    ['raw', 'pellet'].forEach(function (kind) {
+      const rk = incInvDeleted[kind] || {};
+      Object.keys(rk).forEach(function (key) {
+        const ts = rk[key] || 0;
+        invDeleted[kind] = invDeleted[kind] || {};
+        if (ts <= 0) {
+          /* 客户端显式解除墓碑（重新入库/编辑时发 ts=0 标记）：清除服务端墓碑与残留键，
+             随后由下方 mergeInv 用 body 中的新值将该键重新加回。仅此显式信号才允许复活，
+             普通同步（body 不含该键的墓碑）不会清除墓碑，从而防止陈旧推送复活已删条目。 */
+          if (invDeleted[kind][key]) delete invDeleted[kind][key];
+          if (kind === 'raw') { delete invAdjustRaw[key]; delete invRawEdit[key]; }
+          else { delete invAdjust[key]; delete invPelletEdit[key]; }
+          return;
+        }
+        if (kind === 'raw') { delete invAdjustRaw[key]; delete invRawEdit[key]; if (body.invAdjustRaw) delete body.invAdjustRaw[key]; if (body.invRawEdit) delete body.invRawEdit[key]; }
+        else { delete invAdjust[key]; delete invPelletEdit[key]; if (body.invAdjust) delete body.invAdjust[key]; if (body.invPelletEdit) delete body.invPelletEdit[key]; }
+        if ((invDeleted[kind][key] || 0) < ts) invDeleted[kind][key] = ts;
+      });
+    });
+    if (body.invAdjust && typeof body.invAdjust === 'object') mergeInv(invAdjust, body.invAdjust, 'pellet');
+    if (body.invAdjustRaw && typeof body.invAdjustRaw === 'object') mergeInv(invAdjustRaw, body.invAdjustRaw, 'raw');
+    if (body.invRawEdit && typeof body.invRawEdit === 'object') mergeInv(invRawEdit, body.invRawEdit, 'raw');
+    if (body.invPelletEdit && typeof body.invPelletEdit === 'object') mergeInv(invPelletEdit, body.invPelletEdit, 'pellet');
     persist();
     sendJSON(res, 200, { ok: true, serverTime: Date.now(), count: Object.keys(ledger).length }, req);
     return;
@@ -268,7 +315,12 @@ const server = http.createServer(async (req, res) => {
       deletedUsers: incDelUsers,
       deletedCustomers: incDelCustomers,
       finances: incFinances,
-      deletedFinances: incDelFinances
+      deletedFinances: incDelFinances,
+      invAdjust: invAdjust,
+      invAdjustRaw: invAdjustRaw,
+      invRawEdit: invRawEdit,
+      invPelletEdit: invPelletEdit,
+      invDeleted: invDeleted
     }, req);
     return;
   }
@@ -292,11 +344,31 @@ const server = http.createServer(async (req, res) => {
 });
 
 function serveFile(res, file, req) {
-  fs.readFile(file, (err, data) => {
+  fs.stat(file, (err, st) => {
     if (err) { sendJSON(res, 404, { ok: false, error: 'file not found' }, req); return; }
     const ext = path.extname(file).toLowerCase();
-    res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
-    res.end(data);
+    const headers = { 'Content-Type': MIME[ext] || 'application/octet-stream' };
+    // SPA 外壳（html/js/css）禁止强缓存：每次请求都向服务器校验；
+    // 重新部署后文件 mtime 变化即返回最新内容，用户无需手动清浏览器缓存。
+    if (ext === '.html' || ext === '.js' || ext === '.css') {
+      headers['Cache-Control'] = 'no-cache';
+      headers['Last-Modified'] = st.mtime.toUTCString();
+      const inmMs = req.headers['if-modified-since'] ? Date.parse(req.headers['if-modified-since']) : NaN;
+      // 以秒为粒度比较（Last-Modified/If-Modified-Since 仅秒精度）：未变化则回 304，已重新部署（mtime 进入新秒）则回 200 最新内容
+      if (!isNaN(inmMs) && Math.floor(inmMs / 1000) >= Math.floor(st.mtimeMs / 1000)) {
+        res.writeHead(304, headers);
+        res.end();
+        return;
+      }
+    } else {
+      // 图片等静态资源可短期缓存（内容通常不随部署变化）
+      headers['Cache-Control'] = 'public, max-age=86400';
+    }
+    fs.readFile(file, (e2, data) => {
+      if (e2) { sendJSON(res, 404, { ok: false, error: 'file not found' }, req); return; }
+      res.writeHead(200, headers);
+      res.end(data);
+    });
   });
 }
 

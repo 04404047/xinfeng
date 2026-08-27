@@ -80,6 +80,15 @@
   .panel-head .right{margin-left:auto;display:flex;gap:8px;align-items:center;}
   .panel-body{padding:16px;}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .inv-grid .panel{display:flex;flex-direction:column;}
+  .inv-grid .panel-body{flex:1 1 auto;display:flex;flex-direction:column;}
+  #view-inventory .tbl-scroll{max-height:300px;flex:1 1 auto;}
+  .inv-add{border-top:1px dashed var(--line);padding:12px 16px;background:#fafbff;margin-top:auto;}
+  .inv-add-title{font-size:12px;font-weight:700;color:#3730a3;margin-bottom:8px;}
+  .inv-add .field label{font-size:11px;margin-bottom:4px;}
+  .inv-add select,.inv-add input{height:34px;}
+  #inv-catalog{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;align-items:start;}
+  #inv-catalog .cat-row{margin-bottom:0;}
   .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
   @media(max-width:1100px){.cards{grid-template-columns:repeat(2,1fr);}.grid2,.grid3{grid-template-columns:1fr;}}
   table{width:100%;border-collapse:collapse;font-size:12.5px;}
@@ -223,75 +232,19 @@
     .content{padding:14px;}
     .topbar .company-tag,.topbar .factory-tag{display:none;}
   }
-
-/* ===================== RecycleFlow NG · 外观覆盖层（在原始主题之上） =====================
-   目标：在不破坏原始 DOM 组件样式的前提下，将共享外观令牌统一为环保绿企业色板。 */
-:root{
-  --rf-eco:#10b981; --rf-eco-d:#059669; --rf-eco-dd:#047857;
-  --rf-ink-900:#0b1220; --rf-side:#0b1220; --rf-side-2:#111827;
-  --rf-primary:#10b981; --rf-primary-d:#059669;
-  --rf-ngn:#047857; --rf-ngn-bg:#ecfdf5; --rf-cny:#b91c1c; --rf-cny-bg:#fef2f2;
-}
-/* 登录屏：蓝 → 环保绿纵深渐变 */
-#login{
-  background:
-    radial-gradient(1200px 600px at 15% -10%, rgba(16,185,129,.20), transparent 60%),
-    radial-gradient(1000px 500px at 110% 110%, rgba(5,150,105,.26), transparent 55%),
-    linear-gradient(135deg, #042f2e 0%, #064e3b 45%, #065f46 100%);
-}
-.login-card{border-radius:18px;box-shadow:0 24px 60px rgba(15,23,42,.28);}
-.login-card h1{color:var(--rf-eco-dd);}
-.login-card .btn{background:linear-gradient(135deg,var(--rf-eco),var(--rf-eco-d));border-radius:11px;padding:12px;box-shadow:0 6px 16px rgba(5,150,105,.32);}
-.login-card .btn:hover{background:linear-gradient(135deg,var(--rf-eco-d),var(--rf-eco-dd));}
-.brand-dot,.pwd-toggle:hover,.link,.li-err{color:var(--rf-eco-d);}
-/* 侧边栏：保持深色，但用环保绿作为激活态强调（覆盖原始蓝） */
-.sidebar{background:var(--rf-side);}
-.side-logo{border-bottom-color:rgba(255,255,255,.07);}
-.nav a:hover{background:var(--rf-side-2);color:#fff;}
-.nav a.active{background:linear-gradient(90deg,rgba(16,185,129,.22),rgba(16,185,129,.03));color:#fff;border-left-color:var(--rf-eco);}
-.nav a.primary{background:rgba(16,185,129,.12);}
-.nav a.primary.active{background:linear-gradient(90deg,rgba(16,185,129,.28),rgba(16,185,129,.04));border-left-color:var(--rf-eco);}
-.side-foot{border-top-color:rgba(255,255,255,.07);}
-/* 顶栏与同步点：蓝 → 绿 */
-.topbar{border-bottom-color:#e2e8f0;}
-.sync .dot{background:var(--rf-eco);}
-.role-badge{background:#ecfdf5;color:var(--rf-eco-d);}
-.avatar{background:linear-gradient(135deg,var(--rf-eco),var(--rf-eco-d));}
-.lang-seg button.active{background:var(--rf-eco);}
-.company-tag,.factory-tag,.login-company{color:var(--rf-eco-d);}
-.factory-tag{background:#ecfdf5;color:var(--rf-eco-d);}
-/* 卡片与面板：绿调边框 + 阴影强化 */
-.stat{border-color:#e2e8f0;border-radius:14px;}
-.stat.green .v{color:var(--rf-eco);} .stat.blue .v{color:#0ea5e9;} .stat.teal .v{color:var(--rf-eco-d);}
-.panel{border-color:#e2e8f0;border-radius:14px;}
-.panel-head h3{letter-spacing:-.01em;}
-/* 主按钮统一为环保绿（覆盖原始蓝 .btn 基线，保留 .btn.eco/.btn.ghost 语义） */
-.btn{background:var(--rf-eco);}
-.btn:hover{background:var(--rf-eco-d);}
-.btn.ghost{background:#fff;color:#374151;border-color:#e2e8f0;}
-.btn.ghost:hover{border-color:#cbd5e1;background:#f8fafc;}
-.btn.eco{background:var(--rf-eco);} .btn.eco:hover{background:var(--rf-eco-d);}
-/* 标签：绿 / 蓝 / 红语义对齐币种与状态 */
-.tag.g{background:var(--rf-ngn-bg);color:var(--rf-eco-dd);}
-.tag.b{background:#dbeafe;color:#1d4ed8;}
-.tag.r{background:#fef2f2;color:#b91c1c;}
-/* 输入聚焦环：蓝 → 绿 */
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--rf-eco);box-shadow:0 0 0 3px rgba(16,185,129,.14);}
-/* 表格头：绿调 */
-th{color:#64748b;}
-/* 切换开关：绿 */
-.switch input:checked + .sl{background:var(--rf-eco);}
-/* 时间线/链接：蓝 → 绿 */
-.tl-item::before{background:var(--rf-eco);}
-.link{color:var(--rf-eco-d);}
-/* Hero 区：蓝青 → 绿青（保持深色渐变不刺眼） */
-.hero{background:linear-gradient(120deg,#047857,#0e7490);}
-.tabs button.active{color:var(--rf-eco-d);border-bottom-color:var(--rf-eco);}
-/* 币种展示辅助类（部分渲染函数使用 .cur-ngn/.cur-cny） */
-.cur-ngn{color:var(--rf-ngn);} .cur-cny{color:var(--rf-cny);}
-.cur-main{font-weight:700;color:var(--rf-ink-900);}
-/* 公告条沿用暖橙，保持醒目（不改动） */
-
+  /* 回收单 / 生产记录：按日期分组，当日展开、其余折叠为总结框 */
+  .grp-row{background:var(--bg-soft);cursor:pointer;transition:background .15s;}
+  .grp-row:hover{background:#eef2f7;}
+  .grp-row.grp-open{background:#e7eefb;}
+  .grp-ico{display:inline-block;width:14px;color:var(--primary);font-weight:700;}
+  .grp-row td{font-size:13px;color:var(--text-2);padding:9px 12px;border-bottom:1px solid var(--border);}
+  /* 库存合计行 */
+  .inv-total td{border-top:2px solid var(--border);font-weight:700;color:var(--text);background:var(--bg-soft);padding:9px 12px;}
+  /* 库存手动校正输入框 */
+  .inv-adj{font:inherit;text-align:right;border:1px solid var(--border);border-radius:8px;padding:5px 8px;background:#fff;color:var(--text);}
+  .inv-adj:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+  .inv-mat-t{font:inherit;border:1px solid var(--border);border-radius:8px;padding:5px 8px;background:#fff;color:var(--text);width:90px;}
+  .inv-mat-t:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
 </style>
 </head>
 <body>
@@ -314,7 +267,7 @@ th{color:#64748b;}
     <select id="li-factory"><option value="">—</option></select>
     <div class="li-err" id="li-err"></div>
     <button class="btn" onclick="signIn()" data-i18n="liSign">登录</button>
-    <button class="btn ghost sm mt" onclick="openAcctModal(null,true)" data-i18n="register">注册新账号</button>
+    <button class="btn ghost sm mt" onclick="openAcctModal()" data-i18n="register">注册新账号</button>
     <div class="login-foot">
       <span class="small muted" data-i18n="liNote">演示原型 · 支持离线 · ¥ 计价</span>
       <div class="lang-seg" id="login-seg">
@@ -399,6 +352,7 @@ th{color:#64748b;}
           <div class="stat orange" id="dash-card-7" onclick="dashClick(7)"><div class="k" id="dash-l7"></div><div class="v" id="dash-c7">0</div><div class="hint" data-i18n="d_click">点击查看明细 →</div></div>
           <div class="stat" id="dash-card-8" onclick="dashClick(8)"><div class="k" id="dash-l8"></div><div class="v" id="dash-c8">0</div><div class="hint" data-i18n="d_click">点击查看明细 →</div></div>
           <div class="stat" id="dash-card-9" onclick="dashClick(9)"><div class="k" id="dash-l9"></div><div class="v" id="dash-c9">0</div><div class="hint" data-i18n="d_click">点击查看明细 →</div></div>
+          <div class="stat blue" id="dash-card-10" onclick="go('logistics')"><div class="k" id="dash-l10"></div><div class="v" id="dash-c10">0</div><div class="hint" data-i18n="d_click">点击查看物流 →</div></div>
         </div>
         <div class="grid2">
           <div class="panel">
@@ -689,14 +643,34 @@ th{color:#64748b;}
       <!-- ===== Inventory (库存管理) ===== -->
       <section class="view" id="view-inventory">
         <div class="ok" data-i18n="inv_note">库存管理：原料（大料 / 破碎料）与成品（粒子 · 粉，按材质·颜色）由业务记录实时回放得出；下方「种类与颜色」可自由编辑添加，新增造粒产出会自动更新对应成品库存。</div>
-        <div class="grid2">
+        <div class="note mb" id="inv-edit-hint" style="display:none"><b data-i18n="inv_edit_hint_t">老板模式：</b><span data-i18n="inv_edit_hint">原料与成品库存均可在右侧数值框直接修改（按工厂独立校正），系统按「业务回放值 + 校正偏移」展示。</span></div>
+        <div class="grid2 inv-grid">
           <div class="panel">
             <div class="panel-head"><h3 data-i18n="inv_raw">原料库存（大料 / 破碎料）</h3></div>
             <div class="panel-body" style="padding:0"><div class="tbl-scroll"><table><thead><tr><th data-i18n="h_mat">材质</th><th data-i18n="h_form">形态</th><th data-i18n="h_w">重量(kg)</th></tr></thead><tbody id="inv-raw"></tbody></table></div></div>
+            <div class="inv-add">
+              <div class="inv-add-title"><span data-i18n="inv_raw_add">＋ 原料入库（手动增加库存）</span></div>
+              <div class="row" style="gap:8px;flex-wrap:wrap;align-items:flex-end">
+                <div class="field" style="margin:0"><label data-i18n="h_mat">材质</label><select id="ira-mat" class="ira" onchange="onInvMatChange()"></select></div>
+                <div class="field" style="margin:0"><label data-i18n="h_form">形态</label><select id="ira-form" class="ira"><option value="大料" data-i18n="opt_bulk">大料</option><option value="破碎料" data-i18n="opt_frag">破碎料</option></select></div>
+                <div class="field" style="margin:0"><label data-i18n="h_color">颜色</label><select id="ira-color" class="ira"></select></div>
+                <div class="field" style="margin:0"><label data-i18n="h_w">重量(kg)</label><input id="ira-w" type="number" min="0" step="0.1" style="width:110px"/></div>
+                <button class="btn eco sm" onclick="addRawStock()" data-i18n="inv_add_btn">添加入库</button>
+              </div>
+            </div>
           </div>
           <div class="panel">
             <div class="panel-head"><h3 data-i18n="inv_pellet">成品库存（材质 · 颜色）</h3></div>
-            <div class="panel-body" style="padding:0"><div class="tbl-scroll"><table><thead><tr><th data-i18n="h_mat">材质</th><th data-i18n="h_color">颜色</th><th data-i18n="h_w">重量(kg)</th></tr></thead><tbody id="inv-pellet"></tbody></table></div></div>
+            <div class="panel-body" style="padding:0"><div class="tbl-scroll"><table><thead><tr><th data-i18n="h_mat">材质</th><th data-i18n="h_color">颜色</th><th data-i18n="h_bags">袋数</th></tr></thead><tbody id="inv-pellet"></tbody></table></div></div>
+            <div class="inv-add">
+              <div class="inv-add-title"><span data-i18n="inv_pellet_add">＋ 成品入库（手动增加库存）</span></div>
+              <div class="row" style="gap:8px;flex-wrap:wrap;align-items:flex-end">
+                <div class="field" style="margin:0"><label data-i18n="h_mat">种类</label><select id="ipa-mat" class="ipa" onchange="onInvMatChange()"></select></div>
+                <div class="field" style="margin:0"><label data-i18n="h_color">颜色</label><select id="ipa-color" class="ipa"></select></div>
+                <div class="field" style="margin:0"><label data-i18n="h_bags">袋数</label><input id="ipa-bags" type="number" min="0" step="1" style="width:90px"/></div>
+                <button class="btn eco sm" onclick="addPelletStock()" data-i18n="inv_add_btn">添加入库</button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="panel">
@@ -950,12 +924,13 @@ th{color:#64748b;}
                 <option value="Crush" data-i18n="ty_Crush">破碎记录</option>
                 <option value="Produce" data-i18n="ty_Produce">造粒记录</option>
                 <option value="Sale" data-i18n="ty_Sale">出售记录</option>
+                <option value="InvPellet" data-i18n="reset_pellet">成品库存</option>
               </select>
               <button class="btn sm danger" onclick="if(can('data.reset'))resetSelectedData(document.getElementById('reset-cat').value);else toast(lang==='zh'?'无归零权限（仅老板）':'No reset permission (boss only)')" data-i18n="acct_reset">数据归零</button>
             </div></div>
           <div class="panel-body">
             <div class="small muted mb" data-i18n="reg_note">老板可在此新增分厂账号、分配密码与工厂；注册入口同时开放于登录页。</div>
-            <table><thead><tr><th data-i18n="acct_username">账号</th><th data-i18n="acct_name">姓名</th><th data-i18n="acct_role">角色</th><th data-i18n="acct_factories">工厂</th><th data-i18n="acct_status">状态</th><th data-i18n="acct_ops">操作</th></tr></thead>
+            <table><thead><tr><th data-i18n="acct_username">账号</th><th data-i18n="acct_name">姓名</th><th data-i18n="acct_role">角色</th><th data-i18n="acct_factories">工厂</th><th></th></tr></thead>
             <tbody id="accounts-body"></tbody></table>
           </div></div>
         <div id="tab-rate" class="panel hidden"><div class="panel-head"><h3 data-i18n="set_rate">汇率兑换（人民币 / 奈拉）</h3></div>
@@ -1101,7 +1076,7 @@ const I18N = {
     sync_online:"在线", sync_offline:"离线",
     hero_title:"回收作业台", hero_sub:"本厂以废旧塑料回收为核心，记录每日回收与同步状态", hero_cta:"＋ 新建回收单",
     d_crushed:"今日破碎料总量", d_bulk:"今日大料总量", d_sum:"两者之和", d_recamt:"今日回收金额", d_shiptoday:"今日配送量", d_click:"点击查看明细 →",
-    d_ov_bulk:"今日大料采购量", d_ov_crushed:"今日破碎料采购量", d_ov_total:"今日合计采购量", d_ov_buyamt:"今日采购金额", d_ov_income:"累计进账", d_ov_expense:"累计支出", d_ov_balance:"当前余额", d_ov_produced:"今日生产颗粒(kg)", d_ov_sold:"今日出售颗粒(kg)", dash_home:"首页总览",
+    d_ov_bulk:"本月大料采购量", d_ov_crushed:"本月破碎料采购量", d_ov_total:"本月合计采购量", d_ov_buyamt:"本月采购金额", d_ov_income:"累计进账", d_ov_expense:"累计支出", d_ov_balance:"当前余额", d_ov_produced:"本月生产颗粒(kg)", d_ov_sold:"本月出售颗粒(kg)", d_ov_shipw:"本月配送总厂(kg)", dash_home:"首页总览",
     fin_cur:"货币", fin_rate:"1 人民币 CNY = ? 奈拉 NGN", fin_fx_equiv:"等值", fin_equiv:"折合", set_rate:"汇率兑换", rate_tip:"设置当前汇率后，收支登记将按此汇率自动换算展示；具备财务权限（老板 / 工厂管理员）即可修改。", fin_fx:"换算试算：输入金额，自动转换为另一种货币",
     acct_grant:"分配权限", ann_body:"公告内容", ann_del:"删除", ann_post:"📢 发布公告", ann_publish:"发布", ann_title:"公告标题", contact:"联系", rec_detail:"回收明细", reset_all:"全部业务数据", s_pick_note:"选择要配送的库存",
     d_trend_title:"近 7 日 回收 vs 出入（kg）", d_legend_rec:"回收", d_legend_ship:"配送", d_legend_ship_in:"入库", d_activity:"近期动态", d_inv_title:"各材质累计原料（kg，在库参考）",
@@ -1133,9 +1108,9 @@ const I18N = {
     sync_now:"立即同步", sy_conn:"连接", sy_online:"在线（4G）", sy_local:"本地库", sy_pending:"待上传", sy_last:"最近同步", sy_conflict:"冲突策略", sy_lww:"末写优先 + 版本向量", sy_nokey:"同步未加密",
     bk_local:"创建本地备份", bk_cloud:"云端备份", bk_restore:"恢复", bk_last:"最近备份：2026-08-15 23:00（自动，云端）",
     h_time:"时间", h_actor:"操作人", h_action:"动作", h_target:"对象", h_detail:"明细",
-    ac_price:"调价", ac_create:"新建", ac_edit:"编辑", ac_edit_bank:"银行卡号已更新", ac_receive:"回收", ac_ship:"配送", ac_cust:"客户", ac_crush:"破碎", ac_produce:"造粒", ac_sale:"出售", ac_inbound:"入库", ac_reset:"归零",
+    ac_price:"调价", ac_create:"新建", ac_edit:"编辑", ac_edit_bank:"银行卡号已更新", ac_receive:"回收", ac_ship:"配送", ac_cust:"客户", ac_crush:"破碎", ac_produce:"造粒", ac_sale:"出售", ac_inbound:"入库", ac_reset:"归零", reset_pellet:"成品库存", ac_inv_del:"删除库存",
     lo_lang:"界面语言", lo_lang_opt_zh:"中文", lo_lang_opt_en:"English", lo_cur:"货币", lo_date_fmt:"日期格式", lo_num:"数字格式", lo_printer:"打印机 / 地磅", lo_save:"保存设置", lo_note:"语言切换即时生效；其余本地化参数随版本固化（人民币 ¥ / YYYY-MM-DD）。点击「保存设置」将偏好写入本地。",
-    h_date:"日期", h_mat:"材质", h_form:"形态", h_color:"颜色", h_w:"重量", h_price:"单价 ₦", h_amt:"金额",
+    h_date:"日期", h_mat:"材质", h_form:"形态", h_color:"颜色", h_w:"重量", h_bags:"袋数", h_price:"单价 ₦", h_amt:"金额",
     cm_title_new:"新建客户", cm_title_edit:"编辑客户", cm_name:"姓名 *", cm_phone:"电话", cm_bank:"开户行", cm_acct:"账号", cm_addr:"地址", cm_note:"备注", cm_save:"保存", cm_cancel:"取消",
     c_factory:"所属工厂", c_imprint:"重名印记", c_imprint_tip:"该客户名称与所列工厂已有客户重复，请跨厂核对",
     fin_title:"财务记录", fin_income:"进项", fin_expense:"出项", fin_net:"净额", fin_daily:"每日收支统计", fin_date:"日期", fin_type:"类型", fin_cat:"类别", fin_amount:"金额(¥)", fin_note:"备注", fin_by:"经手人", fin_add:"＋ 新增财务记录", fin_link:"🔗 关联业务收支", fin_factory:"所属工厂", fin_auto:"自动关联", s_cost:"运费(¥)",
@@ -1158,7 +1133,7 @@ const I18N = {
     ocr_code:"代码(如 PP.l)", ocr_parsed:"解析(材质/颜色)", ocr_codehint:"票据按「材质.颜色代码」分行（如 PP.l=透明、PP.b=黑色、PP.c=单色；总重为过磅总重，按卸货种类分行）。系统自动解析为回收单行，请核对。",
     ac_cust:"客户",
     repLabels:{day:["周一","周二","周三","周四","周五","周六","周日"],month:["3月","4月","5月","6月","7月","8月"],quarter:["Q1","Q2","Q3","Q4"],year:["2023","2024","2025","2026*"]},
-    liFactory:"工厂 / Plant", login_bad:"账号或密码错误", login_badfac:"您无权进入该工厂", login_required:"请输入账号和密码", login_disabled:"该账号已被禁用，请联系管理员", login_pending:"该账号待管理员审核启用", pwd_title:"首次登录 · 请设置新密码", pwd_new:"新密码（可设置简单密码）", pwd_confirm:"确认新密码", pwd_weak:"请输入新密码", pwd_mismatch:"两次输入的密码不一致", pwd_ok:"确定", liLogout:"退出", opic_bulk_only:"OPIC工厂仅接收大料，不可接收破碎料",
+    liFactory:"工厂 / Plant", login_bad:"账号或密码错误", login_badfac:"您无权进入该工厂", pwd_title:"首次登录 · 请设置新密码", pwd_new:"新密码（可设置简单密码）", pwd_confirm:"确认新密码", pwd_weak:"请输入新密码", pwd_mismatch:"两次输入的密码不一致", pwd_ok:"确定", liLogout:"退出", opic_bulk_only:"OPIC工厂仅接收大料，不可接收破碎料",
     g_core:"核心业务", g_prod:"生产加工", g_logi:"物流协同",
     nav_crush:"破碎清洗", nav_produce:"生产造粒", nav_sell:"成品出售", nav_logistics:"物流协同", nav_inventory:"库存管理", nav_receiving:"回收分拣", nav_today:"当日回收", nav_shipping:"配送总厂",
     hero_title:"综合作业台", hero_sub:"本厂以废旧塑料回收加工为核心，覆盖回收、破碎、造粒与销售全流程",
@@ -1168,7 +1143,7 @@ const I18N = {
     produce_title:"新建造粒生产单", produce_in:"投入破碎料(kg)", produce_out:"产出粒子(kg)", produce_yield:"造粒得率", produce_yield_val:"约 95%", produce_save:"保存生产单", produce_list:"造粒生产记录", produce_pellet:"在产粒子库存", produce_rate:"得率", pr_shift:"班次", pr_machine:"机台", produce_qty:"产出数量(kg)",
     sell_title:"新建成品出售单", sell_mat:"材质", sell_w:"数量(kg)", sell_price:"单价 ¥/kg", sell_amt:"销售额", sell_avail:"可用库存", sell_inv:"成品库存（材质·颜色）", sell_cust:"购货客户 *", sell_save:"保存出售单", sell_list:"成品出售记录", sell_rev:"累计销售额",
     logistics_title:"物流协同看板", logistics_out:"分厂配送", logistics_in:"总厂入库", logistics_confirm:"确认入库", logistics_pending:"待入库", logistics_transit:"在途", logistics_received:"已入库", logistics_from:"来源工厂", logistics_summary:"物流概览", logistics_empty:"暂无物流记录",
-    inv_note:"库存管理：原料（大料 / 破碎料）与成品（粒子·粉，按材质·颜色）由业务记录实时回放得出；下方「种类与颜色」可自由编辑添加，新增造粒产出会自动更新对应成品库存。", inv_raw:"原料库存（大料 / 破碎料）", inv_pellet:"成品库存（材质 · 颜色）", inv_catalog:"种类与颜色配置（全局统一）", inv_add_mat:"＋ 新增种类", inv_catalog_note:"说明：删除颜色 / 种类仅影响可选列表，不影响历史记录；造粒产出与出库销售均从此目录取值，确保种类颜色全局统一。", inv_del:"删除", inv_add_color:"新增颜色", inv_del_mat:"删除种类",
+    inv_note:"库存管理：原料（大料 / 破碎料）与成品（粒子·粉，按材质·颜色）由业务记录实时回放得出；下方「种类与颜色」可自由编辑添加，新增造粒产出会自动更新对应成品库存。", inv_raw:"原料库存（大料 / 破碎料）", inv_pellet:"成品库存（材质 · 颜色）", inv_catalog:"种类与颜色配置（全局统一）", inv_add_mat:"＋ 新增种类", inv_catalog_note:"说明：删除颜色 / 种类仅影响可选列表，不影响历史记录；造粒产出与出库销售均从此目录取值，确保种类颜色全局统一。", inv_del:"删除", inv_add_color:"新增颜色", inv_del_mat:"删除种类", inv_edit_hint_t:"老板模式：", inv_edit_hint:"原料与成品库存均可在右侧数值框直接修改（按工厂独立校正），系统按「业务回放值 + 校正偏移」展示。",
     ty_Receive:"回收", ty_Ship:"配送", ty_Inbound:"入库", ty_Crush:"破碎", ty_Produce:"造粒", ty_Sale:"出售",
     rep_note2:"差额 = 回收量 − 配送量 − 造粒原料消耗；粒子库存 = 造粒产出 − 成品出售。",
     crush_note_dyn:"破碎清洗：将分拣后的大料投入破碎，产出破碎料（含约 8% 损耗）。破碎料可直接配送总厂或留厂库存。",
@@ -1185,7 +1160,7 @@ const I18N = {
     sync_online:"Online", sync_offline:"Offline",
     hero_title:"Recovery Console", hero_sub:"This plant centres on plastic recovery — track daily recovery & dispatch", hero_cta:"＋ New Recovery",
     d_crushed:"Crushed today", d_bulk:"Bulk today", d_sum:"Bulk + Crushed", d_recamt:"Recovered amount today", d_shiptoday:"Dispatched today", d_click:"Click for detail →",
-    d_ov_bulk:"Bulk purchased today", d_ov_crushed:"Crushed purchased today", d_ov_total:"Total purchased today", d_ov_buyamt:"Purchase amount today", d_ov_income:"Income (cum.)", d_ov_expense:"Expense (cum.)", d_ov_balance:"Balance", d_ov_produced:"Pellets produced today (kg)", d_ov_sold:"Pellets sold today (kg)", dash_home:"Home Overview",
+    d_ov_bulk:"Bulk purchased this month", d_ov_crushed:"Crushed purchased this month", d_ov_total:"Total purchased this month", d_ov_buyamt:"Purchase amount this month", d_ov_income:"Income (cum.)", d_ov_expense:"Expense (cum.)", d_ov_balance:"Balance", d_ov_produced:"Pellets produced this month (kg)", d_ov_sold:"Pellets sold this month (kg)", d_ov_shipw:"Shipped to HQ this month (kg)", dash_home:"Home Overview",
     fin_cur:"Currency", fin_rate:"1 CNY = ? NGN", fin_fx_equiv:"Equivalent", fin_equiv:"Equiv.", set_rate:"Exchange Rate", rate_tip:"Set the current rate; finance entries auto-convert at this rate. Finance role (boss / factory admin) can edit.", fin_fx:"Conversion: enter an amount to auto-convert",
     acct_grant:"Grant access", ann_body:"Content", ann_del:"Delete", ann_post:"📢 Post", ann_publish:"Publish", ann_title:"Title", contact:"Contact", rec_detail:"Detail", reset_all:"All business data", s_pick_note:"Pick stock to ship",
     d_trend_title:"Receiving vs outbound (last 7 days, kg)", d_legend_rec:"Receive", d_legend_ship:"Ship", d_legend_ship_in:"Inbound", d_activity:"Recent activity", d_inv_title:"Cumulative raw material by material (kg)",
@@ -1211,15 +1186,15 @@ const I18N = {
     r_trend:"Receive vs outbound trend", r_trend_hq:"Receive vs Inbound trend", r_trend_br:"Receive vs Ship trend", r_by_mat:"By material (kg)", r_by_form:"By form",
     rk_recv:"Received", rk_ship:"Shipped", rk_inbound:"Inbound", rk_amt:"Amount", rk_diff:"Difference (incl. loss)",
     r_note:"Difference = Received − Shipped/Inbound − pelletizing consumption − crushing loss (大料→破碎料 loss, ~8%). Eco-compliance export includes material volumes & supplier registry for the environmental registry.",
-    set_roles:"Roles & Permissions", set_sync:"Sync & Offline", set_backup:"Backup", set_audit:"Audit log", set_local:"Localization", set_accounts:"Account Management", acct_new:"New / Register Account", acct_username:"Account (email)", acct_name:"Name", acct_role:"Role", acct_factories:"Plants", acct_password:"Password", acct_save:"Save Account", acct_delete:"Delete Account", acct_edit:"Edit", acct_approve:"Enable", acct_disable:"Disable", acct_enable:"Enable", acct_status:"Status", acct_ops:"Actions", acct_genpw:"Auto-generate", acct_reset:"Reset All Business Data", reset_title:"Reset All Business Data", register:"Register Account", reg_note:"Submits a local account (boss approval to enable)", au_clear_all:"Clear",
+    set_roles:"Roles & Permissions", set_sync:"Sync & Offline", set_backup:"Backup", set_audit:"Audit log", set_local:"Localization", set_accounts:"Account Management", acct_new:"New / Register Account", acct_username:"Account (email)", acct_name:"Name", acct_role:"Role", acct_factories:"Plants", acct_password:"Password", acct_save:"Save Account", acct_delete:"Delete Account", acct_genpw:"Auto-generate", acct_reset:"Reset All Business Data", reset_title:"Reset All Business Data", register:"Register Account", reg_note:"Submits a local account (boss approval to enable)", au_clear_all:"Clear",
     set_role_col:"Role", set_audit_col:"Audit",
     role_owner_s:"Owner / Manager", role_receiving_s:"Recovery Clerk", role_shipping_s:"Dispatch Clerk", role_auditor_s:"Auditor",
     sync_now:"Sync now", sy_conn:"Connection", sy_online:"Online (4G)", sy_local:"Local DB", sy_pending:"Pending upload", sy_last:"Last sync", sy_conflict:"Conflict policy", sy_lww:"Last-write-wins + version vector", sy_nokey:"Sync unencrypted",
     bk_local:"Create local backup", bk_cloud:"Cloud backup", bk_restore:"Restore", bk_last:"Last backup: 2026-08-15 23:00 (auto, cloud)",
     h_time:"Time", h_actor:"Actor", h_action:"Action", h_target:"Target", h_detail:"Detail",
-    ac_price:"Price change", ac_create:"Create", ac_edit:"Edit", ac_edit_bank:"bank acct updated", ac_receive:"Receive", ac_ship:"Ship", ac_cust:"Customer", ac_crush:"Crush", ac_produce:"Produce", ac_sale:"Sale", ac_inbound:"Inbound", ac_reset:"Reset",
+    ac_price:"Price change", ac_create:"Create", ac_edit:"Edit", ac_edit_bank:"bank acct updated", ac_receive:"Receive", ac_ship:"Ship", ac_cust:"Customer", ac_crush:"Crush", ac_produce:"Produce", ac_sale:"Sale", ac_inbound:"Inbound", ac_reset:"Reset", reset_pellet:"Finished goods inventory", ac_inv_del:"Delete stock",
     lo_lang:"UI language", lo_lang_opt_zh:"中文", lo_lang_opt_en:"English", lo_cur:"Currency", lo_date_fmt:"Date format", lo_num:"Number format", lo_printer:"Printer / weighbridge", lo_save:"Save settings", lo_note:"Language switch applies instantly; other localization params are fixed per build (China ¥ / YYYY-MM-DD). Click “Save settings” to persist preference locally.",
-    h_date:"Date", h_mat:"Material", h_form:"Form", h_color:"Color", h_w:"Weight", h_price:"Unit ₦", h_amt:"Amount",
+    h_date:"Date", h_mat:"Material", h_form:"Form", h_color:"Color", h_w:"Weight", h_bags:"Bags", h_price:"Unit ₦", h_amt:"Amount",
     cm_title_new:"New Customer", cm_title_edit:"Edit Customer", cm_name:"Name *", cm_phone:"Phone", cm_bank:"Bank", cm_acct:"Account", cm_addr:"Address", cm_note:"Remark", cm_save:"Save", cm_cancel:"Cancel",
     c_factory:"Plant", c_imprint:"Dup imprint", c_imprint_tip:"This customer name duplicates one already registered in the listed plant(s); verify across plants",
     fin_title:"Finance Records", fin_income:"Income", fin_expense:"Expense", fin_net:"Net", fin_daily:"Daily Income/Expense", fin_date:"Date", fin_type:"Type", fin_cat:"Category", fin_amount:"Amount(¥)", fin_note:"Remark", fin_by:"By", fin_add:"＋ New Finance Entry", fin_link:"🔗 Link Business", fin_factory:"Plant", fin_auto:"Auto", s_cost:"Freight(¥)",
@@ -1241,7 +1216,7 @@ const I18N = {
     ocr_file:"Ticket image (camera / upload)", ocr_run:"Recognize", ocr_confirm:"Confirm & fill form", rc_ocr:"📷 Scan ticket",
     ocr_code:"Code (e.g. PP.l)", ocr_parsed:"Parsed (mat/color)", ocr_codehint:"Tickets list goods as 'material.colorcode' per line (e.g. PP.l=Clear, PP.b=Black, PP.c=Single; total = weighbridge weight, split by unloading category). Auto-parsed into recovery lines — please verify.",
     ac_cust:"Customer",
-    liFactory:"Plant", login_bad:"Wrong account or password", login_badfac:"You are not authorized for this plant", login_required:"Enter account and password", login_disabled:"This account is disabled, contact admin", login_pending:"This account is pending admin approval", pwd_title:"First login — set a new password", pwd_new:"New password (simple passwords allowed)", pwd_confirm:"Confirm password", pwd_weak:"Please enter a new password", pwd_mismatch:"Passwords do not match", pwd_ok:"Confirm",     liLogout:"Logout", opic_bulk_only:"OPIC plant accepts bulk only — crushed material not allowed",
+    liFactory:"Plant", login_bad:"Wrong account or password", login_badfac:"You are not authorized for this plant", pwd_title:"First login — set a new password", pwd_new:"New password (simple passwords allowed)", pwd_confirm:"Confirm password", pwd_weak:"Please enter a new password", pwd_mismatch:"Passwords do not match", pwd_ok:"Confirm",     liLogout:"Logout", opic_bulk_only:"OPIC plant accepts bulk only — crushed material not allowed",
     g_core:"CORE", g_prod:"PRODUCTION", g_logi:"LOGISTICS",
     nav_crush:"Crushing", nav_produce:"Pelletizing", nav_sell:"Sales", nav_logistics:"Logistics", nav_inventory:"Inventory", nav_receiving:"Receiving", nav_today:"Today", nav_shipping:"Ship to HQ",
     hero_title:"Operations Console", hero_sub:"Plastic recovery & processing — receiving, crushing, pelletizing and sales.",
@@ -1251,7 +1226,7 @@ const I18N = {
     produce_title:"New pelletizing batch", produce_in:"Crushed in (kg)", produce_out:"Pellets out (kg)", produce_yield:"Yield", produce_yield_val:"~95%", produce_save:"Save batch", produce_list:"Pelletizing records", produce_pellet:"Pellet stock", produce_rate:"Yield", pr_shift:"Shift", pr_machine:"Machine", produce_qty:"Output (kg)",
     sell_title:"New sales order", sell_mat:"Material", sell_w:"Qty (kg)", sell_price:"Unit ¥/kg", sell_amt:"Revenue", sell_avail:"Avail. stock", sell_inv:"Finished stock (mat·color)", sell_cust:"Buyer *", sell_save:"Save order", sell_list:"Sales records", sell_rev:"Total revenue",
     logistics_title:"Logistics board", logistics_out:"Branch shipments", logistics_in:"HQ inbound", logistics_confirm:"Confirm receipt", logistics_pending:"Pending", logistics_transit:"In transit", logistics_received:"Received", logistics_from:"From plant", logistics_summary:"Overview", logistics_empty:"No logistics records",
-    inv_note:"Inventory: raw (bulk/crushed) and finished goods (pellets/powder by material·color) are replayed from business records. Edit materials/colors below; new pelletizing output auto-updates finished stock.", inv_raw:"Raw stock (bulk / crushed)", inv_pellet:"Finished stock (material · color)", inv_catalog:"Materials & colors (global)", inv_add_mat:"＋ Add material", inv_catalog_note:"Note: deleting a color/material only affects the picker, not history. Pelletizing output and sales both read from this catalog for unified naming.", inv_del:"Delete", inv_add_color:"Add color", inv_del_mat:"Delete material",
+    inv_note:"Inventory: raw (bulk/crushed) and finished goods (pellets/powder by material·color) are replayed from business records. Edit materials/colors below; new pelletizing output auto-updates finished stock.", inv_raw:"Raw stock (bulk / crushed)", inv_pellet:"Finished stock (material · color)", inv_catalog:"Materials & colors (global)", inv_add_mat:"＋ Add material", inv_catalog_note:"Note: deleting a color/material only affects the picker, not history. Pelletizing output and sales both read from this catalog for unified naming.", inv_del:"Delete", inv_add_color:"Add color", inv_del_mat:"Delete material", inv_edit_hint_t:"Owner mode: ", inv_edit_hint:"Raw and finished stock can be edited directly in the right-side box (per-factory adjustment); the system shows 'replay value + adjustment'.",
     ty_Receive:"Receive", ty_Ship:"Ship", ty_Inbound:"Inbound", ty_Crush:"Crush", ty_Produce:"Produce", ty_Sale:"Sale",
     rep_note2:"Difference = received − shipped − pelletizing input; pellet stock = produced − sold.",
     crush_note_dyn:"Crushing: feed sorted bulk, output crushed material (~8% loss). Crushed can be shipped to HQ or kept in stock.",
@@ -1264,42 +1239,6 @@ const I18N = {
 let lang="zh";
 let currentRole=null;
 function t(k){return I18N[lang][k]!==undefined?I18N[lang][k]:k;}
-
-
-/* ===== jsSha256：纯 JS SHA-256（与 WebCrypto SHA-256 字节级一致，规避 file:// 差异） ===== */
-function jsSha256(msgStr){
-  function rotr(x,n){return (x>>>n)|(x<<(32-n));}
-  const K=new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
-    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
-    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
-    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
-    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
-    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
-    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
-    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
-  const utf8 = new TextEncoder().encode(msgStr);
-  const l=utf8.length, bitLen=l*8;
-  const k=Math.ceil((l+1+8)/64)*64;
-  const m=new Uint8Array(k); m.set(utf8); m[l]=0x80;
-  const dv=new DataView(m.buffer); dv.setUint32(k-4, bitLen>>>0, false);
-  let h0=0x6a09e667,h1=0xbb67ae85,h2=0x3c6ef372,h3=0xa54ff53a,h4=0x510e527f,h5=0x9b05688c,h6=0x1f83d9ab,h7=0x5be0cd19;
-  for(let i=0;i<k;i+=64){
-    const w=new Uint32Array(64);
-    for(let j=0;j<16;j++)w[j]=dv.getUint32(i+j*4,false);
-    for(let j=16;j<64;j++){const a=w[j-15],b=w[j-2];
-      const s0=rotr(a,7)^rotr(a,18)^(a>>>3), s1=rotr(b,17)^rotr(b,19)^(b>>>10);
-      w[j]=(w[j-16]+s0+w[j-7]+s1)>>>0;}
-    let a=h0,b=h1,c=h2,d=h3,e=h4,f=h5,g=h6,hh=h7;
-    for(let j=0;j<64;j++){const S1=rotr(e,6)^rotr(e,11)^rotr(e,25), ch=(e&f)^(~e&g),
-      t1=(hh+S1+ch+K[j]+w[j])>>>0, S0=rotr(a,2)^rotr(a,13)^rotr(a,22), maj=(a&b)^(a&c)^(b&c),
-      t2=(S0+maj)>>>0;
-      hh=g;g=f;f=e;e=(d+t1)>>>0;d=c;c=b;b=a;a=(t1+t2)>>>0;}
-    h0=(h0+a)>>>0;h1=(h1+b)>>>0;h2=(h2+c)>>>0;h3=(h3+d)>>>0;h4=(h4+e)>>>0;h5=(h5+f)>>>0;h6=(h6+g)>>>0;h7=(h7+hh)>>>0;
-  }
-  const out=new Uint8Array(32); const od=new DataView(out.buffer);
-  [h0,h1,h2,h3,h4,h5,h6,h7].forEach((x,i)=>od.setUint32(i*4,x,false));
-  return Array.from(out).map(x=>x.toString(16).padStart(2,'0')).join('');
-}
 
 /* ===================== SECURITY (pure JS, no deps) ===================== */
 /* —— 纯 JS SHA-256（同步，规避 file:// 下 crypto.subtle 不可用） —— */
@@ -1369,29 +1308,14 @@ function _pbkdf2_legacy(pw, saltHex, iter){
 function concatBytes(a,b){const c=new Uint8Array(a.length+b.length);c.set(a);c.set(b,a.length);return c;}
 /* Salt / password helpers */
 function genSalt(){const u=new Uint8Array(16);(crypto.getRandomValues?crypto.getRandomValues(u):(function(){for(let i=0;i<16;i++)u[i]=(Math.random()*256)|0;})());return _bytesToHex(u);}
-/* 大厂级密码哈希：PBKDF2-style 迭代（jsSha256 为底，盐真正参与），抗彩虹表/撞库。
-   存储格式 hash = iterations:salt:hex(sha256^k(pw|salt))，verify 时按迭代次数复算。 */
-const PW_ITER = 60000;
-function hashPassword(pw, saltHex){
-  const pw0 = String(pw==null?'':pw);
-  const salt = String(saltHex==null?'':saltHex);
-  let h = jsSha256(pw0 + '|' + salt);
-  for(let i=1;i<PW_ITER;i++){ h = jsSha256(h + '|' + salt); }
-  return PW_ITER + ':' + salt + ':' + h;
-}
-function verifyPassword(pw, storedHash){
-  if(!storedHash) return false;
-  const str=String(storedHash);
-  /* 兼容旧版存储（纯 sha256(pw) 无盐）：迁移期可平滑登录，新密码写入后将变为新格式 */
-  if(str.indexOf(':')<0){ return ctEqual(jsSha256(String(pw==null?'':pw)), str); }
-  const parts = str.split(':');
-  if(parts.length!==3) return false;
-  const iter = parseInt(parts[0],10), salt = parts[1], target = parts[2];
-  if(!(iter>0) || !salt || !target) return false;
-  const pw0 = String(pw==null?'':pw);
-  let h = jsSha256(pw0 + '|' + salt);
-  for(let i=1;i<iter;i++){ h = jsSha256(h + '|' + salt); }
-  return ctEqual(h, target);
+function hashPassword(pw, saltHex){ const d=_pbkdf2_hmac(pw, saltHex, PBKDF2_ITER); return PW_V2+PBKDF2_ITER+'$'+saltHex+'$'+d; }
+function verifyPassword(pw, saltHex, hashHex){
+  if(typeof hashHex==='string' && hashHex.indexOf(PW_V2)===0){
+    const p=hashHex.split('$'); // ['', 'pbkdf2', iter, salt, derived]
+    const iter=parseInt(p[2],10)||PBKDF2_ITER;
+    return ctEqual(_pbkdf2_hmac(pw, p[3], iter), p[4]);
+  }
+  return ctEqual(_pbkdf2_legacy(pw, saltHex, PBKDF2_ITER_LEGACY), hashHex); // 兼容旧账号
 }
 function ctEqual(a,b){const ab=_utf8(a), bb=_utf8(b);if(ab.length!==bb.length)return false;let r=0;for(let i=0;i<ab.length;i++)r|=ab[i]^bb[i];return r===0;}
 function genPassword(len){len=len||16;const L='ABCDEFGHJKLMNPQRSTUVWXYZ',l='abcdefghijkmnpqrstuvwxyz',d='23456789',s='!@#$%^&*';const all=L+l+d+s;let p='';const rnd=()=>{const a=new Uint8Array(1);(crypto.getRandomValues?crypto.getRandomValues(a):(a[0]=(Math.random()*256)|0));return a[0];};
@@ -1434,28 +1358,25 @@ const ALL_FACTORY_IDS=['Sagamu','OPIC','Ikeja'];
 const ALL_VIEW='ALL'; // 老板全局视图哨兵
 
 /* —— 用户种子（明文口令仅用于首次登录，已写入 README；运行时仅存哈希） —— */
-/* 种子账号：前 4 个为已交付给用户、可连续登录的账号（mustChange:false）；
-   其余补全原版的工厂管理员 / 登记员 / 审计员角色矩阵，便于演示多厂 RBAC 与隔离。 */
 const SEED_USERS=[
-  {username:'boss@recycleflow.ng',   name:'老板（全局）',  role:'boss',          factories:ALL_FACTORY_IDS, pw:'Boss@2024', mustChange:false, status:'active'},
-  {username:'admin@recycleflow.ng',  name:'Sagamu 管理员', role:'factoryAdmin', factories:['Sagamu'],     pw:'Admin@2024', mustChange:false, status:'active'},
-  {username:'op@recycleflow.ng',     name:'Sagamu 登记员', role:'registrar',    factories:['Sagamu'],     pw:'Op@2024', mustChange:false, status:'active'},
-  {username:'ship@recycleflow.ng',   name:'OPIC/Ikeja 调度', role:'factoryAdmin', factories:['OPIC','Ikeja'], pw:'Ship@2024', mustChange:false, status:'active'},
-  {username:'admin.opic@recycleflow.ng',  name:'OPIC 管理员',  role:'factoryAdmin', factories:['OPIC'],  pw:'Opik@2024', mustChange:true, status:'active'},
-  {username:'admin.ikeja@recycleflow.ng', name:'Ikeja 管理员', role:'factoryAdmin', factories:['Ikeja'], pw:'Ikeja@2024', mustChange:true, status:'active'},
-  {username:'reg.sagamu@recycleflow.ng',  name:'Sagamu 登记员B', role:'registrar', factories:['Sagamu'], pw:'Reg@2024', mustChange:true, status:'active'},
-  {username:'auditor@recycleflow.ng',     name:'审计员',       role:'auditor',      factories:ALL_FACTORY_IDS, pw:'Audit@2024', mustChange:true, status:'active'}
+  {username:'boss@xf.com',        name:'黄总（老板）', role:'boss',         factories:ALL_FACTORY_IDS, pw:'8wN2JCnDhHFc54W^', mustChange:true},
+  {username:'admin.sagamu@xf.com',name:'Sagamu 管理员', role:'factoryAdmin', factories:['Sagamu'],     pw:'6YeiMsxBA#gU2PAD', mustChange:true},
+  {username:'admin.opic@xf.com',  name:'OPIC 管理员',  role:'factoryAdmin', factories:['OPIC'],        pw:'&SFb32Y9YTBzhq#L', mustChange:true},
+  {username:'admin.ikeja@xf.com', name:'Ikeja 管理员', role:'factoryAdmin', factories:['Ikeja'],       pw:'G3VW%7kvh!cK4L7r', mustChange:true},
+  {username:'reg.sagamu@xf.com',  name:'Sagamu 登记员', role:'registrar',   factories:['Sagamu'],     pw:'nQH4uiizAJA@Hpn^', mustChange:true},
+  {username:'auditor@xf.com',     name:'审计员',       role:'auditor',      factories:ALL_FACTORY_IDS, pw:'8GaqmC3an8sK&3#B', mustChange:true},
+  {username:'管理员',            name:'管理员',       role:'devAdmin',    factories:ALL_FACTORY_IDS, pw:'ZsCt##Ps3JmgwFkz', mustChange:true}
 ];
 let users=[];
 function buildSeedUsers(){
-  users=SEED_USERS.map(u=>{const salt=genSalt();return {username:u.username,name:u.name,role:u.role,factories:u.factories.slice(),salt,passwordHash:hashPassword(u.pw,salt),mustChange:u.mustChange,status:u.status||'active',createdTs:Date.now()};});
+  users=SEED_USERS.map(u=>{const salt=genSalt();return {username:u.username,name:u.name,role:u.role,factories:u.factories.slice(),salt,passwordHash:hashPassword(u.pw,salt),mustChange:u.mustChange};});
 }
 
 /* —— RBAC 权限矩阵 —— */
 const ROLE_PERMS={
   boss:['view:*','customer:*','receive','ship','produce','sell','inbound','crush','pricing','settings.write','audit.view','record.delete','customer.create','customer.edit','customer.delete','account.manage','data.reset','view.allFactories','announce','finance.view','finance.manage'],
   devAdmin:['view:*','customer:*','receive','ship','produce','sell','inbound','crush','pricing','settings.write','audit.view','record.delete','customer.create','customer.edit','customer.delete','account.manage','data.reset','view.allFactories','announce','finance.view','finance.manage'],
-  factoryAdmin:['view:dashboard','view:customers','view:receiving','view:today','view:pricing','view:shipping','view:crush','view:produce','view:sell','view:logistics','view:inventory','view:search','view:reports','view:settings','view:custdetail','view:finance','customer.create','customer.edit','customer.delete','receive','ship','produce','sell','pricing','record.delete','settings.write','audit.view','finance.view','finance.manage'],
+  factoryAdmin:['view:dashboard','view:customers','view:receiving','view:today','view:pricing','view:shipping','view:crush','view:produce','view:sell','view:logistics','view:inventory','view:search','view:reports','view:settings','view:custdetail','view:finance','customer.create','customer.edit','customer.delete','receive','ship','inbound','produce','sell','pricing','record.delete','settings.write','audit.view','finance.view','finance.manage'],
   registrar:['view:dashboard','view:customers','view:receiving','view:today','view:shipping','view:search','view:custdetail','receive','ship','record.delete'],
   auditor:['view:dashboard','view:customers','view:today','view:search','view:reports','view:settings','view:custdetail','view:finance','audit.view','finance.view']
 };
@@ -1504,36 +1425,17 @@ function validateReceivingItems(items, factory){
 }
 
 /* —— 会话持久化 —— */
-const SESSION_KEY='rf_session_v2';
-/* 设备级派生密钥（用于会话签名/防篡改），从 localStorage 获取或随机生成并固化 */
-function getDeviceKey(){
-  try{
-    let k=localStorage.getItem('rf_device_key_v2');
-    if(!k){ const u=new Uint8Array(32); (crypto.getRandomValues?crypto.getRandomValues(u):(()=>{for(let i=0;i<32;i++)u[i]=(Math.random()*256)|0;})()); k=_bytesToHex(u); localStorage.setItem('rf_device_key_v2',k); }
-    return k;
-  }catch(e){ return 'dev-fallback'; }
-}
-function sessionSign(payloadStr){ return jsSha256(payloadStr + '|' + getDeviceKey()); }
+const SESSION_KEY='rf_session_v1';
 function setSession(user, fac){
   currentUser=user; currentRole=user.role;
   currentFactory=(fac===ALL_VIEW?ALL_VIEW:fac);
-  /* 大厂级会话：签名 + 过期，避免明文篡改/重放 */
-  const payload={username:user.username, role:user.role, factory:currentFactory, name:user.name, exp:Date.now()+1000*60*60*12};
-  const raw=JSON.stringify(payload);
-  const sig=sessionSign(raw).slice(0,16);
-  try{localStorage.setItem(SESSION_KEY, JSON.stringify({p:payload, s:sig}));}catch(e){}
+  try{localStorage.setItem(SESSION_KEY, JSON.stringify({username:user.username, role:user.role, factory:currentFactory, name:user.name, ts:Date.now()}));}catch(e){}
 }
 function loadSession(){
-  try{
-    const s=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');if(!s||!s.p)return null;
-    const expect=sessionSign(JSON.stringify(s.p)).slice(0,16);
-    if(expect!==s.s) return null;
-    if((s.p.exp||0) < Date.now()) return null; /* 会话过期需重新登录 */
-    const u=users.find(x=>x.username===s.p.username);if(!u)return null;
-    if(u.status==='disabled') return null; /* 账号被禁用后旧会话失效 */
-    currentUser=u;currentRole=u.role;currentFactory=s.p.factory||u.factories[0];
-    return s;
-  }catch(e){return null;}
+  try{const s=JSON.parse(localStorage.getItem(SESSION_KEY));if(!s)return null;
+    const u=users.find(x=>x.username===s.username);if(!u)return null;
+    currentUser=u;currentRole=u.role;currentFactory=s.factory||u.factories[0];
+    return s;}catch(e){return null;}
 }
 function clearSession(){try{localStorage.removeItem(SESSION_KEY);}catch(e){} currentUser=null;currentRole=null;currentFactory=null;}
 
@@ -1553,6 +1455,10 @@ const STATE_KEY="rf_state_v4";
 /* 业务"今日"基准：默认跟随设备实时日期（确保"当日回收/下班核对"随日历推进）。
    如需演示固定某天，可在此覆盖为 'YYYY-MM-DD'；否则使用 today() 的本地日期。 */
 const PLANT_TODAY=(typeof DEMO_TODAY!=='undefined'&&DEMO_TODAY)?DEMO_TODAY:today();
+/* 当月判断：仅比较「年-月」前缀，用于首页统计由「今日」改为「当月」汇总 */
+function isThisMonth(dt){ if(!dt)return false; const t=PLANT_TODAY; if(!t)return false; return String(dt).slice(0,7)===String(t).slice(0,7); }
+/* 总厂(Sagamu)或全局视角(老板+ALL)：开放造粒与成品出售；分厂(OPIC/Ikeja)不开放（分厂无造粒产能、不出售颗粒） */
+function isHQorAllFactory(){ return (currentRole==='boss'&&currentFactory==='ALL')||currentFactory==='Sagamu'; }
 const COLORS=['透明','单色','白色','红色','黄色','蓝色','绿色','紫色','黑色','VJ','GBT','杂色'];
 const COLOR_LABELS={
   zh:{'透明':'透明','单色':'单色','白色':'白色','红色':'红色','黄色':'黄色','蓝色':'蓝色','绿色':'绿色','紫色':'紫色','黑色':'黑色','VJ':'VJ','GBT':'GBT','杂色':'杂色','管子':'管子','扣板':'扣板','混合':'混合','GBT桶':'GBT桶','勺子':'勺子','yellow黄桶':'yellow黄桶','天花板':'天花板'},
@@ -1757,6 +1663,12 @@ let auditLog = [
 ];
 let settings = {lang:'zh', conn:'online', pending:3, lastSync:'2026-08-16 09:40', netMode:'lan', lanEnabled:true, syncUrl:'', syncKey:'', rate:230, lastSyncTs:0};
 let invAdjust = {}; // 成品库存校正（袋）：'材质|颜色' -> 相对计算值的袋数偏移（老板可编辑）
+let invAdjustRaw = {}; // 原料库存校正（kg）：'材质|形态' -> 相对计算值的 kg 偏移（老板可编辑）
+let invRawEdit = {}; // 原料库存自由编辑覆盖（老板）：'材质|形态' -> {m,f,w} 绝对有效值
+let invPelletEdit = {}; // 成品库存自由编辑覆盖（老板）：'材质|颜色' -> {m,c,bags} 绝对有效值
+let invDeleted = { raw:{}, pellet:{} }; // 库存删除墓碑：kind -> key -> 删除时间戳(ms)。防止本地删除后被同步拉取再次合并复活（跨设备一致）
+var expandedRecDates = {};   // 回收单：已展开的日期（其余日期折叠为总结框）
+var expandedProdDates = {};  // 生产记录：已展开的日期
 /* 财务记录：三厂独立录入、老板可全局汇总。
    {id, dt, factory, type:'income'|'expense', cat, amount, note, by, ts, rev, auto, src}
    - 总厂(Sagamu) 含进项与出项；分厂(OPIC/Ikeja) 仅出项（运费/运营等）。
@@ -1802,7 +1714,7 @@ function toast(msg){
 
 /* ============ State persistence ============ */
 function saveState(){
-  Store.set(STATE_KEY,{customers,priceBy,records,priceHist,auditLog,settings,users,companyName:COMPANY.name,products,invAdjust,deletedGids,tombMeta,deletedUsers,deletedCustomers,finances,deletedFinances});
+  Store.set(STATE_KEY,{customers,priceBy,records,priceHist,auditLog,settings,users,companyName:COMPANY.name,products,invAdjust,invAdjustRaw,invRawEdit,invPelletEdit,invDeleted,deletedGids,tombMeta,deletedUsers,deletedCustomers,finances,deletedFinances});
   scheduleAutoSync();
 }
 function loadState(){
@@ -1811,9 +1723,7 @@ function loadState(){
   else buildSeedUsers();
   /* 重新部署后，把缺失的种子账号（如新增的"管理员"开发管理员）并入已有用户，
      避免老用户数据里没有该账号而登录失败、又不必清空业务数据。 */
-  SEED_USERS.forEach(su=>{ if(!users.some(u=>u.username===su.username)){ const salt=genSalt(); users.push({username:su.username,name:su.name,role:su.role,factories:su.factories.slice(),salt,passwordHash:hashPassword(su.pw,salt),mustChange:su.mustChange,status:su.status||'active',createdTs:Date.now()}); } });
-  /* 兼容老数据：补齐 status 字段 */
-  users.forEach(u=>{ if(!u.status)u.status='active'; });
+  SEED_USERS.forEach(su=>{ if(!users.some(u=>u.username===su.username)){ const salt=genSalt(); users.push({username:su.username,name:su.name,role:su.role,factories:su.factories.slice(),salt,passwordHash:hashPassword(su.pw,salt),mustChange:su.mustChange}); } });
   if(typeof s!=='object'||!s)return;
   if(typeof s.companyName==='string')COMPANY.name=s.companyName;
   if(Array.isArray(s.customers))customers=s.customers.map(c=>{if(c.id!=null)c.id=String(c.id);if(!c.factory)c.factory='Sagamu';if(!c.updatedTs)c.updatedTs=0;return c;});
@@ -1830,6 +1740,10 @@ function loadState(){
   if(Array.isArray(s.auditLog))auditLog=s.auditLog;
   if(s.settings&&typeof s.settings==='object')settings=Object.assign(settings,s.settings);
   if(s.invAdjust&&typeof s.invAdjust==='object')invAdjust=s.invAdjust;
+  if(s.invAdjustRaw&&typeof s.invAdjustRaw==='object')invAdjustRaw=s.invAdjustRaw;
+  if(s.invRawEdit&&typeof s.invRawEdit==='object')invRawEdit=s.invRawEdit;
+  if(s.invPelletEdit&&typeof s.invPelletEdit==='object')invPelletEdit=s.invPelletEdit;
+  if(s.invDeleted&&typeof s.invDeleted==='object'){ invDeleted={raw:(s.invDeleted.raw||{}),pellet:(s.invDeleted.pellet||{})}; }
   if(Array.isArray(s.deletedGids))deletedGids=s.deletedGids.slice();
   if(Array.isArray(s.deletedUsers))deletedUsers=s.deletedUsers.slice();
   if(Array.isArray(s.deletedCustomers))deletedCustomers=s.deletedCustomers.slice();
@@ -1907,7 +1821,7 @@ function scopeRecords(){
 }
 function recomputeDashboard(){
   const scope=(currentRole==='boss'&&currentFactory==='ALL')?'ALL':currentFactory;
-  const recs=scopeRecords().filter(r=>r.dt===PLANT_TODAY);
+  const recs=scopeRecords().filter(r=>isThisMonth(r.dt));
   let recKg=0,recAmt=0,crushed=0,bulk=0,shipW=0,crushW=0,prodW=0,saleW=0,saleAmt=0,pendingW=0;
   recs.forEach(r=>{
     if(r.ty==='Receive'){recKg+=r.tw;recAmt+=toNGN(toCNY(r.ta,r.currency||'NGN'));r.items.forEach(it=>{if(it.f==='大料')bulk+=it.w;else if(it.f==='破碎料')crushed+=it.w;});}
@@ -1936,8 +1850,13 @@ function recomputeDashboard(){
   setC(5,t('d_ov_income'),M(income));
   setC(6,t('d_ov_expense'),fmtExpense(expense,'NGN'));
   setC(7,t('d_ov_balance'),M(balance));
+  /* 分厂无造粒/无出售颗粒/无进账/无余额：非总厂、非全局视角时隐藏对应统计卡（保留支出卡，分厂仍记录支出） */
+  const isHQorAll=(currentRole==='boss'&&currentFactory==='ALL')||currentFactory==='Sagamu';
+  const hideForBranch=!isHQorAll;
+  ['dash-card-5','dash-card-7','dash-card-8','dash-card-9'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=hideForBranch?'none':'';});
   setC(8,t('d_ov_produced'),kg(prodW));
   setC(9,t('d_ov_sold'),kg(saleW));
+  setC(10,t('d_ov_shipw'),kg(shipW));
   renderAnnouncements();
 }
 function dashTrendData(){
@@ -2341,10 +2260,13 @@ function renderFinance(){
   const income=fs.filter(f=>f.type==='income').reduce((s,f)=>s+toCNY(f.amount,f.currency),0);
   const expense=fs.filter(f=>f.type==='expense').reduce((s,f)=>s+toCNY(f.amount,f.currency),0);
   const cards=document.getElementById('fin-cards');
-  if(cards)cards.innerHTML=`
-    <div class="stat green"><div class="k">${t('fin_income')}</div><div class="v">${fmtWithFx(income,'CNY')}</div></div>
-    <div class="stat red"><div class="k">${t('fin_expense')}</div><div class="v">${fmtExpense(expense,'CNY')}</div></div>
-    <div class="stat ${income-expense>=0?'green':'red'}"><div class="k">${t('fin_net')}</div><div class="v">${fmtWithFx(income-expense,'CNY')}</div></div>`;
+  if(cards){
+    let cardHTML='';
+    if(hasIncome) cardHTML+=`<div class="stat green"><div class="k">${t('fin_income')}</div><div class="v">${fmtWithFx(income,'CNY')}</div></div>`;
+    cardHTML+=`<div class="stat red"><div class="k">${t('fin_expense')}</div><div class="v">${fmtExpense(expense,'CNY')}</div></div>`;
+    if(hasIncome) cardHTML+=`<div class="stat ${income-expense>=0?'green':'red'}"><div class="k">${t('fin_net')}</div><div class="v">${fmtWithFx(income-expense,'CNY')}</div></div>`;
+    cards.innerHTML=cardHTML;
+  }
   const byDay={};
   fs.forEach(f=>{const d=f.dt||'—';if(!byDay[d])byDay[d]={inc:0,exp:0};const cny=toCNY(f.amount,f.currency);if(f.type==='income')byDay[d].inc+=cny;else byDay[d].exp+=cny;});
   const days=Object.keys(byDay).sort().reverse();
@@ -2504,13 +2426,32 @@ function deleteReceive(id){
 }
 function renderReceiveList(){
   const el=document.getElementById('rc-list');if(!el)return;
-  const list=visibleRecords().filter(r=>r.ty==='Receive').slice(0,60);
-  setHTML('rc-list', list.length?list.map(r=>{
-    const mat=(r.items||[]).map(it=>`${esc(it.m)} ${esc(it.f)} ${esc(it.c)} ${(+it.w).toLocaleString()}kg`).join('<br/>');
-    return `<tr><td>${esc(r.dt)}</td><td>${esc(r.ticket||'—')}</td><td><b>${esc(r.custName)}</b></td><td class="muted">${mat}</td><td class="num">${r.tw.toLocaleString()}</td><td class="num">${fmtWithFx(r.ta, r.currency||'NGN')}</td><td><span class="link" onclick="editReceive('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteReceive('${r.id}')">${t('delete')}</span></td></tr>`;
-  }).join(''):`<tr><td colspan="7" class="muted">${lang==='zh'?'暂无记录':'No records'}</td></tr>`);
-  const cnt=document.getElementById('rc-list-count');if(cnt)cnt.textContent=list.length+(lang==='zh'?' 条':' records');
+  const all=visibleRecords().filter(r=>r.ty==='Receive');
+  const byDate={};
+  all.forEach(r=>{(byDate[r.dt]=byDate[r.dt]||[]).push(r);});
+  const dates=Object.keys(byDate).sort((a,b)=>b.localeCompare(a));
+  if(!dates.length){ setHTML('rc-list',`<tr><td colspan="7" class="muted">${lang==='zh'?'暂无记录':'No records'}</td></tr>`); const c=document.getElementById('rc-list-count'); if(c)c.textContent='0'; return; }
+  let html='';
+  dates.forEach(dt=>{
+    const rows=byDate[dt];
+    const isToday=(dt===PLANT_TODAY);
+    const open=isToday||expandedRecDates[dt];
+    const totW=rows.reduce((s,r)=>s+r.tw,0);
+    const totA=rows.reduce((s,r)=>s+toNGN(toCNY(r.ta,r.currency||'NGN')),0);
+    if(!open){
+      html+=`<tr class="grp-row" onclick="toggleRecDate('${dt}')"><td colspan="7"><span class="grp-ico">▸</span> <b>${dt}</b> · ${rows.length}${lang==='zh'?' 单':' recs'} · ${totW.toLocaleString()} kg · ${fmtWithFx(totA,'NGN')} <span class="muted">${lang==='zh'?'点击展开':'tap to expand'}</span></td></tr>`;
+    }else{
+      if(!isToday) html+=`<tr class="grp-row grp-open" onclick="toggleRecDate('${dt}')"><td colspan="7"><span class="grp-ico">▾</span> <b>${dt}</b> · ${rows.length}${lang==='zh'?' 单':' recs'} · ${totW.toLocaleString()} kg · ${fmtWithFx(totA,'NGN')} <span class="muted">${lang==='zh'?'点击收起':'tap to collapse'}</span></td></tr>`;
+      rows.forEach(r=>{
+        const mat=(r.items||[]).map(it=>`${esc(it.m)} ${esc(it.f)} ${esc(it.c)} ${(+it.w).toLocaleString()}kg`).join('<br/>');
+        html+=`<tr><td>${esc(r.dt)}</td><td>${esc(r.ticket||'—')}</td><td><b>${esc(r.custName)}</b></td><td class="muted">${mat}</td><td class="num">${r.tw.toLocaleString()}</td><td class="num">${fmtWithFx(r.ta, r.currency||'NGN')}</td><td><span class="link" onclick="event.stopPropagation();editReceive('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="event.stopPropagation();deleteReceive('${r.id}')">${t('delete')}</span></td></tr>`;
+      });
+    }
+  });
+  setHTML('rc-list', html);
+  const cnt=document.getElementById('rc-list-count');if(cnt)cnt.textContent=all.length+(lang==='zh'?' 条':' records');
 }
+function toggleRecDate(dt){ expandedRecDates[dt]=!expandedRecDates[dt]; renderReceiveList(); }
 function printTicket(){
   try{
     const name=document.getElementById('rc-name').value.trim();
@@ -2681,6 +2622,9 @@ function saveShipping(view){
     const fromFac=ship.factory;
     ship.dt=date;ship.dest=dest;ship.items=items;ship.tw=tot;ship.ta=0;ship.factory=fromFac;ship.fromFac=fromFac;ship.note=noteAll;ship.custName='→ 总厂';ship.ts=Date.now();
     if(inb){inb.dt=date;inb.dest=dest;inb.items=items.map(it=>({m:'混装',f:it.f,c:'',w:it.w,note:it.note}));inb.tw=tot;inb.fromFac=fromFac;inb.note='from '+fromFac+' · '+(shipNote?shipNote+' · ':'')+'batch '+ship.batch;inb.ts=Date.now();}
+    else { /* 分厂编辑发货单时若关联入库单缺失，则补全新建（待入库），确保总厂即时可确认入库 */
+      inb=pushRec({id:genGid(),dt:date,ty:'Inbound',custId:0,custName:'来料入库',items:items.map(it=>({m:'混装',f:it.f,c:'',w:it.w,note:it.note})),tw:tot,ta:0,ticket:'',op:opName(),batch:ship.batch,dest,note:'from '+fromFac+' · '+(shipNote?shipNote+' · ':'')+'batch '+ship.batch,factory:'Sagamu',status:'待入库',linkId:ship.id,fromFac});
+    }
     ship.carrier=carrier;ship.vehicle=vehicle;ship.driver=driver;ship.eta=eta;ship.shipCost=cost;
     auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_ship',target:ship.batch,detail:(lang==='zh'?'修改 · ':'edited · ')+tot.toLocaleString()+' kg · '+FACTORIES[fromFac].name});
     editingShipId=null;
@@ -2837,6 +2781,7 @@ function resetProduce(){
 }
 function saveProduce(){
   if(!can('produce')){toast(lang==='zh'?'无造粒权限':'No produce permission');return;}
+  if(!isHQorAllFactory()){toast(lang==='zh'?'分厂无造粒产能':'Branch has no pelletizing');return;}
   const date=document.getElementById('pr-date').value;
   const op=document.getElementById('pr-op').value.trim()||opName();
   const shift=document.getElementById('pr-shift').value;
@@ -2907,15 +2852,33 @@ function renderProduce(){
   const fac=effectiveFactory();
   const sh=document.getElementById('pr-shift');if(sh&&!sh.options.length)sh.innerHTML=shiftOptions('白班');
   if(!editingProduceId && !document.querySelectorAll('#pr-body tr').length)addProduceRow();
-  purgeProduce(14); /* 造粒记录只保留最近 2 周 */
+  purgeProduce(14); /* 造粒记录只保留最近 2 周；每天每厂仅一条（逐日合并覆盖） */
   const inv=computeInventory(fac);const pel=flattenPellet(inv);
-  const invRows=Object.keys(pel).filter(k=>pel[k]>0.0001).sort().map(k=>{const [m,c]=k.split('|');return `<tr><td><b>${m}</b></td><td>${c?esc(colorLabel(c)):'—'}</td><td class="num">${Math.round(pel[k]/BAG_KG).toLocaleString()} <span class="muted">${unitBag()}</span></td></tr>`;}).join('');
+  const invRows=Object.keys(pel).filter(k=>pel[k]>0.0001).sort().map(k=>{const [m,c]=k.split('|');return `<tr><td><b>${m}</b></td><td>${c?esc(colorLabel(c)):'—'}</td><td class="num">${Math.round((pel[k]||0)/BAG_KG).toLocaleString()} <span class="muted">${unitBag()}</span></td></tr>`;}).join('');
   setHTML('pr-inv', invRows||`<tr><td colspan="3" class="muted">—</td></tr>`);
   const list=records.filter(r=>r.ty==='Produce'&&(fac==='Sagamu'||r.factory===fac));
+  const byDate={};
+  list.forEach(r=>(byDate[r.dt]=byDate[r.dt]||[]).push(r));
+  const dates=Object.keys(byDate).sort((a,b)=>b.localeCompare(a));
+  if(!dates.length){ setHTML('pr-list',`<tr><td colspan="9" class="muted">${lang==='zh'?'暂无记录':'No records'}</td></tr>`); return; }
   let rows='';
-  list.forEach(r=>(r.items||[]).forEach(it=>{rows+=`<tr><td style="cursor:pointer" class="link" onclick="viewProduceDetail('${r.id}')">${r.dt}</td><td>${r.batch}</td><td>${r.shift||''}</td><td>${esc(machineName(it.machine))}</td><td><b>${it.m}</b></td><td>${esc(colorLabel(it.c))}</td><td class="num">${it.bags+" "+unitBag()}</td><td>${esc(r.op)}</td><td><span class="link" onclick="editProduce('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="deleteProduce('${r.id}')">${t('delete')}</span></td></tr>`;}));
-  setHTML('pr-list', rows||`<tr><td colspan="9" class="muted">${lang==='zh'?'暂无记录':'No records'}</td></tr>`);
+  dates.forEach(dt=>{
+    const recs=byDate[dt];
+    const isToday=(dt===PLANT_TODAY);
+    const open=isToday||expandedProdDates[dt];
+    const totBags=recs.reduce((s,r)=>s+(r.items||[]).reduce((a,it)=>a+(+it.bags||0),0),0);
+    if(!open){
+      rows+=`<tr class="grp-row" onclick="toggleProdDate('${dt}')"><td colspan="9"><span class="grp-ico">▸</span> <b>${dt}</b> · ${recs.length}${lang==='zh'?' 单':' recs'} · ${totBags} ${unitBag()} <span class="muted">${lang==='zh'?'点击展开':'tap to expand'}</span></td></tr>`;
+    }else{
+      if(!isToday) rows+=`<tr class="grp-row grp-open" onclick="toggleProdDate('${dt}')"><td colspan="9"><span class="grp-ico">▾</span> <b>${dt}</b> · ${recs.length}${lang==='zh'?' 单':' recs'} · ${totBags} ${unitBag()} <span class="muted">${lang==='zh'?'点击收起':'tap to collapse'}</span></td></tr>`;
+      recs.forEach(r=>(r.items||[]).forEach(it=>{
+        rows+=`<tr><td style="cursor:pointer" class="link" onclick="event.stopPropagation();viewProduceDetail('${r.id}')">${r.dt}</td><td>${r.batch}</td><td>${r.shift||''}</td><td>${esc(machineName(it.machine))}</td><td><b>${it.m}</b></td><td>${esc(colorLabel(it.c))}</td><td class="num">${it.bags+" "+unitBag()}</td><td>${esc(r.op)}</td><td><span class="link" onclick="event.stopPropagation();editProduce('${r.id}')">${t('edit')}</span> · <span class="link" style="color:var(--danger)" onclick="event.stopPropagation();deleteProduce('${r.id}')">${t('delete')}</span></td></tr>`;
+      }));
+    }
+  });
+  setHTML('pr-list', rows);
 }
+function toggleProdDate(dt){ expandedProdDates[dt]=!expandedProdDates[dt]; renderProduce(); }
 
 /* ===== Sell ===== */
 function addSellRow(o){
@@ -2963,6 +2926,7 @@ function resetSell(){
 function availFor(m,c){const inv=computeInventory(effectiveFactory());const pel=flattenPellet(inv);return Math.max(0,Math.round(pel[`${m}|${c}`]||0));}
 function saveSell(){
   if(!can('sell')){toast(lang==='zh'?'无销售权限':'No sell permission');return;}
+  if(!isHQorAllFactory()){toast(lang==='zh'?'分厂不开放成品出售':'Branch cannot sell finished goods');return;}
   const cust=document.getElementById('sl-cust').value.trim();
   if(!cust){toast(lang==='zh'?'请填写购货客户':'Enter buyer');return;}
   const date=document.getElementById('sl-date').value;
@@ -3023,7 +2987,7 @@ function deleteSell(id){
 function renderSell(){
   const fac=effectiveFactory();
   const inv=computeInventory(fac);const pel=flattenPellet(inv);
-  const invRows=Object.keys(pel).filter(k=>pel[k]>0.0001).sort().map(k=>{const [m,c]=k.split('|');return `<tr><td><b>${m}</b></td><td>${c?esc(colorLabel(c)):'—'}</td><td class="num">${Math.round(pel[k]/BAG_KG).toLocaleString()} ${unitBag()}</td></tr>`;}).join('');
+  const invRows=Object.keys(pel).filter(k=>pel[k]>0.0001).sort().map(k=>{const [m,c]=k.split('|');return `<tr><td><b>${m}</b></td><td>${c?esc(colorLabel(c)):'—'}</td><td class="num">${Math.round((pel[k]||0)/BAG_KG).toLocaleString()} ${unitBag()}</td></tr>`;}).join('');
   setHTML('sl-inv', invRows||`<tr><td colspan="3" class="muted">—</td></tr>`);
   const list=records.filter(r=>r.ty==='Sale'&&(fac==='Sagamu'||r.factory===fac));
   const rev=list.reduce((s,r)=>s+toNGN(toCNY(r.ta,r.currency||'NGN')),0);
@@ -3035,16 +2999,65 @@ function renderSell(){
 
 /* ===== Inventory ===== */
 function saveInvAdjust(key,bags){const fac=effectiveFactory();const pel=flattenPellet(computeInventory(fac));const base=Math.round((pel[key]||0)/BAG_KG);invAdjust[key]=Math.max(0,Math.round(bags))-base;settings.pending=(settings.pending||0)+1;saveState();refreshAfterSave();toast(lang==='zh'?'库存已校正':'Stock adjusted');}
+function saveInvAdjustRaw(key,kg){const fac=effectiveFactory();const fr=flattenRaw(computeInventory(fac));const base=Math.round(fr[key]||0);invAdjustRaw[key]=Math.max(0,Math.round(kg))-base;clearInvDeleted('raw',key);settings.pending=(settings.pending||0)+1;saveState();refreshAfterSave();toast(lang==='zh'?'原料库存已校正':'Raw stock adjusted');}
+/* 原料库存自由编辑：覆盖材质/形态/重量（老板），便于修正回放口径与标签 */
+function editRawInv(key,field,val){
+  if(currentRole!=='boss')return;
+  const ov=invRawEdit[key]||{};
+  if(field==='m')ov.m=String(val||'').trim();
+  else if(field==='f')ov.f=String(val||'').trim();
+  else if(field==='w')ov.w=Math.max(0,Math.round(+val||0));
+  invRawEdit[key]=ov;clearInvDeleted('raw',key);settings.pending=(settings.pending||0)+1;saveState();renderInventory();
+  toast(lang==='zh'?'原料库存已更新':'Raw stock updated');
+}
+/* 成品库存自由编辑：覆盖材质/颜色/袋数（老板） */
+function editPelletInv(key,field,val){
+  if(currentRole!=='boss')return;
+  const ov=invPelletEdit[key]||{};
+  if(field==='m')ov.m=String(val||'').trim();
+  else if(field==='c')ov.c=String(val||'').trim();
+  else if(field==='bags')ov.bags=Math.max(0,Math.round(+val||0));
+  invPelletEdit[key]=ov;clearInvDeleted('pellet',key);settings.pending=(settings.pending||0)+1;saveState();renderInventory();
+  toast(lang==='zh'?'成品库存已更新':'Finished stock updated');
+}
 function renderInventory(){
   const fac=effectiveFactory();
   const inv=computeInventory(fac);
   const fr=flattenRaw(inv);
-  const rawRows=Object.keys(fr).filter(k=>fr[k]>0.0001).sort().map(k=>{const [m,f]=k.split('|');return `<tr><td><b>${m}</b></td><td>${f==='大料'?t('opt_bulk'):t('opt_frag')}</td><td class="num">${Math.round(fr[k]).toLocaleString()}</td></tr>`;}).join('');
-  setHTML('inv-raw', rawRows||`<tr><td colspan="3" class="muted">${lang==='zh'?'暂无原料库存':'No raw stock'}</td></tr>`);
+  const rawDel=invDeleted.raw||{};
+  const rawKeys=Array.from(new Set([...Object.keys(fr).filter(k=>fr[k]>0.0001), ...Object.keys(invAdjustRaw).filter(k=>(invAdjustRaw[k]||0)!==0), ...Object.keys(invRawEdit)])).filter(k=>!rawDel[k]).sort();
+  const rawRows=rawKeys.map(k=>{
+    const [m,f]=k.split('|');const base=Math.round(fr[k]||0);const ov=invRawEdit[k];
+    const curM=ov?ov.m:m; const curF=ov?ov.f:f; const curW=ov?ov.w:(base+(invAdjustRaw[k]||0));
+    if(currentRole==='boss'){
+      return `<tr><td><input class="inv-mat-t" type="text" value="${esc(curM)}" data-k="${esc(k)}" data-field="m" onchange="editRawInv(this.getAttribute('data-k'),'m',this.value)" style="width:72px"/></td>
+        <td><input class="inv-mat-t" type="text" value="${esc(curF)}" data-k="${esc(k)}" data-field="f" onchange="editRawInv(this.getAttribute('data-k'),'f',this.value)" style="width:72px"/></td>
+        <td class="num"><input class="inv-adj" type="number" min="0" step="1" value="${Math.round(curW)}" data-k="${esc(k)}" data-field="w" onchange="editRawInv(this.getAttribute('data-k'),'w',+this.value)" style="width:90px"/> kg<button data-k="${esc(k)}" onclick="deleteInvEntry('raw',this.getAttribute('data-k'))" title="${t('inv_del')}" style="margin-left:6px;border:none;background:#fee2e2;color:#b91c1c;border-radius:6px;padding:2px 7px;cursor:pointer;font-size:12px">✕</button></td></tr>`;
+    }
+    return `<tr><td><b>${esc(curM)}</b></td><td>${curF==='大料'?t('opt_bulk'):t('opt_frag')}</td><td class="num">${Math.round(curW).toLocaleString()} kg</td></tr>`;
+  }).join('');
+  const rawTotal=rawKeys.reduce((s,k)=>{const ov=invRawEdit[k];const base=Math.round(fr[k]||0);return s+(ov?ov.w:(base+(invAdjustRaw[k]||0)));},0);
+  const rawFoot=rawKeys.length?`<tr class="inv-total"><td colspan="2">${lang==='zh'?'原料合计':'Raw total'}</td><td class="num">${Math.round(rawTotal).toLocaleString()} kg</td></tr>`:'';
+  setHTML('inv-raw', (rawRows||`<tr><td colspan="3" class="muted">${lang==='zh'?'暂无原料库存':'No raw stock'}</td></tr>`)+rawFoot);
   const pel=flattenPellet(inv);
-  const pelRows=Object.keys(pel).filter(k=>pel[k]>0.0001).sort().map(k=>{const [m,c]=k.split("|");const base=Math.round(pel[k]/BAG_KG);const eff=base+(invAdjust[k]||0);const cell=currentRole==='boss'?`<input class="inv-adj" type="number" min="0" value="${eff}" data-k="${esc(k)}" onchange="saveInvAdjust(this.getAttribute('data-k'),+this.value)" style="width:80px"/> ${unitBag()}`:`${eff} ${unitBag()}`;return `<tr><td><b>${m}</b></td><td>${c?esc(colorLabel(c)):"—"}</td><td class="num">${cell}</td></tr>`;}).join('');
-  setHTML('inv-pellet', pelRows||`<tr><td colspan="3" class="muted">${lang==='zh'?'暂无成品库存':'No finished stock'}</td></tr>`);
+  const pelDel=invDeleted.pellet||{};
+  const pelKeys=Array.from(new Set([...Object.keys(pel).filter(k=>pel[k]>0.0001), ...Object.keys(invAdjust).filter(k=>(invAdjust[k]||0)!==0), ...Object.keys(invPelletEdit)])).filter(k=>!pelDel[k]).sort();
+  const pelRows=pelKeys.map(k=>{
+    const [m,c]=k.split("|");const base=Math.round((pel[k]||0)/BAG_KG);const ov=invPelletEdit[k];
+    const curM=ov?ov.m:m; const curC=ov?ov.c:c; const curB=ov?ov.bags:(base+(invAdjust[k]||0));
+    if(currentRole==='boss'){
+      return `<tr><td><input class="inv-mat-t" type="text" value="${esc(curM)}" data-k="${esc(k)}" data-field="m" onchange="editPelletInv(this.getAttribute('data-k'),'m',this.value)" style="width:60px"/></td>
+        <td><input class="inv-mat-t" type="text" value="${esc(curC||'—')}" data-k="${esc(k)}" data-field="c" onchange="editPelletInv(this.getAttribute('data-k'),'c',this.value)" style="width:80px"/></td>
+        <td class="num"><input class="inv-adj" type="number" min="0" value="${Math.round(curB)}" data-k="${esc(k)}" data-field="bags" onchange="editPelletInv(this.getAttribute('data-k'),'bags',+this.value)" style="width:70px"/> ${unitBag()}<button data-k="${esc(k)}" onclick="deleteInvEntry('pellet',this.getAttribute('data-k'))" title="${t('inv_del')}" style="margin-left:6px;border:none;background:#fee2e2;color:#b91c1c;border-radius:6px;padding:2px 7px;cursor:pointer;font-size:12px">✕</button></td></tr>`;
+    }
+    return `<tr><td><b>${esc(curM)}</b></td><td>${c?esc(colorLabel(c)):'—'}</td><td class="num">${Math.round(curB)} ${unitBag()}</td></tr>`;
+  }).join('');
+  const pelTotalBags=pelKeys.reduce((s,k)=>{const ov=invPelletEdit[k];const base=Math.round((pel[k]||0)/BAG_KG);return s+(ov?ov.bags:(base+(invAdjust[k]||0)));},0);
+  const pelFoot=pelKeys.length?`<tr class="inv-total"><td colspan="2">${lang==='zh'?'成品合计':'Finished total'}</td><td class="num">${Math.round(pelTotalBags).toLocaleString()} ${unitBag()}</td></tr>`:'';
+  setHTML('inv-pellet', (pelRows||`<tr><td colspan="3" class="muted">${lang==='zh'?'暂无成品库存':'No finished stock'}</td></tr>`)+pelFoot);
+  if(currentRole==='boss'){ const h=document.getElementById('inv-edit-hint'); if(h)h.style.display=''; } else { const h=document.getElementById('inv-edit-hint'); if(h)h.style.display='none'; }
   renderCatalog();
+  populateInvAddSelects();
 }
 function renderCatalog(){
   const el=document.getElementById('inv-catalog');if(!el)return;
@@ -3070,6 +3083,52 @@ function refreshProductSelects(){
   document.querySelectorAll('.pr-c').forEach(sel=>{const m=sel.closest('tr').querySelector('.pr-m').value;const v=sel.value;sel.innerHTML=productColorOptions(m,v);});
   document.querySelectorAll('.sl-m').forEach(sel=>{const v=sel.value;sel.innerHTML=productMaterials().map(m=>`<option ${m===v?'selected':''}>${esc(m)}</option>`).join('');});
   document.querySelectorAll('.sl-c').forEach(sel=>{const m=sel.closest('tr').querySelector('.sl-m').value;const v=sel.value;sel.innerHTML=productColorOptions(m,v);});
+  populateInvAddSelects();
+}
+function populateInvAddSelects(){
+  const iraMat=document.getElementById('ira-mat'); if(iraMat){const v=iraMat.value;iraMat.innerHTML=productMaterials().map(m=>`<option ${m===v?'selected':''}>${esc(m)}</option>`).join('');}
+  const iraColor=document.getElementById('ira-color'); if(iraColor){const m=(document.getElementById('ira-mat')||{}).value||'';const v=iraColor.value;iraColor.innerHTML='<option value="">'+esc(t('inv_color_opt'))+'</option>'+productColorOptions(m,v);}
+  const ipaMat=document.getElementById('ipa-mat'); if(ipaMat){const v=ipaMat.value;ipaMat.innerHTML=productMaterials().map(m=>`<option ${m===v?'selected':''}>${esc(m)}</option>`).join('');}
+  const ipaColor=document.getElementById('ipa-color'); if(ipaColor){const m=(document.getElementById('ipa-mat')||{}).value||'';const v=ipaColor.value;ipaColor.innerHTML=productColorOptions(m,v);}
+}
+function onInvMatChange(){
+  const iraColor=document.getElementById('ira-color'); if(iraColor){const m=(document.getElementById('ira-mat')||{}).value||'';iraColor.innerHTML='<option value="">'+esc(t('inv_color_opt'))+'</option>'+productColorOptions(m,'');}
+  const ipaColor=document.getElementById('ipa-color'); if(ipaColor){const m=(document.getElementById('ipa-mat')||{}).value||'';ipaColor.innerHTML=productColorOptions(m,'');}
+}
+function addRawStock(){
+  const m=document.getElementById('ira-mat').value; const f=document.getElementById('ira-form').value; const c=document.getElementById('ira-color').value; const w=parseFloat(document.getElementById('ira-w').value);
+  if(!m||!f){toast(lang==='zh'?'请选择材质与形态':'Select material & form');return;}
+  if(!(w>0)){toast(lang==='zh'?'请输入有效重量':'Enter valid weight');return;}
+  const key=m+'|'+f;
+  invAdjustRaw[key]=(invAdjustRaw[key]||0)+w;
+  clearInvDeleted('raw',key); /* 重新入库则解除该键的删除墓碑 */
+  settings.pending=(settings.pending||0)+1;
+  auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_raw_add',target:m+' '+f+(c?' '+colorLabel(c):''),detail:(lang==='zh'?'原料入库 +':'Raw in +')+Math.round(w)+'kg'});
+  saveState(); renderInventory(); toast(lang==='zh'?'已增加原料库存':'Raw stock added');
+}
+function addPelletStock(){
+  const m=document.getElementById('ipa-mat').value; const c=document.getElementById('ipa-color').value; const bags=parseInt(document.getElementById('ipa-bags').value,10);
+  if(!m){toast(lang==='zh'?'请选择种类':'Select material');return;}
+  if(!(bags>0)){toast(lang==='zh'?'请输入有效袋数':'Enter valid bags');return;}
+  const key=m+'|'+c;
+  invAdjust[key]=(invAdjust[key]||0)+bags;
+  clearInvDeleted('pellet',key); /* 重新入库则解除该键的删除墓碑 */
+  settings.pending=(settings.pending||0)+1;
+  auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_pellet_add',target:m+' '+(c?colorLabel(c):''),detail:(lang==='zh'?'成品入库 +':'Finished in +')+bags+unitBag()});
+  saveState(); renderInventory(); toast(lang==='zh'?'已增加成品库存':'Finished stock added');
+}
+
+function clearInvDeleted(kind,key){ invDeleted[kind]=invDeleted[kind]||{}; invDeleted[kind][key]=0; /* 标记 ts=0 = 显式解除墓碑，推送后由服务端复活该键（普通同步不会误清墓碑） */ }
+function deleteInvEntry(kind,key){
+  if(!can('data.reset')){toast(lang==='zh'?'无库存删除权限（仅老板）':'No permission (boss only)');return;}
+  if(!confirm(lang==='zh'?'确认删除该库存条目？此操作不可恢复。':'Delete this stock entry? Cannot undo.'))return;
+  /* 清除人工调整项；同时写墓碑：业务记录回放得出的库存行也通过墓碑在界面与同步中隐藏，杜绝"删了又回来" */
+  if(kind==='raw'){ if(invAdjustRaw[key]!==undefined){delete invAdjustRaw[key];} if(invRawEdit[key]!==undefined){delete invRawEdit[key];} }
+  else { if(invAdjust[key]!==undefined){delete invAdjust[key];} if(invPelletEdit[key]!==undefined){delete invPelletEdit[key];} }
+  invDeleted[kind]=invDeleted[kind]||{}; invDeleted[kind][key]=Date.now(); /* 库存删除墓碑：随 push 传播、pull 强制剔除，防复活 */
+  settings.pending=(settings.pending||0)+1;
+  auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_inv_del',target:key,detail:(lang==='zh'?'删除库存条目 ':'deleted stock entry ')+key});
+  saveState();renderInventory();toast(lang==='zh'?'已删除库存条目':'Stock entry deleted');
 }
 
 /* ===== Logistics ===== */
@@ -3085,7 +3144,27 @@ function renderLogistics(){
   setHTML('lg-summary', (lang==='zh'?'在途 ':'In transit ')+transit.toLocaleString()+' kg · '+(lang==='zh'?'待入库 ':'Pending ')+pend.toLocaleString()+' kg');
 }
 function confirmInbound(id){
-  const inb=records.find(r=>String(r.id)===String(id)&&r.ty==='Inbound');if(!inb){toast(lang==='zh'?'未找到对应入库记录':'Inbound record not found');return;}
+  let inb=records.find(r=>String(r.id)===String(id)&&r.ty==='Inbound');
+  if(!inb){
+    /* 多设备场景：本设备可能尚未拉取到分厂发来的入库单。先与云端同步一次再确认，
+       避免「分厂明明发过货、总厂却提示未找到」的同步时序问题。 */
+    if(SYNC.enabled() && typeof fetch==='function'){
+      toast(lang==='zh'?'本地未找到，正在从云端刷新…':'Not found locally, refreshing from cloud…');
+      syncPull().then(function(){
+        const inb2=records.find(r=>String(r.id)===String(id)&&r.ty==='Inbound');
+        if(inb2) _doConfirmInbound(inb2);
+        else confirmInboundFail();
+      });
+      return;
+    }
+    confirmInboundFail(); return;
+  }
+  _doConfirmInbound(inb);
+}
+function confirmInboundFail(){
+  toast(lang==='zh'?'未找到该入库记录：请确认①分厂已在「配送总厂」发货 ②本机已完成云端同步（设置-同步中手动同步一次）':'Inbound not found: ensure branch shipped & this device synced to cloud');
+}
+function _doConfirmInbound(inb){
   if(!can('inbound')){toast(lang==='zh'?'无入库确认权限':'No inbound permission');return;}
   inb.status='已入库';inb.ts=Date.now();
   const ship=records.find(r=>String(r.id)===String(inb.linkId)&&r.ty==='Ship');if(ship){ship.status='已入库';ship.ts=Date.now();}
@@ -3278,7 +3357,15 @@ function syncPush(){
     deletedUsers:deletedUsers,
     deletedCustomers:deletedCustomers,
     finances:finances.map(f=>Object.assign({},f,{updatedTs:f.ts||0})),
-    deletedFinances:deletedFinances
+    deletedFinances:deletedFinances,
+    priceBy:priceBy,
+    products:products,
+    priceHist:priceHist,
+    invAdjust:invAdjust,
+    invAdjustRaw:invAdjustRaw,
+    invRawEdit:invRawEdit,
+    invPelletEdit:invPelletEdit,
+    invDeleted:invDeleted
   });
   return fetch(SYNC.url()+'/sync/push',{method:'POST',headers:SYNC.headers(),body})
     .then(r=>r.json()).then(j=>{
@@ -3286,7 +3373,7 @@ function syncPush(){
       return !!(j&&j.ok);
     }).catch(e=>{ console.warn('syncPush failed',e); return false; });
 }
-function applyRemote(remoteRecs, deleted, remoteUsers, remoteCustomers, remoteDelUsers, remoteDelCustomers, remoteFinances, remoteDelFinances){
+function applyRemote(remoteRecs, deleted, remoteUsers, remoteCustomers, remoteDelUsers, remoteDelCustomers, remoteFinances, remoteDelFinances, remotePriceBy, remoteProducts, remotePriceHist, remoteInvAdjust, remoteInvAdjustRaw, remoteInvRawEdit, remoteInvPelletEdit, remoteInvDeleted){
   const map={}; records.forEach(r=>{map[r.id]=r;});
   (remoteRecs||[]).forEach(rr=>{
     if(rr.id==null)return;
@@ -3304,7 +3391,7 @@ function applyRemote(remoteRecs, deleted, remoteUsers, remoteCustomers, remoteDe
     if(idx<0){ users.push(ru); }
     else if((ru.updatedTs||0) > (users[idx].updatedTs||0)){ users[idx]=ru; }
   });
-  (remoteDelUsers||[]).forEach(un=>{ if(un===currentUser&&currentUser.username==='boss')return; if(users.some(u=>u.username===un&&u.role==='boss'))return; users=users.filter(u=>u.username!==un); if(deletedUsers.indexOf(un)<0)deletedUsers.push(un); });
+  (remoteDelUsers||[]).forEach(un=>{ if(un===currentUser.username)return; users=users.filter(u=>u.username!==un); if(deletedUsers.indexOf(un)<0)deletedUsers.push(un); });
   /* ---- 客户同步：按 id 做 LWW，使分厂录入的客户可在老板账号查看 ---- */
   const cmap={}; customers.forEach(c=>{cmap[c.id]=c;});
   (remoteCustomers||[]).forEach(rc=>{
@@ -3325,8 +3412,32 @@ function applyRemote(remoteRecs, deleted, remoteUsers, remoteCustomers, remoteDe
     else if((rf.ts||0) > (local.ts||0) || ((rf.ts||0)===(local.ts||0) && (rf.rev||0) > (local.rev||0))){ Object.assign(local, rf); }
   });
   (remoteDelFinances||[]).forEach(fid=>{ finances=finances.filter(f=>f.id!==fid); if(deletedFinances.indexOf(fid)<0)deletedFinances.push(fid); });
+  /* ---- 价格主数据 / 产品目录 / 库存校正：服务端权威，拉取后并入本地（服务端为空时保留本地既有数据，避免首次同步清空） ---- */
+  if(remotePriceBy&&typeof remotePriceBy==='object'&&['Sagamu','OPIC','Ikeja'].some(f=>remotePriceBy[f]&&Object.keys(remotePriceBy[f]||{}).length)){
+    ['Sagamu','OPIC','Ikeja'].forEach(f=>{ if(remotePriceBy[f]&&typeof remotePriceBy[f]==='object')priceBy[f]=remotePriceBy[f]; });
+  }
+  if(remoteProducts&&typeof remoteProducts==='object'&&Object.keys(remoteProducts).length)products=remoteProducts;
+  if(Array.isArray(remotePriceHist))priceHist=remotePriceHist;
+  if(remoteInvAdjust&&typeof remoteInvAdjust==='object')Object.assign(invAdjust,remoteInvAdjust);
+  if(remoteInvAdjustRaw&&typeof remoteInvAdjustRaw==='object')Object.assign(invAdjustRaw,remoteInvAdjustRaw);
+  if(remoteInvRawEdit&&typeof remoteInvRawEdit==='object')Object.assign(invRawEdit,remoteInvRawEdit);
+  if(remoteInvPelletEdit&&typeof remoteInvPelletEdit==='object')Object.assign(invPelletEdit,remoteInvPelletEdit);
+  /* 库存删除墓碑：先合并远端墓碑到本地（取较新时间戳），再强制剔除已删键——这是修复"删除几秒后复活"的关键：
+     服务端对库存 map 是合并存储，被删的键不会因 push 中 absent 而消失；必须由墓碑在每次 pull 后显式剔除。 */
+  if(remoteInvDeleted&&typeof remoteInvDeleted==='object'){
+    ['raw','pellet'].forEach(function(kind){
+      const rk=remoteInvDeleted[kind]||{};
+      Object.keys(rk).forEach(function(k){ const ts=rk[k]||0; if(ts>0){ invDeleted[kind]=invDeleted[kind]||{}; if((invDeleted[kind][k]||0)<ts)invDeleted[kind][k]=ts; } });
+    });
+  }
+  ['raw','pellet'].forEach(function(kind){
+    const dk=invDeleted[kind]||{};
+    Object.keys(dk).forEach(function(k){ const ts=dk[k]||0; if(ts>0){ if(kind==='raw'){delete invAdjustRaw[k];delete invRawEdit[k];} else {delete invAdjust[k];delete invPelletEdit[k];} } });
+  });
   /* 同步后，若当前登录账号对象被替换，重新指向最新引用，避免会话 stale */
-  if(currentUser){ const fresh=users.find(u=>u.username===currentUser.username); if(fresh)currentUser=fresh; }
+  if(currentUser){ const fresh=users.find(u=>u.username===currentUser.username); if(fresh){currentUser=fresh; currentRole=fresh.role;} }
+  /* 账号/角色可能随同步变化，立即刷新角色徽标与汇率等权限相关 UI 的可见性 */
+  updateRoleBadge();
 }
 function syncPull(){
   if(!SYNC.enabled()) return Promise.resolve(false);
@@ -3335,14 +3446,14 @@ function syncPull(){
   return fetch(SYNC.url()+'/sync/pull?since='+since,{headers:SYNC.headers()})
     .then(r=>r.json()).then(j=>{
       if(!j||!j.records) return false;
-      applyRemote(j.records, j.deleted||[], j.users||[], j.customers||[], j.deletedUsers||[], j.deletedCustomers||[], j.finances||[], j.deletedFinances||[]);
+      applyRemote(j.records, j.deleted||[], j.users||[], j.customers||[], j.deletedUsers||[], j.deletedCustomers||[], j.finances||[], j.deletedFinances||[], j.priceBy, j.products, j.priceHist, j.invAdjust, j.invAdjustRaw, j.invRawEdit, j.invPelletEdit, j.invDeleted);
       /* 数据互通：拉取后重新校验「发货→总厂入库」配对，确保总厂始终有可确认的来料入库单
          （分厂发货在分厂本地生成入库单可能因未同步而不到达总厂，此处以总厂本地补齐） */
       reconcileAll();
       settings.lastSync=nowStr();
       // 用服务端权威时间作为下次增量基线，避免客户端时钟偏差导致漏拉
       settings.lastSyncTs = j.serverTime || Date.now();
-      saveState(); refreshAfterSave(); renderCustomers(); renderAccounts(); renderFinance(); updateSyncUI();
+      saveState(); refreshAfterSave(); renderCustomers(); renderAccounts(); renderFinance(); renderInventory(); updateSyncUI();
       return true;
     }).catch(e=>{ console.warn('syncPull failed',e); return false; });
 }
@@ -3390,7 +3501,9 @@ function doSync(){
 }
 function backupLocal(){settings.lastBackup=nowStr();saveState();const blob=new Blob([JSON.stringify(Store.get(STATE_KEY,{}))],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rf_backup_'+nowStr().replace(/[: ]/g,'-')+'.json';a.click();toast(lang==='zh'?'本地备份已创建':'Local backup created');}
 function backupCloud(){settings.lastBackup=nowStr();saveState();toast(lang==='zh'?'云端备份完成':'Cloud backup done');}
-function restoreBackup(input){const f=input.files&&input.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const s=JSON.parse(rd.result);if(s&&s.records){if(!confirm(lang==='zh'?'恢复备份将覆盖当前数据，确定？':'Overwrite current data?'))return;if(Array.isArray(s.customers))customers=s.customers;if(Array.isArray(s.records))records=s.records.map(r=>{if(!r.items)r.items=[];if(!r.factory)r.factory='Sagamu';recTotals(r);return r;});if(s.priceMap)priceMap=s.priceMap;if(s.products)products=s.products;if(s.priceHist)priceHist=s.priceHist;if(s.auditLog)auditLog=s.auditLog;if(s.settings)settings=Object.assign(settings,s.settings);if(Array.isArray(s.users)&&s.users.length)users=s.users;saveState();renderAll();toast(lang==='zh'?'已恢复备份':'Backup restored');}}catch(e){toast(lang==='zh'?'恢复失败':'Restore failed');}};rd.readAsText(f);}
+function restoreBackup(input){const f=input.files&&input.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const s=JSON.parse(rd.result);if(s&&s.records){if(!confirm(lang==='zh'?'恢复备份将覆盖当前数据，确定？':'Overwrite current data?'))return;if(Array.isArray(s.customers))customers=s.customers;if(Array.isArray(s.records))records=s.records.map(r=>{if(!r.items)r.items=[];if(!r.factory)r.factory='Sagamu';recTotals(r);return r;});if(s.priceMap)priceMap=s.priceMap;if(s.products)products=s.products;if(s.priceHist)priceHist=s.priceHist;
+if(s.invRawEdit)invRawEdit=s.invRawEdit;
+if(s.invPelletEdit)invPelletEdit=s.invPelletEdit;if(s.auditLog)auditLog=s.auditLog;if(s.settings)settings=Object.assign(settings,s.settings);if(Array.isArray(s.users)&&s.users.length)users=s.users;saveState();renderAll();toast(lang==='zh'?'已恢复备份':'Backup restored');}}catch(e){toast(lang==='zh'?'恢复失败':'Restore failed');}};rd.readAsText(f);}
 function saveLocal(){const el=document.getElementById('lo-lang');if(el)settings.lang=el.value;saveState();setLang(settings.lang||'zh');toast(lang==='zh'?'设置已保存':'Settings saved');}
 function renderAudit(){const el=document.getElementById('audit-body');if(!el)return;const rows=(auditLog||[]).slice(0,300).map((r,i)=>`<tr><td class="muted">${esc(r.time||'')}</td><td>${esc(r.actor||'')}</td><td>${esc(t(r.action)||r.action||'')}</td><td>${esc(r.target||'')}</td><td class="muted">${esc(r.detail||'')}</td><td><span class="link" style="color:var(--danger)" onclick="deleteAuditItem(${i})">${t('delete')}</span></td></tr>`).join('');el.innerHTML=rows||`<tr><td colspan="6" class="muted">—</td></tr>`;}
 /* 单条删除审计记录（操作本身记入审计，形成闭环可追溯） */
@@ -3429,7 +3542,7 @@ function exportCustomersExcel(){exportExcel(['姓名','电话','开户行','账�
 function exportSearchExcel(){const rows=[];document.querySelectorAll('#s-body tr').forEach(tr=>{const tds=[...tr.children].map(td=>td.textContent.trim());if(tds.length)rows.push(tds);});exportExcel(['日期','类型','客户','电话','开户行','账号','地址','备注','材质','重量','金额','操作'],rows,'search.xls');}
 function exportTodayExcel(){exportExcel(['日期','客户','材质','形态','颜色','重量','金额'],visibleRecords().filter(r=>r.ty==='Receive'&&r.dt===PLANT_TODAY).flatMap(r=>(r.items||[]).map(it=>[r.dt,r.custName,it.m,it.f,it.c,it.w,r.ta])),'today.xls');}
 function exportReportExcel(){const a=repAggregate(currentPeriod);exportExcel(['指标','值'],[['收购量',Math.round(a.recv)],['发货量',Math.round(a.ship)],['金额',Math.round(a.amt)]],'report.xls');}
-function exportAllExcel(){const recs=visibleRecords().map(r=>[r.dt,r.ty,r.custName,r.tw,r.ta]);exportExcel(['日期','类型','客户','重量(kg)','金额(¥)'],recs,'all_data.xls');}
+function exportAllExcel(){const recs=records.map(r=>[r.dt,r.ty,r.custName,r.tw,r.ta]);exportExcel(['日期','类型','客户','重量(kg)','金额(¥)'],recs,'all_data.xls');}
 function exportAudit(kind,fmt){
   try{
     if(kind==='search'){const rows=[];document.querySelectorAll('#s-body tr').forEach(tr=>{const tds=[...tr.children].map(td=>td.textContent);if(tds.length)rows.push(tds);});exportExcel(['日期','类型','客户','电话','开户行','账号','地址','备注','材质','重量','金额'],rows,'search.xls');return;}
@@ -3516,47 +3629,21 @@ function loadRemembered(){
     if(rem)rem.checked=true;
   }
 }
-/* —— 登录失败锁定（大厂级暴力破解防护） —— */
-const LOCK_KEY='rf_login_lock_v1', LOCK_MAX=5, LOCK_WINDOW=5*60*1000;
-function loginFailures(){ try{return JSON.parse(localStorage.getItem(LOCK_KEY)||'{}');}catch(e){return {};} }
-function recordFailure(u){
-  const m=loginFailures(); const now=Date.now();
-  const e=m[u]||{count:0,first:now};
-  e.count++; e.first=now; m[u]=e;
-  try{localStorage.setItem(LOCK_KEY,JSON.stringify(m));}catch(e){}
-  return e;
-}
-function clearFailure(u){ const m=loginFailures(); if(m[u]){delete m[u]; try{localStorage.setItem(LOCK_KEY,JSON.stringify(m));}catch(e){}} }
-function isLocked(u){
-  const m=loginFailures(); const e=m[u]; if(!e)return false;
-  if(Date.now()-e.first > LOCK_WINDOW){ delete m[u]; try{localStorage.setItem(LOCK_KEY,JSON.stringify(m));}catch(e){} return false; }
-  return e.count>=LOCK_MAX;
-}
-function lockRetryAfter(u){
-  const m=loginFailures(); const e=m[u]; if(!e)return 0;
-  return Math.max(0, LOCK_WINDOW-(Date.now()-e.first));
-}
 function signIn(){
   const u=document.getElementById('li-user').value.trim();
   const pw=document.getElementById('li-pass').value;
   const fac=document.getElementById('li-factory').value;
   const err=document.getElementById('li-err'); err.textContent='';
-  if(!u||!pw){ err.textContent=t('login_required'); return; }
-  if(isLocked(u)){
-    const sec=Math.ceil(lockRetryAfter(u)/1000);
-    err.textContent=(lang==='zh'?'尝试次数过多，请 '+sec+' 秒后再试':'Too many attempts, retry in '+sec+'s');
-    return;
-  }
-  let user=users.find(x=>x.username===u);
+  const user=users.find(x=>x.username===u);
   if(!user){
-    /* 本地无此账号：很可能是在其他设备/总厂创建的。先尝试从同步服务器拉取账号，
-       解开"新设备登录前本地无账号"的死锁。 */
+    /* 本地无此账号：很可能是在其他设备创建的。先尝试从同步服务器拉取账号再登录，
+       直接解开"新设备登录前本地无账号"的死锁（登录校验逻辑本身保持不变）。 */
     if(SYNC.enabled()){
       err.textContent=lang==='zh'?'正在从服务器获取账号…':'Fetching account…';
       syncPull().then(()=>{
         const u2=users.find(x=>x.username===u);
         if(u2) finishSignIn(u2, pw, fac, err);
-        else { recordFailure(u); err.textContent=t('login_bad'); }
+        else err.textContent=t('login_bad');
       }).catch(()=>{ err.textContent=t('login_bad'); });
       return;
     }
@@ -3565,12 +3652,8 @@ function signIn(){
   finishSignIn(user, pw, fac, err);
 }
 function finishSignIn(user, pw, fac, err){
-  /* 账号被禁用：不可登录（大厂级账号生命周期） */
-  if(user.status==='disabled'){ err.textContent=t('login_disabled'); recordFailure(user.username); return; }
-  if(user.status==='pending'){ err.textContent=t('login_pending'); recordFailure(user.username); return; }
-  if(!verifyPassword(pw, user.passwordHash)){ recordFailure(user.username); err.textContent=t('login_bad'); return; }
-  if(fac!==ALL_VIEW && !user.factories.includes(fac)){ err.textContent=t('login_badfac'); return; }
-  clearFailure(user.username);
+  if(!verifyPassword(pw,user.salt,user.passwordHash)){err.textContent=t('login_bad');return;}
+  if(fac!==ALL_VIEW && !user.factories.includes(fac)){err.textContent=t('login_badfac');return;}
   setSession(user,fac);
   saveRemembered();
   if(user.mustChange){ openForceChange(); return; }
@@ -3641,6 +3724,10 @@ function refreshControls(){
   show('s-factory-wrap', currentRole==='boss'&&currentFactory===ALL_VIEW);
   const cd=document.getElementById('cd-del-btn'); if(cd)cd.style.display=can('customer.delete')?'':'none';
   document.querySelectorAll('.pp-apply').forEach(b=>b.style.display=can('pricing')?'':'none');
+  /* 分厂不开放造粒与成品出售：隐藏对应导航入口（总厂/全局视角才显示） */
+  const hq=isHQorAllFactory();
+  const navSell=document.querySelector('#nav a[data-view="sell"]'); if(navSell)navSell.style.display=hq?'':'none';
+  const navProd=document.querySelector('#nav a[data-view="produce"]'); if(navProd)navProd.style.display=hq?'':'none';
   const cmf=document.getElementById('cm-factory'), cmfr=document.getElementById('cm-factory-readonly');
   if(cmf&&cmfr){ if(currentRole==='boss'&&currentFactory===ALL_VIEW){cmf.style.display='';cmfr.textContent='';} else {cmf.style.display='none';const f=FACTORIES[currentFactory];cmfr.textContent=f?(f.name+' · '+f.loc):'—';} }
 }
@@ -3662,30 +3749,19 @@ function logout(){
 }
 
 /* ===== Account management (boss only) ===== */
-const STATUS_BADGE={active:{zh:'启用',en:'Active'},pending:{zh:'待审核',en:'Pending'},disabled:{zh:'已禁用',en:'Disabled'}};
 function renderAccounts(){
   const el=document.getElementById('accounts-body');if(!el)return;
   const canEdit=can('account.manage');
   const rows=users.map(u=>{
-    const badge=STATUS_BADGE[u.status]?STATUS_BADGE[u.status][lang]:u.status;
-    const isSelf = u.username===(currentUser&&currentUser.username);
-    const edit = (canEdit && !isSelf && u.role!=='boss') ? `<span class="link" onclick="loadAcct('${esc(u.username)}')">${t('acct_edit')}</span>` : (isSelf?'—':'—');
-    const ops=[];
-    if(canEdit && !isSelf && u.role!=='boss'){
-      if(u.status==='pending') ops.push(`<span class="link" style="color:var(--ok)" onclick="approveAccount('${esc(u.username)}')">${t('acct_approve')}</span>`);
-      if(u.status==='active') ops.push(`<span class="link" style="color:var(--danger)" onclick="disableAccount('${esc(u.username)}')">${t('acct_disable')}</span>`);
-      if(u.status==='disabled') ops.push(`<span class="link" style="color:var(--ok)" onclick="enableAccount('${esc(u.username)}')">${t('acct_enable')}</span>`);
-      ops.push(`<span class="link" style="color:var(--danger)" onclick="deleteAccount('${esc(u.username)}')">${t('acct_delete')}</span>`);
-    }
-    return `<tr><td><b>${esc(u.username)}</b></td><td>${esc(u.name||'')}</td><td>${roleBadgeMap[u.role]?roleBadgeMap[u.role][lang]:u.role}</td><td>${u.factories.map(f=>FACTORIES[f]?FACTORIES[f].name:f).join('、')}</td><td>${badge}</td><td>${ops.join(' &nbsp; ')||'—'}</td></tr>`;
+    const grant = canEdit&&u.username!==(currentUser&&currentUser.username) ? `<span class="link" onclick="loadAcct('${esc(u.username)}')">${t('acct_grant')}</span>` : '—';
+    const del = (canEdit&&u.role!=='boss'&&u.role!=='devAdmin') ? `<span class="link" style="color:var(--danger)" onclick="deleteAccount('${esc(u.username)}')">${t('acct_delete')}</span>` : '—';
+    return `<tr><td><b>${esc(u.username)}</b></td><td>${esc(u.name||'')}</td><td>${roleBadgeMap[u.role]?roleBadgeMap[u.role][lang]:u.role}</td><td>${u.factories.map(f=>FACTORIES[f]?FACTORIES[f].name:f).join('、')}</td><td>${grant} &nbsp; ${del}</td></tr>`;
   }).join('');
-  el.innerHTML=rows||`<tr><td colspan="6" class="muted">—</td></tr>`;
+  el.innerHTML=rows||`<tr><td colspan="5" class="muted">—</td></tr>`;
 }
 let editingAcct=null; /* 非空表示正在编辑已有账号（老板赋权） */
-let acctFromRegister=false; /* 新增账号是否来自登录页「注册」（需老板审核启用）；老板在设置页直接创建则直接启用 */
-function openAcctModal(presetUser, fromRegister){
+function openAcctModal(presetUser){
   editingAcct = presetUser || null;
-  acctFromRegister = !!fromRegister && !presetUser;
   const m=document.getElementById('acct-modal');if(m)m.classList.remove('hidden');
   const fc=document.getElementById('ac-factories');if(fc)fc.innerHTML=ALL_FACTORY_IDS.map(f=>`<label class="chk"><input type="checkbox" value="${f}" checked/> ${FACTORIES[f]?FACTORIES[f].name:f}</label>`).join(' ');
   const msg=document.getElementById('ac-msg');if(msg)msg.textContent='';
@@ -3694,15 +3770,14 @@ function openAcctModal(presetUser, fromRegister){
     const u=users.find(x=>x.username===editingAcct);
     if(u){
       const eu=document.getElementById('ac-user');if(eu){eu.value=u.username;eu.readOnly=true;}
-      const en2=document.getElementById('ac-name');if(en2)en2.value=u.name||'';
+      const en=document.getElementById('ac-name');if(en)en.value=u.name||'';
       const er=document.getElementById('ac-role');if(er)er.value=u.role;
       const ef=document.getElementById('ac-factories');if(ef)ef.innerHTML=ALL_FACTORY_IDS.map(f=>`<label class="chk"><input type="checkbox" value="${f}" ${u.factories.includes(f)?'checked':''}/> ${FACTORIES[f]?FACTORIES[f].name:f}</label>`).join(' ');
       const ep=document.getElementById('ac-pass');if(ep)ep.value=''; /* 留空表示不修改密码 */
-      if(msg)msg.textContent=lang==='zh'?'正在为「'+u.username+'」赋权：修改角色、工厂与状态，密码留空则不变':'Granting perms to '+u.username;
+      if(msg)msg.textContent=lang==='zh'?'正在为「'+u.username+'」赋权：修改角色与工厂，密码留空则不变':'Granting perms to '+u.username;
     }
   } else {
     const eu=document.getElementById('ac-user');if(eu){eu.value='';eu.readOnly=false;}
-    if(acctFromRegister && msg)msg.textContent=lang==='zh'?'注册后账号处于「待审核」，需老板在设置页启用后方可登录':'Account is pending; boss must enable it in Settings';
   }
 }
 function loadAcct(username){ openAcctModal(username); }
@@ -3719,12 +3794,12 @@ function submitAcct(){
   if(factories.length===0){if(msg)msg.textContent=lang==='zh'?'请至少选择一个工厂':'Pick at least one plant';return;}
   if(editingAcct && editingAcct===username){
     /* 老板赋权：更新已有账号角色/工厂，密码留空则不变 */
-    const u=users.find(x=>x.username===username);if(!u){if(msg)msg.textContent=lang==='zh'?'账号不存在':'Account not found';  return;}
+    const u=users.find(x=>x.username===username);if(!u){if(msg)msg.textContent=lang==='zh'?'账号不存在':'Account not found';return;}
     if(pass){ if(!passwordStrong(pass)){if(msg)msg.textContent=lang==='zh'?'密码需≥8位且含字母与数字':'Password >=8 chars with letters & digits';return;} const salt=genSalt(); u.salt=salt; u.passwordHash=hashPassword(pass,salt); u.mustChange=true; }
-    u.name=name; u.role=role; u.factories=factories.slice(); u.updatedTs=Date.now();
+    if(role)u.role=role; u.name=name; u.factories=factories.slice(); u.updatedTs=Date.now();
     settings.pending=(settings.pending||0)+1;
     auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_edit',target:username,detail:lang==='zh'?'赋权 · '+name+' · '+role:'grant · '+name+' · '+role});
-    saveState();renderAccounts();updateSyncUI();
+    saveState();renderAccounts();updateSyncUI();syncPush();updateRoleBadge();
     toast(lang==='zh'?'已更新账号权限':'Permissions updated');
     closeAcctModal();
     return;
@@ -3733,29 +3808,13 @@ function submitAcct(){
   if(!pass||!passwordStrong(pass)){if(msg)msg.textContent=lang==='zh'?'密码需≥8位且含字母与数字':'Password >=8 chars with letters & digits';return;}
   const di=deletedUsers.indexOf(username); if(di>=0)deletedUsers.splice(di,1); /* 重新创建同名账号时清除旧墓碑，避免下次同步又被删 */
   const salt=genSalt();
-  const initialStatus = acctFromRegister ? 'pending' : 'active';
-  users.push({username,name,  role,factories:factories.slice(),salt,passwordHash:hashPassword(pass,salt),mustChange:true,status:initialStatus,createdTs:Date.now(),updatedTs:Date.now()});
+  users.push({username,name,role,factories:factories.slice(),salt,passwordHash:hashPassword(pass,salt),mustChange:true,updatedTs:Date.now()});
   settings.pending=(settings.pending||0)+1;
-  auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_create',target:username,detail:(initialStatus==='pending'?('注册待审核 · '):('新增账号 · '))+name+' · '+role});
-  saveState();renderAccounts();updateSyncUI();
-  toast(initialStatus==='pending'? (lang==='zh'?'账号已提交，待老板审核启用':'Submitted — pending boss approval') : (lang==='zh'?'账号已创建（初始密码需首次登录修改）':'Account created'));
+  auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_create',target:username,detail:lang==='zh'?'新增账号 · '+name+' · '+role:'new account · '+name+' · '+role});
+  saveState();renderAccounts();updateSyncUI();syncPush();
+  toast(lang==='zh'?'账号已创建（初始密码需首次登录修改）':'Account created');
   closeAcctModal();
 }
-
-/* —— 账号审批 / 禁用 / 启用（大厂级生命周期） —— */
-function accountAction(username, action, okMsg){
-  const u=users.find(x=>x.username===username);if(!u)return;
-  if(u.role==='boss'){toast(lang==='zh'?'不能操作老板账号':'Cannot modify boss');return;}
-  if(action==='disable'){ u.status='disabled'; u.updatedTs=Date.now(); if(currentUser&&currentUser.username===username) logout(); }
-  else if(action==='enable'){ u.status='active'; u.updatedTs=Date.now(); }
-  settings.pending=(settings.pending||0)+1;
-  auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_'+action,target:username,detail:okMsg});
-  saveState();renderAccounts();updateSyncUI();
-  toast(okMsg);
-}
-function approveAccount(username){ accountAction(username,'enable', lang==='zh'?'已启用账号':'Account enabled'); }
-function disableAccount(username){ accountAction(username,'disable', lang==='zh'?'已禁用账号':'Account disabled'); }
-function enableAccount(username){ accountAction(username,'enable', lang==='zh'?'已启用账号':'Account enabled'); }
 /* ===== 公告（老板/开发管理员可发布，首页置顶） ===== */
 function openAnnounceModal(){ const m=document.getElementById('ann-modal'); if(m)m.classList.remove('hidden'); const t=document.getElementById('ann-title'); if(t)t.value=''; const b=document.getElementById('ann-body'); if(b)b.value=''; }
 function closeAnnounceModal(){ const m=document.getElementById('ann-modal'); if(m)m.classList.add('hidden'); }
@@ -3793,13 +3852,13 @@ function renderAnnouncements(){
 function deleteAccount(username){
   if(!can('account.manage')){toast(lang==='zh'?'无账号管理权限（仅老板）':'No permission (boss only)');return;}
   const u=users.find(x=>x.username===username);if(!u)return;
-  if(u.role==='boss'){toast(lang==='zh'?'不能删除老板账号':'Cannot delete boss');return;}
+  if((u.role==='boss'||u.role==='devAdmin') && users.filter(x=>x.role===u.role).length<=1){toast(lang==='zh'?'不能删除最后一个'+(roleBadgeMap[u.role]?roleBadgeMap[u.role][lang]:u.role)+'账号':'Cannot delete the last '+u.role);return;}
   if(!confirm(lang==='zh'?`确认删除账号 ${username}？`:`Delete ${username}?`))return;
   users=users.filter(x=>x.username!==username);
   if(deletedUsers.indexOf(username)<0)deletedUsers.push(username);
   settings.pending=(settings.pending||0)+1;
   auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_delete',target:username,detail:lang==='zh'?'删除账号':'deleted account'});
-  saveState();renderAccounts();updateSyncUI();
+  saveState();renderAccounts();updateSyncUI();syncPush();
   toast(lang==='zh'?'账号已删除':'Account deleted');
 }
 function resetAllData(){
@@ -3809,7 +3868,8 @@ function resetAllData(){
   records.forEach(r=>addTomb(r.id, currentRole)); /* 全量归零也走墓碑，防止同步把旧数据拉回 */
   records=[];
   customers.forEach(c=>{c.kg=0;c.amt=0;c.last='';});
-  invAdjust={};
+  invAdjust={};invAdjustRaw={};invRawEdit={};invPelletEdit={};
+  invDeleted={raw:{},pellet:{}};
   settings.pending=0;
   auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_reset',target:'ALL',detail:lang==='zh'?'数据归零':'data reset'});
   saveState();refreshAfterSave();
@@ -3822,12 +3882,15 @@ function recomputeCustomerTotals(){
 }
 function resetSelectedData(cat){
   if(!can('data.reset')){toast(lang==='zh'?'无归零权限（仅老板）':'No reset permission (boss only)');return;}
-  const catName = cat==='ALL' ? (lang==='zh'?'全部业务数据':'all business data') : (t('ty_'+cat)||cat);
+  const catName = cat==='ALL' ? (lang==='zh'?'全部业务数据':'all business data') : (cat==='InvPellet' ? (lang==='zh'?'成品库存':'finished goods inventory') : (t('ty_'+cat)||cat));
   if(!confirm(lang==='zh'?`确认归零「${catName}」？此操作不可恢复。`:`Reset ${catName}? Cannot undo.`))return;
-  const removed = (cat==='ALL'?records.slice():records.filter(r=>r.ty===cat));
-  if(cat==='ALL'){ records=[]; customers.forEach(c=>{c.kg=0;c.amt=0;c.last='';}); invAdjust={}; }
-  else { records=records.filter(r=>r.ty!==cat); recomputeCustomerTotals(); }
-  removed.forEach(r=>addTomb(r.id, currentRole)); /* 分类删除也走墓碑，跨设备生效 */
+  if(cat==='InvPellet'){ invAdjust={}; invPelletEdit={}; invDeleted.pellet={}; }
+  else {
+    const removed = (cat==='ALL'?records.slice():records.filter(r=>r.ty===cat));
+    if(cat==='ALL'){ records=[]; customers.forEach(c=>{c.kg=0;c.amt=0;c.last='';}); invAdjust={};invAdjustRaw={}; invRawEdit={}; invPelletEdit={}; invDeleted={raw:{},pellet:{}}; }
+    else { records=records.filter(r=>r.ty!==cat); recomputeCustomerTotals(); }
+    removed.forEach(r=>addTomb(r.id, currentRole)); /* 分类删除也走墓碑，跨设备生效 */
+  }
   settings.pending=(settings.pending||0)+1;
   auditLog.unshift({time:nowHMS(),actor:opName(),action:'ac_reset',target:cat,detail:lang==='zh'?'分类归零 · '+catName:'reset · '+catName});
   saveState();refreshAfterSave();
@@ -3903,6 +3966,8 @@ function viewProduceDetail(id){
       <div class="field"><label data-i18n="acct_username">账号</label><input id="ac-user" placeholder="工号 / 手机号 / 任意标识"/></div>
       <div class="field"><label data-i18n="acct_name">姓名</label><input id="ac-name" placeholder="张三"/></div>
       <div class="field"><label data-i18n="acct_role">角色</label><select id="ac-role">
+        <option value="boss">老板</option>
+        <option value="devAdmin">开发管理员</option>
         <option value="factoryAdmin">工厂管理员</option>
         <option value="registrar">登记员</option>
         <option value="auditor">审计员</option>
