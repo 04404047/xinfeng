@@ -936,16 +936,22 @@
         <div id="tab-rate" class="panel hidden"><div class="panel-head"><h3 data-i18n="set_rate">汇率兑换（人民币 / 奈拉）</h3></div>
           <div class="panel-body">
             <div class="note mb" data-i18n="rate_tip">设置当前汇率后，收支登记将按此汇率自动换算展示；具备财务权限（老板 / 工厂管理员）即可修改。</div>
+            <div class="rate-current-box" style="margin:8px 0 14px;font-size:15px">
+              <span class="muted" data-i18n="rate_current">当前汇率</span>：<b id="rate-current">1 ¥ = 230 ₦</b>
+            </div>
             <div class="row" style="align-items:flex-end;gap:12px">
-              <div class="field" style="max-width:260px"><label data-i18n="fin_rate">1 人民币 CNY = ? 奈拉 NGN</label><input id="rate-input" type="number" min="0" step="0.01" oninput="rateChanged()"/></div>
+              <div class="field" style="max-width:260px"><label data-i18n="fin_rate">1 人民币 CNY = ? 奈拉 NGN</label><input id="rate-input" type="number" min="0" step="0.01" oninput="rateInputLive()"/></div>
               <button class="btn eco sm" onclick="saveRate()" data-i18n="lo_save">保存汇率</button>
             </div>
             <div class="mt" style="border-top:1px dashed #ddd;padding-top:12px">
               <div class="small muted mb" data-i18n="fin_fx">换算试算：输入金额，自动转换为另一种货币</div>
-              <div class="row" style="align-items:flex-end;gap:12px">
-                <div class="field" style="max-width:200px"><label data-i18n="fin_amount">金额</label><input id="fx-amt" type="number" min="0" step="0.01" placeholder="0.00" oninput="rateConvertPreview()"/></div>
-                <div class="field" style="max-width:160px"><label data-i18n="fin_cur">货币</label><select id="fx-cur" onchange="rateConvertPreview()"><option value="CNY">¥ CNY</option><option value="NGN">₦ NGN</option></select></div>
-                <div class="field" style="max-width:240px"><label data-i18n="fin_fx_equiv">等值</label><div id="fx-out" class="kv-out">—</div></div>
+              <div class="row" style="align-items:flex-end;gap:12px;flex-wrap:wrap">
+                <div class="field" style="max-width:200px"><label data-i18n="fin_cny2ngn">人民币 ¥ → 奈拉 ₦</label><input id="cny-amt" type="number" min="0" step="0.01" placeholder="0.00" oninput="rateConvert2()"/></div>
+                <div class="field" style="max-width:240px"><label data-i18n="fin_equiv">等值</label><div id="cny-out" class="kv-out">—</div></div>
+              </div>
+              <div class="row" style="align-items:flex-end;gap:12px;flex-wrap:wrap;margin-top:10px">
+                <div class="field" style="max-width:200px"><label data-i18n="fin_ngn2cny">奈拉 ₦ → 人民币 ¥</label><input id="ngn-amt" type="number" min="0" step="0.01" placeholder="0.00" oninput="rateConvert2()"/></div>
+                <div class="field" style="max-width:240px"><label data-i18n="fin_equiv">等值</label><div id="ngn-out" class="kv-out">—</div></div>
               </div>
             </div>
           </div></div>
@@ -1077,7 +1083,7 @@ const I18N = {
     hero_title:"回收作业台", hero_sub:"本厂以废旧塑料回收为核心，记录每日回收与同步状态", hero_cta:"＋ 新建回收单",
     d_crushed:"今日破碎料总量", d_bulk:"今日大料总量", d_sum:"两者之和", d_recamt:"今日回收金额", d_shiptoday:"今日配送量", d_click:"点击查看明细 →",
     d_ov_bulk:"本月大料采购量", d_ov_crushed:"本月破碎料采购量", d_ov_total:"本月合计采购量", d_ov_buyamt:"本月采购金额", d_ov_income:"累计进账", d_ov_expense:"累计支出", d_ov_balance:"当前余额", d_ov_produced:"本月生产颗粒(kg)", d_ov_sold:"本月出售颗粒(kg)", d_ov_shipw:"本月配送总厂(kg)", dash_home:"首页总览",
-    fin_cur:"货币", fin_rate:"1 人民币 CNY = ? 奈拉 NGN", fin_fx_equiv:"等值", fin_equiv:"折合", set_rate:"汇率兑换", rate_tip:"设置当前汇率后，收支登记将按此汇率自动换算展示；具备财务权限（老板 / 工厂管理员）即可修改。", fin_fx:"换算试算：输入金额，自动转换为另一种货币",
+    fin_cur:"货币", fin_rate:"1 人民币 CNY = ? 奈拉 NGN", fin_fx_equiv:"等值", fin_equiv:"折合", set_rate:"汇率兑换", rate_tip:"设置当前汇率后，收支登记将按此汇率自动换算展示；具备财务权限（老板 / 工厂管理员）即可修改。", fin_fx:"换算试算：输入金额，自动转换为另一种货币", rate_current:"当前汇率", fin_cny2ngn:"人民币 ¥ → 奈拉 ₦", fin_ngn2cny:"奈拉 ₦ → 人民币 ¥",
     acct_grant:"分配权限", ann_body:"公告内容", ann_del:"删除", ann_post:"📢 发布公告", ann_publish:"发布", ann_title:"公告标题", contact:"联系", rec_detail:"回收明细", reset_all:"全部业务数据", s_pick_note:"选择要配送的库存",
     d_trend_title:"近 7 日 回收 vs 出入（kg）", d_legend_rec:"回收", d_legend_ship:"配送", d_legend_ship_in:"入库", d_activity:"近期动态", d_inv_title:"各材质累计原料（kg，在库参考）",
     c_search:"搜索姓名 / 电话", c_new:"+ 新建客户", c_count:"家供货商",
@@ -1161,7 +1167,7 @@ const I18N = {
     hero_title:"Recovery Console", hero_sub:"This plant centres on plastic recovery — track daily recovery & dispatch", hero_cta:"＋ New Recovery",
     d_crushed:"Crushed today", d_bulk:"Bulk today", d_sum:"Bulk + Crushed", d_recamt:"Recovered amount today", d_shiptoday:"Dispatched today", d_click:"Click for detail →",
     d_ov_bulk:"Bulk purchased this month", d_ov_crushed:"Crushed purchased this month", d_ov_total:"Total purchased this month", d_ov_buyamt:"Purchase amount this month", d_ov_income:"Income (cum.)", d_ov_expense:"Expense (cum.)", d_ov_balance:"Balance", d_ov_produced:"Pellets produced this month (kg)", d_ov_sold:"Pellets sold this month (kg)", d_ov_shipw:"Shipped to HQ this month (kg)", dash_home:"Home Overview",
-    fin_cur:"Currency", fin_rate:"1 CNY = ? NGN", fin_fx_equiv:"Equivalent", fin_equiv:"Equiv.", set_rate:"Exchange Rate", rate_tip:"Set the current rate; finance entries auto-convert at this rate. Finance role (boss / factory admin) can edit.", fin_fx:"Conversion: enter an amount to auto-convert",
+    fin_cur:"Currency", fin_rate:"1 CNY = ? NGN", fin_fx_equiv:"Equivalent", fin_equiv:"Equiv.", set_rate:"Exchange Rate", rate_tip:"Set the current rate; finance entries auto-convert at this rate. Finance role (boss / factory admin) can edit.", fin_fx:"Conversion: enter an amount to auto-convert", rate_current:"Current rate", fin_cny2ngn:"CNY ¥ → NGN ₦", fin_ngn2cny:"NGN ₦ → CNY ¥",
     acct_grant:"Grant access", ann_body:"Content", ann_del:"Delete", ann_post:"📢 Post", ann_publish:"Publish", ann_title:"Title", contact:"Contact", rec_detail:"Detail", reset_all:"All business data", s_pick_note:"Pick stock to ship",
     d_trend_title:"Receiving vs outbound (last 7 days, kg)", d_legend_rec:"Receive", d_legend_ship:"Ship", d_legend_ship_in:"Inbound", d_activity:"Recent activity", d_inv_title:"Cumulative raw material by material (kg)",
     c_search:"Search name / phone", c_new:"+ New Customer", c_count:"suppliers",
@@ -3259,10 +3265,10 @@ function setPeriod(p,btn){
 function setTab(t,btn){document.querySelectorAll('#set-tabs button').forEach(b=>b.classList.toggle('active',b.dataset.t===t));document.querySelectorAll('#view-settings > .panel').forEach(p=>p.classList.toggle('hidden',p.id!=='tab-'+t));if(t==='sync')renderSyncConfig();if(t==='rate')renderRateTab();}
 
 /* ===== Settings / Sync ===== */
-function renderRateTab(){const inp=document.getElementById('rate-input');if(inp)inp.value=(settings.rate>0)?settings.rate:'';rateConvertPreview();}
-function rateChanged(){const out=document.getElementById('fx-out');if(out)out.textContent='';}
+function renderRateTab(){const inp=document.getElementById('rate-input');if(inp)inp.value=(settings.rate>0)?settings.rate:'';const cur=document.getElementById('rate-current');if(cur)cur.textContent='1 ¥ = '+(fxRate())+' ₦';rateConvert2();}
+function rateInputLive(){const cur=document.getElementById('rate-current');const v=parseFloat((document.getElementById('rate-input')||{}).value)||0;if(cur)cur.textContent=(v>0)?('1 ¥ = '+v+' ₦'):('1 ¥ = '+(fxRate())+' ₦');}
 function saveRate(){if(!can('finance.manage')){toast(lang==='zh'?'无汇率修改权限（需财务权限）':'No permission to edit rate');return;}const v=parseFloat(document.getElementById('rate-input').value)||0;if(v<=0){toast(lang==='zh'?'汇率需大于 0':'Rate must be > 0');return;}settings.rate=v;saveState();renderFinance();recomputeDashboard();renderRateTab();toast(lang==='zh'?'汇率已保存：1 CNY = '+v+' NGN':'Rate saved: 1 CNY = '+v+' NGN');}
-function rateConvertPreview(){const amt=parseFloat(document.getElementById('fx-amt').value)||0;const cur=document.getElementById('fx-cur')?document.getElementById('fx-cur').value:'CNY';const out=document.getElementById('fx-out');if(!out)return;if(amt<=0||fxRate()<=0){out.innerHTML='—';return;}out.innerHTML=fmtWithFx(amt,cur);}
+function rateConvert2(){const r=fxRate();const cny=parseFloat((document.getElementById('cny-amt')||{}).value)||0;const ngn=parseFloat((document.getElementById('ngn-amt')||{}).value)||0;const cnyOut=document.getElementById('cny-out');if(cnyOut)cnyOut.textContent=(cny>0&&r>0)?(fmtMoney(cny*r)+' ₦'):'—';const ngnOut=document.getElementById('ngn-out');if(ngnOut)ngnOut.textContent=(ngn>0&&r>0)?(fmtMoney(ngn/r)+' ¥'):'—';}
 function toggleBossTabs(){const rt=document.getElementById('set-tab-rate');if(rt)rt.style.display=can('finance.manage')?'':'none';}
 function updateRoleBadge(){
   const rb=roleBadgeMap[currentRole]?roleBadgeMap[currentRole][lang]:'';
