@@ -20,6 +20,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const zlib = require('zlib');
 
 const PORT = parseInt(process.env.PORT || '8787', 10);
 const HOST = process.env.HOST || '0.0.0.0';
@@ -28,6 +29,17 @@ const HOST = process.env.HOST || '0.0.0.0';
 const SYNC_KEY = process.env.SYNC_KEY || '';
 const DATA_FILE = process.env.SYNC_DATA_FILE || path.join(__dirname, 'sync-data.json');
 const APP_HTML = path.join(__dirname, '塑料回收收发货管理.html');
+const BACKUP_DIR = process.env.RF_BACKUP_DIR || path.join(path.dirname(DATA_FILE), 'backups');
+/* 静态文件白名单：默认不放行 .json/.env 等数据配置文件。
+   此前任何位于项目目录内的文件都能被 GET 下来——sync-data.json（整本账目 + 账号哈希）
+   就躺在同一目录，等于把账本挂在网上任人下载。 */
+/* 不放行 .js：前端是单文件内联 HTML，根目录不该有任何前端脚本，
+   白名单里留 .js 只会把 app-server.js 这类后端源码挂出去给人读。
+   若将来确需前端脚本，请放到 assets/ 子目录并在白名单里单独放开。 */
+const STATIC_EXT_OK = { '.html': 1, '.htm': 1, '.css': 1, '.ico': 1, '.png': 1, '.svg': 1, '.jpg': 1, '.jpeg': 1, '.webp': 1, '.woff2': 1 };
+const STATIC_DENY_NAMES = { 'sync-data.json': 1, 'package.json': 1, 'package-lock.json': 1, 'railway.json': 1, '.env': 1, '.gitignore': 1 };
+const MAX_BACKUP_BYTES = 64 * 1024 * 1024;
+const MAX_BACKUPS_PER_SOURCE = 24;
 
 /* ---------- 状态 ---------- */
 let ledger = {};        // id -> record
@@ -46,6 +58,9 @@ let invAdjustRaw = {};
 let invRawEdit = {};
 let invPelletEdit = {};
 let invDeleted = { raw: {}, pellet: {} };
+/* 汇率（1 CNY = ? NGN）：服务端权威，按 ts 做 LWW。
+   此前汇率只存在各设备本地 settings，同一笔账在不同机器上会算出不同金额。 */
+let fx = null; // {rate, ts, by, hist:[{rate,ts,by,prev}]}
 
 /* 墓碑归一化：兼容旧版 ['id1','id2'] 与新版 [{id,ts}] 两种格式，统一为对象数组 */
 function normTomb(arr) {
@@ -70,6 +85,7 @@ try {
     if (d.invRawEdit && typeof d.invRawEdit === 'object') invRawEdit = d.invRawEdit;
     if (d.invPelletEdit && typeof d.invPelletEdit === 'object') invPelletEdit = d.invPelletEdit;
     if (d.invDeleted && typeof d.invDeleted === 'object') invDeleted = { raw: (d.invDeleted.raw || {}), pellet: (d.invDeleted.pellet || {}) };
+    if (d.fx && typeof d.fx === 'object' && d.fx.rate > 0) fx = { rate: d.fx.rate, ts: d.fx.ts || 0, by: d.fx.by || '', hist: Array.isArray(d.fx.hist) ? d.fx.hist.slice(0, 50) : [] };
     console.log('[sync] 已载入本地账本：%d 条记录，%d 条删除墓碑；账号 %d；客户 %d；财务 %d',
       Object.keys(ledger).length, deleted.length, Object.keys(usersById).length, Object.keys(customersById).length, Object.keys(financesById).length);
   }
@@ -78,6 +94,19 @@ try {
 let saveTimer = null;
 /* 落盘脱敏：配置了 SYNC_KEY 时，用 AES-256-GCM（密钥由 SYNC_KEY 派生）加密磁盘文件，
    避免明文 JSON（含账号密码哈希）意外泄露；未配置密钥则明文存储并提示风险。 */
+function writeOnce(payload, done) {
+  const tmp = DATA_FILE + '.tmp.' + process.pid;
+  fs.writeFile(tmp, payload, (err) => {
+    if (err) { try { fs.unlinkSync(tmp); } catch (e) {} return done(err); }
+    fs.rename(tmp, DATA_FILE, (e2) => {
+      if (e2) { try { fs.unlinkSync(tmp); } catch (e) {} return done(e2); }
+      done(null);
+    });
+  });
+}
+let persistFailures = 0;      // 连续落盘失败次数
+let lastPersistError = null;  // 最近一次失败原因（由 /sync/health 上报，便于发现静默丢数据）
+const PERSIST_MAX_ATTEMPTS = 3;
 function deriveKey() {
   if (!SYNC_KEY) return null;
   return crypto.scryptSync(SYNC_KEY, 'recycleflow-sync-v1', 32);
@@ -109,20 +138,53 @@ function persist() {
   if (saveTimer) return;
   saveTimer = setTimeout(() => {
     saveTimer = null;
-    const plain = JSON.stringify({ ledger, deleted, usersById, customersById, deletedUsers, deletedCustomers, financesById, deletedFinances, invAdjust, invAdjustRaw, invRawEdit, invPelletEdit, invDeleted }, null, 0);
+    const plain = JSON.stringify({ ledger, deleted, usersById, customersById, deletedUsers, deletedCustomers, financesById, deletedFinances, fx, invAdjust, invAdjustRaw, invRawEdit, invPelletEdit, invDeleted }, null, 0);
     const packed = encryptData(plain);
-    const tmp = DATA_FILE + '.tmp';
-    /* 先写临时文件再原子 rename，避免进程崩溃/断电时损坏数据文件 */
-    fs.writeFile(tmp, packed.enc ? ('ENC:' + packed.data) : plain, (err) => {
-      if (err) { console.warn('[sync] 写入失败：', err.message); return; }
-      fs.rename(tmp, DATA_FILE, (e2) => { if (e2) console.warn('[sync] 重命名失败：', e2.message); });
-    });
+    const payload = packed.enc ? ('ENC:' + packed.data) : plain;
+    /* 落盘失败必须重试并留痕：只 warn 一次会造成「业务显示成功、重启后数据没了」的静默丢失 */
+    const attempt = (n) => {
+      writeOnce(payload, (err) => {
+        if (!err) {
+          if (persistFailures) console.warn('[sync] 落盘已恢复（此前连续失败 %d 次）', persistFailures);
+          persistFailures = 0; lastPersistError = null;
+          return;
+        }
+        persistFailures++;
+        lastPersistError = err.message;
+        console.error('[sync] 落盘失败（第 %d/%d 次）：%s', n, PERSIST_MAX_ATTEMPTS, err.message);
+        if (n < PERSIST_MAX_ATTEMPTS) setTimeout(() => attempt(n + 1), 200 * Math.pow(2, n - 1));
+        else console.error('[sync][严重] 连续 %d 次落盘失败，内存中的数据有丢失风险，请检查磁盘权限/空间：%s', PERSIST_MAX_ATTEMPTS, err.message);
+      });
+    };
+    attempt(1);
   }, 300);
 }
 
 /* ---------- 工具 ---------- */
 /* CORS 限源：仅允许与服务器同 Host 的来源（即由本服务器托管的页面），
    阻断任意第三方网站跨站读取/写入同步数据；可用 SYNC_CORS_ORIGIN 显式放行额外源。 */
+const SECURITY_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'Referrer-Policy': 'no-referrer',
+  'Cross-Origin-Opener-Policy': 'same-origin',
+  'Content-Security-Policy': [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline'",
+    // 页面仍有大量字面量 onclick（参数均为常量，不含用户数据）。
+    // CSP 的 'unsafe-inline' 只覆盖 <script> 块、不覆盖事件属性，不显式放行会让这些按钮全部失效。
+    "script-src-attr 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob:",
+    // 保留 http/https/ws：现场可能把同步服务器指向局域网 IP
+    "connect-src 'self' http: https: ws: wss:",
+    "font-src 'self' data:",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'"
+  ].join('; ')
+};
 function originAllowed(req) {
   const origin = req.headers.origin;
   if (!origin) return null;
@@ -147,14 +209,19 @@ function sendJSON(res, code, obj, req) {
   headers['Access-Control-Allow-Origin'] = origin || 'null';
   headers['Access-Control-Allow-Headers'] = 'Content-Type, X-Api-Key';
   headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
+  Object.assign(headers, SECURITY_HEADERS);
   res.writeHead(code, headers);
   res.end(body);
 }
 function authOk(req) {
-  // 未配置密钥时为免鉴权模式（同源一体化部署默认），配置后必须密钥匹配
-  if (!SYNC_KEY) return true;
-  const k = req.headers['x-api-key'];
-  return typeof k === 'string' && k === SYNC_KEY;
+  if (SYNC_KEY) {
+    const k = req.headers['x-api-key'];
+    return typeof k === 'string' && k === SYNC_KEY;
+  }
+  // 未配密钥时退化为「仅放行同源页面」：CORS 只挡浏览器，挡不住 curl，
+  // 但至少不再是完全裸奔；公网部署必须设 SYNC_KEY。
+  if (process.env.RF_ALLOW_NO_ORIGIN === '1') return true;
+  return !!originAllowed(req);
 }
 function readBody(req) {
   return new Promise((resolve, reject) => {
@@ -172,6 +239,7 @@ const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; cha
 function mergeRecord(rec) {
   if (!rec || rec.id == null) return;
   if (deleted.some(t => t.id === rec.id)) return; // 墓碑中的记录永不复活
+  rec._srv = Date.now(); // 服务端接收时间戳：增量拉取基线（与 serverTime 同钟，避免客户端时钟偏差导致漏拉）
   const cur = ledger[rec.id];
   const ts = rec.ts || 0, rev = rec.rev || 0;
   const cts = cur ? (cur.ts || 0) : -1, crev = cur ? (cur.rev || 0) : -1;
@@ -183,6 +251,7 @@ function mergeRecord(rec) {
 function mergeUser(u) {
   if (!u || u.username == null) return;
   if (deletedUsers.some(t => t.id === u.username)) return;
+  u._srv = Date.now();
   const cur = usersById[u.username];
   if (!cur || (u.updatedTs || 0) > (cur.updatedTs || 0)) usersById[u.username] = u;
 }
@@ -190,6 +259,7 @@ function mergeUser(u) {
 function mergeCustomer(c) {
   if (!c || c.id == null) return;
   if (deletedCustomers.some(t => t.id === c.id)) return;
+  c._srv = Date.now();
   const cur = customersById[c.id];
   if (!cur || (c.updatedTs || 0) > (cur.updatedTs || 0)) customersById[c.id] = c;
 }
@@ -197,6 +267,7 @@ function mergeCustomer(c) {
 function mergeFinance(f) {
   if (!f || f.id == null) return;
   if (deletedFinances.some(t => t.id === f.id)) return;
+  f._srv = Date.now();
   const cur = financesById[f.id];
   if (!cur || (f.ts || 0) > (cur.ts || 0)) financesById[f.id] = f;
 }
@@ -210,6 +281,22 @@ function mergeInv(target, src, kind) {
   });
 }
 
+/* ---------- 云端备份（本副本无账号体系，按来源 IP 归档） ---------- */
+function ensureBackupDir() {
+  try { if (!fs.existsSync(BACKUP_DIR)) fs.mkdirSync(BACKUP_DIR, { recursive: true }); return true; }
+  catch (e) { console.error('[backup] 目录不可用：', e.message); return false; }
+}
+function clientTag(req) {
+  const ip = ((req.headers['x-forwarded-for'] || '').split(',')[0] || req.socket.remoteAddress || 'local').trim();
+  return ip.replace(/[^A-Za-z0-9._-]/g, '_').slice(0, 40) + '__';
+}
+function pruneBackups(tag) {
+  try {
+    const mine = fs.readdirSync(BACKUP_DIR).filter(f => f.indexOf(tag) === 0).sort();
+    while (mine.length > MAX_BACKUPS_PER_SOURCE) { try { fs.unlinkSync(path.join(BACKUP_DIR, mine.shift())); } catch (e) {} }
+  } catch (e) {}
+}
+
 /* ---------- 路由 ---------- */
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
@@ -220,7 +307,11 @@ const server = http.createServer(async (req, res) => {
 
   // 健康检查（无需鉴权，供前端同源探测自动启用同步）
   if (p === '/sync/health' && req.method === 'GET') {
-    sendJSON(res, 200, { ok: true, count: Object.keys(ledger).length, key: !!SYNC_KEY }, req);
+    sendJSON(res, 200, {
+      ok: true, count: Object.keys(ledger).length, key: !!SYNC_KEY,
+      persistFailures, persistError: lastPersistError,
+      backupsDir: BACKUP_DIR
+    }, req);
     return;
   }
 
@@ -229,15 +320,23 @@ const server = http.createServer(async (req, res) => {
     if (!authOk(req)) { sendJSON(res, 401, { ok: false, error: 'unauthorized' }, req); return; }
     let body;
     try { body = await readBody(req); } catch (e) { sendJSON(res, 400, { ok: false, error: 'bad json' }, req); return; }
-    const recs = Array.isArray(body.records) ? body.records : [];
-    recs.forEach(mergeRecord);
     const del = Array.isArray(body.deleted) ? body.deleted : [];
     const now = Date.now();
+    /* 先落墓碑再合并记录：同一批次里「记录 + 它的删除墓碑」同时到达时，记录根本进不去。
+       旧版顺序相反，若中途抛异常或记录 id 与墓碑 id 类型不一致，就会把已删记录重新写回 ledger。 */
     del.forEach(id => {
       if (id == null) return;
       delete ledger[id];
       if (deleted.findIndex(t => t.id === id) < 0) deleted.push({ id, ts: now });
     });
+    (Array.isArray(body.records) ? body.records : []).forEach(mergeRecord);
+    /* 汇率：按 ts 做 LWW，谁最新听谁的（通常由老板账号写入） */
+    if (body.fx && typeof body.fx === 'object' && body.fx.rate > 0) {
+      const incTs = body.fx.ts || 0;
+      if (!fx || incTs > (fx.ts || 0)) {
+        fx = { rate: body.fx.rate, ts: incTs || now, by: body.fx.by || '', hist: Array.isArray(body.fx.hist) ? body.fx.hist.slice(0, 50) : (fx && fx.hist ? fx.hist : []) };
+      }
+    }
     // 账号同步
     (Array.isArray(body.users) ? body.users : []).forEach(mergeUser);
     (Array.isArray(body.deletedUsers) ? body.deletedUsers : []).forEach(un => {
@@ -289,16 +388,48 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // 云端备份：上传整份本地快照（POST）/ 列出历史（GET）
+  if (p === '/sync/backup' && req.method === 'POST') {
+    if (!authOk(req)) { sendJSON(res, 401, { ok: false, error: 'unauthorized' }, req); return; }
+    let b; try { b = await readBody(req); } catch (e) { sendJSON(res, 400, { ok: false, error: 'bad json' }, req); return; }
+    let payload;
+    try { payload = JSON.stringify(b); } catch (e) { sendJSON(res, 400, { ok: false, error: 'bad payload' }, req); return; }
+    const size = Buffer.byteLength(payload);
+    if (size > MAX_BACKUP_BYTES) { sendJSON(res, 413, { ok: false, error: 'too_large', maxBytes: MAX_BACKUP_BYTES }, req); return; }
+    if (!ensureBackupDir()) { sendJSON(res, 500, { ok: false, error: 'backup_dir_unavailable' }, req); return; }
+    const d = new Date(), pad = n => String(n).padStart(2, '0');
+    const name = clientTag(req) + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds()) + '.json';
+    fs.writeFile(path.join(BACKUP_DIR, name), payload, 'utf8', (err) => {
+      if (err) { console.error('[backup] 写入失败：', err.message); sendJSON(res, 500, { ok: false, error: 'write_failed' }, req); return; }
+      pruneBackups(clientTag(req));
+      sendJSON(res, 200, { ok: true, name, size }, req);
+    });
+    return;
+  }
+  if (p === '/sync/backup' && req.method === 'GET') {
+    if (!authOk(req)) { sendJSON(res, 401, { ok: false, error: 'unauthorized' }, req); return; }
+    let list = [];
+    try {
+      list = fs.readdirSync(BACKUP_DIR).filter(f => /^[A-Za-z0-9._-]+__\d{8}-\d{6}\.json$/.test(f))
+        .sort().reverse().slice(0, 50)
+        .map(f => { let st; try { st = fs.statSync(path.join(BACKUP_DIR, f)); } catch (e) { return null; }
+          return { name: f, size: st.size, time: new Date(st.mtimeMs).toISOString() }; }).filter(Boolean);
+    } catch (e) {}
+    sendJSON(res, 200, { ok: true, backups: list }, req);
+    return;
+  }
+
   // 拉取（增量：since 之后的变更才返回，避免数据增长后每次全量下发）
   if (p === '/sync/pull' && req.method === 'GET') {
     if (!authOk(req)) { sendJSON(res, 401, { ok: false, error: 'unauthorized' }, req); return; }
     let since = parseInt(url.searchParams.get('since') || '0', 10);
     if (!(since > 0)) since = 0;
     const srvTime = Date.now();
-    const incRecords = Object.values(ledger).filter(r => (r.ts || 0) > since);
-    const incUsers = Object.values(usersById).filter(u => (u.updatedTs || 0) > since);
-    const incCustomers = Object.values(customersById).filter(c => (c.updatedTs || 0) > since);
-    const incFinances = Object.values(financesById).filter(f => (f.ts || 0) > since);
+    // 增量基线用服务端接收时间戳 _srv（与 since=serverTime 同钟）；旧数据缺 _srv 时回退 srvTime 保证全量包含
+    const incRecords = Object.values(ledger).filter(r => (r._srv || srvTime) > since);
+    const incUsers = Object.values(usersById).filter(u => (u._srv || srvTime) > since);
+    const incCustomers = Object.values(customersById).filter(c => (c._srv || srvTime) > since);
+    const incFinances = Object.values(financesById).filter(f => (f._srv || srvTime) > since);
     // 墓碑：仅返回删除时间晚于 since 的（首次 since=0 全量下发，保证历史清理一致）
     const incDeleted = deleted.filter(t => t.ts > since).map(t => t.id);
     const incDelUsers = deletedUsers.filter(t => t.ts > since).map(t => t.id);
@@ -320,7 +451,8 @@ const server = http.createServer(async (req, res) => {
       invAdjustRaw: invAdjustRaw,
       invRawEdit: invRawEdit,
       invPelletEdit: invPelletEdit,
-      invDeleted: invDeleted
+      invDeleted: invDeleted,
+      fx: fx
     }, req);
     return;
   }
@@ -333,8 +465,15 @@ const server = http.createServer(async (req, res) => {
   }
   // 其它静态文件（可选）
   if (req.method === 'GET') {
-    const cand = path.join(__dirname, path.normalize(p).replace(/^(\.\.[/\\])+/, ''));
-    if (cand.startsWith(__dirname) && fs.existsSync(cand) && fs.statSync(cand).isFile()) {
+    const cand = path.resolve(__dirname, '.' + path.normalize(p).replace(/^(\.\.[/\\])+/, ''));
+    /* 目录穿越双重校验：只用 startsWith(__dirname) 会被 /app-secrets 这类「同前缀不同目录」绕过，
+       必须改为「规范化后的相对路径既不以 .. 开头、也不是绝对路径」才算在根目录内。 */
+    const rel = path.relative(__dirname, cand);
+    const inRoot = !!rel && !rel.startsWith('..') && !path.isAbsolute(rel);
+    const ext = path.extname(cand).toLowerCase();
+    const base = path.basename(cand).toLowerCase();
+    const allowed = inRoot && !!STATIC_EXT_OK[ext] && !STATIC_DENY_NAMES[base];
+    if (allowed && fs.existsSync(cand) && fs.statSync(cand).isFile()) {
       serveFile(res, cand, req);
       return;
     }
@@ -343,31 +482,56 @@ const server = http.createServer(async (req, res) => {
   sendJSON(res, 404, { ok: false, error: 'not found' }, req);
 });
 
+/* 400KB 的 index.html 每次请求都 gzip 一遍会白白烧 CPU，缓存后只有首访与更新后各压一次 */
+const gzipCache = new Map(); // file -> {key, buf}  key 为内容级 ETag（html/js/css）或 mtimeMs-size（其它）
+function writeFileBody(res, file, ext, data, headers, req, cacheKey) {
+  const compressible = ext === '.html' || ext === '.js' || ext === '.css' || ext === '.json' || ext === '.svg';
+  const acceptGzip = compressible && data.length > 1024 && /gzip/i.test(req.headers['accept-encoding'] || '');
+  if (!acceptGzip) { res.writeHead(200, headers); res.end(data); return; }
+  const cached = gzipCache.get(file);
+  if (cached && cached.key === cacheKey) {
+    headers['Content-Encoding'] = 'gzip';
+    headers['Content-Length'] = cached.buf.length;
+    res.writeHead(200, headers);
+    res.end(cached.buf);
+    return;
+  }
+  zlib.gzip(data, (gzErr, gz) => {
+    if (gzErr) { res.writeHead(200, headers); res.end(data); return; }
+    gzipCache.set(file, { key: cacheKey, buf: gz });
+    headers['Content-Encoding'] = 'gzip';
+    headers['Content-Length'] = gz.length;
+    res.writeHead(200, headers);
+    res.end(gz);
+  });
+}
+
 function serveFile(res, file, req) {
-  fs.stat(file, (err, st) => {
+  /* 先读字节再判缓存：ETag 由真实内容算出，杜绝 stat/read 两次系统调用之间的错配 */
+  fs.readFile(file, (err, data) => {
     if (err) { sendJSON(res, 404, { ok: false, error: 'file not found' }, req); return; }
     const ext = path.extname(file).toLowerCase();
-    const headers = { 'Content-Type': MIME[ext] || 'application/octet-stream' };
-    // SPA 外壳（html/js/css）禁止强缓存：每次请求都向服务器校验；
-    // 重新部署后文件 mtime 变化即返回最新内容，用户无需手动清浏览器缓存。
+    const headers = { 'Content-Type': MIME[ext] || 'application/octet-stream', 'Vary': 'Accept-Encoding' };
+    Object.assign(headers, SECURITY_HEADERS);
     if (ext === '.html' || ext === '.js' || ext === '.css') {
+      /* SPA 外壳禁止强缓存，每次都回源校验。
+         校验器用内容级强 ETag（sha1 + 字节长度）而不是 Last-Modified：
+         Last-Modified 只有秒精度，重新部署若落在同一秒会被误判为未变更而回 304，
+         用户就会看到"部署了新文件但页面还是旧的"。内容级 ETag 只要字节变了就一定不等。 */
       headers['Cache-Control'] = 'no-cache';
-      headers['Last-Modified'] = st.mtime.toUTCString();
-      const inmMs = req.headers['if-modified-since'] ? Date.parse(req.headers['if-modified-since']) : NaN;
-      // 以秒为粒度比较（Last-Modified/If-Modified-Since 仅秒精度）：未变化则回 304，已重新部署（mtime 进入新秒）则回 200 最新内容
-      if (!isNaN(inmMs) && Math.floor(inmMs / 1000) >= Math.floor(st.mtimeMs / 1000)) {
-        res.writeHead(304, headers);
-        res.end();
-        return;
-      }
-    } else {
-      // 图片等静态资源可短期缓存（内容通常不随部署变化）
-      headers['Cache-Control'] = 'public, max-age=86400';
+      const etag = '"' + crypto.createHash('sha1').update(data).digest('hex').slice(0, 27) + '-' + data.length.toString(16) + '"';
+      headers['ETag'] = etag;
+      if (req.headers['if-none-match'] === etag) { res.writeHead(304, headers); res.end(); return; }
+      fs.stat(file, (e3, st) => {
+        if (!e3) headers['Last-Modified'] = st.mtime.toUTCString();
+        writeFileBody(res, file, ext, data, headers, req, etag);
+      });
+      return;
     }
-    fs.readFile(file, (e2, data) => {
-      if (e2) { sendJSON(res, 404, { ok: false, error: 'file not found' }, req); return; }
-      res.writeHead(200, headers);
-      res.end(data);
+    /* 图片等静态资源内容通常不随部署变化，可短期强缓存 */
+    headers['Cache-Control'] = 'public, max-age=86400';
+    fs.stat(file, (e3, st) => {
+      writeFileBody(res, file, ext, data, headers, req, e3 ? ('nos-' + data.length) : (st.mtimeMs + '-' + st.size));
     });
   });
 }
@@ -375,6 +539,10 @@ function serveFile(res, file, req) {
 server.listen(PORT, HOST, () => {
   console.log('[app] 一体化部署服务器已启动: http://%s:%d', HOST, PORT);
   console.log('[app] 前端: 打开上方地址即可使用（同源自动启用多厂同步）');
-  console.log('[sync] API Key: %s', SYNC_KEY);
+  // 关键：不要把 SYNC_KEY 本身打进日志——平台日志面板对团队成员可见，打印等于泄露密钥
+  console.log('[sync] API Key: %s', SYNC_KEY ? ('已配置（长度 ' + SYNC_KEY.length + '）') : '未配置（写接口仅放行同源请求）');
+  if (!SYNC_KEY) console.warn('[sync][建议] 公网/多机部署请设置 SYNC_KEY 强密钥；若确需回退宽松模式请设 RF_ALLOW_NO_ORIGIN=1，但账本将不受保护');
+  console.log('[sync] 数据文件: %s', DATA_FILE);
+  console.log('[sync] 备份目录: %s', BACKUP_DIR);
   console.log('[sync] 多厂区可访问 http://<本机局域网IP>:%d 进行联网', PORT);
 });
